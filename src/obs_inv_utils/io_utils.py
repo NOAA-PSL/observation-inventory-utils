@@ -14,3 +14,11 @@ def show_aws_region():
     """
     print(f'aws default region: {creds.AWS_DEFAULT_REGION}')
     return creds.AWS_DEFAULT_REGION
+
+
+def show_aws_access_key_id():
+    """
+    This function will show and return the configured aws default region
+    """
+    print(f'aws default region: {creds.AWS_DEFAULT_REGION}')
+    return creds.AWS_ACCESS_KEY_ID
