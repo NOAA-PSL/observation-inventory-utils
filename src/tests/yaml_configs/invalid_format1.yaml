@@ -1,0 +1,10 @@
+,{
+  "string": "json_format",
+  "value": 2,
+  "list": [5, 8, 90.0],
+  "dict": {
+    "key1": "hello",
+    "key2": true,
+    "key3": 25.3
+  }
+}
