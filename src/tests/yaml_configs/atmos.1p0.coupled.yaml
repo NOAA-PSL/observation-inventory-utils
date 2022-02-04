@@ -1,0 +1,79 @@
+#----
+
+# Atmosphere model general settings.
+atmos_general:
+     calendar: 2
+     restart_freq_seconds: 10800
+     coupler_file_prefix: ufs.s2s.cpl.r
+     deterministic:
+          dt_atmos: 900
+          coupling_interval_sec: 900
+          fv3_nml_params:
+               n_sponge: 10
+               ccpp_suite: FV3_GFS_v15p2_coupled
+               tau: 10.0
+               d2_bg_k1: 0.15
+               d2_bg_k2: 0.04
+               k_split: 1
+               n_split: 6
+               dnats: 1
+               hord_mt: 5
+               hord_vt: 5
+               hord_tm: 5
+               hord_dp: -5
+               hord_tr: 8
+               ncld: 5
+               imp_physics: 11
+               launch_level: 27
+               do_sat_adj: True
+               funky_bool: False
+     ensemble:
+          do_iau: True
+          do_stochy: True
+          niter: 1
+          dt_atmos: 900
+          coupling_interval_sec: 900
+          fv3_nml_params:
+               n_sponge: 10
+               ccpp_suite: FV3_GFS_v15p2_coupled
+               tau: 10.0
+               d2_bg_k1: 0.15
+               d2_bg_k2: 0.04
+               k_split: 1
+               n_split: 6
+               dnats: 1
+               hord_mt: 5
+               hord_vt: 5
+               hord_tm: 5
+               hord_dp: -5
+               hord_tr: 8
+               ncld: 5
+               imp_physics: 11
+               launch_level: 27
+               do_sat_adj: True               
+          
+#----
+
+atmos_grid:
+     scrub: True
+     nlevs: 64
+     deterministic:
+          resolution: C96
+     ensemble:
+          resolution: C96
+
+#----
+
+atmos_ics:
+     scrub: True
+     file_type: nemsio
+     nemsio:
+          tracers_input: spfh, clwmr, o3mr, icmr, rwmr, snmr, grle
+          cntrl_sfc_filename: bfg_%Y%m%d%H_fhr00_control
+     restart:
+          tracer_inputs: sphum, liq_wat, o3mr, ice_wat, rainwat, snowwat, graupel
+     deterministic:
+          resolution: C768
+     ensemble:
+          resolution: C384
+     tracers: sphum, liq_wat, o3mr, ice_wat, rainwat, snowwat, graupel

@@ -1,0 +1,17 @@
+date_range:
+  foo: bar
+  biz: bash
+search_info:
+  -
+    platform: hera_hpss
+    key: /3year/NCEPDEV/GEFSRR/GDAS_OBS/convbufr.nr/OP_BUFR/%Y/gdas.%Y%m%d_convbufr.nr.tar
+  -
+    platform: hera_hpss
+    key: /3year/NCEPDEV/GEFSRR/GDAS_OBS/grib/OP_BUFR/%Y/gdas.%Y%m%d_grib.tar
+  -
+    platform: hera_hpss
+    key: /3year/NCEPDEV/GEFSRR/GDAS_OBS/satbufr/OP_BUFR/%Y/gdas.%Y%m%d__satbufr.tar
+  -
+    platform: hera_hpss
+    key: /3year/NCEPDEV/GEFSRR/GDAS_OBS/satbufr/OP_BUFR/%Y/gdas.%Y%m%d__satbufr.tar
+

@@ -1,1 +1,1 @@
-from .obs_inv_utils import cli
+from .obs_inv_cli import cli
