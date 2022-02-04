@@ -6,12 +6,12 @@ Collection of methods to facilitate file/object retrieval
 
 """
 import os
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
-# load_dotenv will look for a .env file at the top dir and will
-# load the environment variables from that file
+# load private credentials from environment variables that were sourced from
+# the file .env_rc .  It would be a lot easier to use the dotenv module
 
-load_dotenv()
+#load_dotenv()
 
 # load private credentials
 AWS_ACCESS_KEY_ID = os.getenv("aws_access_key_id")
