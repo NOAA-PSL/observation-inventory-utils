@@ -3,6 +3,7 @@ import os
 import re
 from collections import namedtuple, OrderedDict
 import subprocess
+from datetime import datetime
 
 nl = '\n'
 
@@ -11,21 +12,43 @@ HpssCommand = namedtuple(
     [
         'command',
         'arg_validator',
-        'output_handler',
-        'error_handler'
+        'output_parser'
     ],
 )
 
-HpssCommandResponse = namedtuple(
-    'HpssCommandResponse',
+HpssCommandRawResponse = namedtuple(
+    'HpssCommandRawResponse',
     [
         'command',
         'return_code',
-        'error_msg',
-        'output_msg',
+        'error',
+        'output',
         'success'
     ],
 )
+
+
+HpssFileInfo = namedtuple(
+    'HpssFileInfo',
+    [
+        'name',
+        'permissions',
+        'time',
+        'size'
+    ]
+)
+
+
+HpssTarballContents = namedtuple(
+    'HpssParsedTarballContents',
+    [
+        'parent_dir',
+        'expected_count',
+        'files'
+    ]
+)
+
+EXPECTED_COMPONENTS_HTAR_TVF_FILE_OBJ = 7
 
 
 def inspect_tarball_args_valid(args):
@@ -52,44 +75,54 @@ def inspect_tarball_args_valid(args):
     return True
 
 
-def hpss_htar_error_handler(return_code, cmd, out, err):
-    print(f'{nl}{nl}In hpss_htar_error_handler, cmd: {cmd}, return_code: {return_code}{nl}{nl}')
-    print(f'In hpss_htar_error_handler, error: {err}, output: {out}')
-    # we might want to handle errors in a specific way here or repackage
-    # the output depending on our needs
-    if not isinstance(out, list):
-        raise ValueError('Expecting command output to be a list: out: {out}')
-    return HpssCommandResponse(
-        cmd,
-        return_code,
-        err,
-        out[0],
-        False
-    )
+def hpss_inspect_tarball_parser(response):
+    if not isinstance(response, HpssCommandRawResponse):
+        msg = f'Response needs to be an instance type HpssCommandRawResponse.'\
+              f'Received type: {type(response)}'
+        raise TypeError(msg)
 
+    try:
+        output = response.output.rsplit('\n')
+    except Exception as e:
+        raise ValueError('Problem parsing response.output. Error: {e}')
 
-def hpss_htar_output_handler(return_code, cmd, out, err):
-    print(f'cmd: {cmd}, return_code: {return_code}')
-    print(f'error: {err}, output: {out}')
-    return HpssCommandResponse(
-        cmd,
-        return_code,
-        err,
-        out,
-        True
-    )
+    expected_count = 0
+    parent_dir = ''
+    files = []
+    for output_line in output:
+        print(f'out_line: {output_line}')
+        components = output_line.split()
+        if len(components) < EXPECTED_COMPONENTS_HTAR_TVF_FILE_OBJ:
+            continue
+        if components[1] == 'Listing':
+            parent_dir = components[4].replace(',','')
+            expected_count = int(components[5])
+            continue
+
+        permissions = components[1]
+        size = int(components[3])
+        date_str = components[4]
+        time_str = components[5]
+        filetime_str = f'{date_str}T{time_str}:00Z'
+        try:
+            file_datetime = datetime.strptime(filetime_str, '%Y-%m-%dT%H:%M:00Z')
+        except Exception as e:
+            msg = 'Problem parsing file timestamp: {filetime_str}, error: {e}'
+            raise ValueError(msg)
+
+        fn = components[6]
+        files.append(HpssFileInfo(fn, permissions, file_datetime, size))
+
+    return HpssTarballContents(parent_dir, expected_count, files)
 
 
 hpss_cmds = {
     'INSPECT_TARBALL': HpssCommand(
         ['htar', '-tvf'],
         inspect_tarball_args_valid,
-        hpss_htar_output_handler,
-        hpss_htar_error_handler
+        hpss_inspect_tarball_parser,
     )
 }
-
-print(f'in hpss_command_handler: hpss_cmds: {hpss_cmds}')
 
 
 def is_valid_hpss_cmd(instance, attribute, value):
@@ -108,6 +141,7 @@ class HpssCommandHandler(object):
     args = attr.ib(default=attr.Factory(list))
     hpss_cmd_obj = attr.ib(init=False)
     hpss_cmd_line = attr.ib(init=False)
+    raw_resp = attr.ib(default=None)
 
     def __attrs_post_init__(self):
         self.hpss_cmd_obj = hpss_cmds[self.command]
@@ -140,17 +174,28 @@ class HpssCommandHandler(object):
             msg = f'Error after sending command {cmd_str}, error: {e}.'
             raise ValueError(msg)
 
-        err_decoded = err.decode('utf-8').rsplit('\n')
-        out_decoded = out.decode('utf-8').rsplit('\n')
-        for line in out_decoded:
-            print(f'output line: {line}')
+        self.raw_resp = HpssCommandRawResponse(
+            self.hpss_cmd_line,
+            proc.returncode,
+            err.decode('utf-8'),
+            out.decode('utf-8'),
+            (proc.returncode == 0)
+        )
 
-        for line in err_decoded:
-            print(f'error line: {line}')
-
+        print(f'raw_resp: {self.raw_resp}')
+        
         if proc.returncode != 0:
-            return self.hpss_cmd_obj.error_handler(
-                proc.returncode, self.hpss_cmd_line, out_decoded, err_decoded)
+            return False
+        else:
+            return True
 
-        return self.hpss_cmd_obj.output_handler(
-            proc.returncode, self.hpss_cmd_line, out_decoded, err_decoded)
+
+    def get_raw_response(self):
+        return self.raw_resp
+
+
+    def parse_response(self):
+        if self.raw_resp is not None:
+            return self.hpss_cmd_obj.output_parser(self.raw_resp)
+        else:
+            return None
