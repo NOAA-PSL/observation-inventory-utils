@@ -1,33 +1,15 @@
 import attr
+from copy import deepcopy
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
 import re
 from obs_inv_utils import yaml_utils
 from obs_inv_utils import obs_storage_platforms
+from obs_inv_utils import time_utils
+from obs_inv_utils.time_utils import DateRange
 
-DEFAULT_START_TIME = datetime(year=1990, month=1, day=1)
-DEFAULT_END_TIME = datetime.utcnow()
-DEFAULT_DATE_STR = '%Y%m%dT%H%M%SZ'
-DEFAULT_OBS_CYCLE_INTERVALS = [0, 21600, 43200, 64800]
-
-DEFAULT_DATE_RANGE_CONFIG = {
-    'datestr': DEFAULT_DATE_STR,
-    'end': DEFAULT_END_TIME,
-    'start': DEFAULT_START_TIME
-}
-
-
-def get_datetime_str(value, format_str):
-    try:
-        formatted_datetime =  datetime.strptime(value, format_str)
-    except Exception as e:
-        msg = f'Invalid time: {value} or format_str: {format_str}' \
-              f', error: {e}'
-        raise ValueError(msg) 
-
-    return formatted_datetime
-
+SEARCH_PATH_KEY = 'key'
 
 def is_valid_readable_file(instance, attribute, value):
     """
@@ -62,59 +44,7 @@ def is_valid_readable_file(instance, attribute, value):
         raise ValueError(
             f'Insufficient permissions on file "{value}" - {permissions}.'
         )
-    
-    return True
 
-
-def set_datetime(time_str, format_str):
-    try:
-        time = datetime.strptime(time_str, format_str)
-    except Exception as e:
-        print(f'Invalid time str: {time_str} or format string: {format_str}. {e}')
-        return None
-
-    return time
-
-
-# def is_valid_cycle_intervals(instance, attribute, values):
-#    if not isinstance(value, list):
-#        print(f'Attribute must be a list of ints. valid example: '\
-#              f'{DEFAULT_OBS_CYCLE_INTERVALS}, using default.')
-#        return False
-#
-#    for item in values:
-#         if value < 0 or value > MAX_CYCLE_INTERVAL:
-
-
-def is_valid_date_range(instance, attribute, value):
-    if not isinstance(value, dict):
-        print(f'Attribute must be a dict, valid example: '\
-              f'{DEFAULT_DATE_RANGE_CONFIG}, using defaults.')
-        return False
-
-    datestr = value.get('datestr', None)
-    if datestr is None:
-        msg = f'Invalid date format string: {value}, valid example: ' \
-              f'{DEFAULT_DATE_STR}'
-        raise ValueError(msg)
-
-    start = set_datetime(value.get('start', None), datestr)
-    end = set_datetime(value.get('end', None), datestr)
-
-    if start is None or end is None:
-        msg = f'Invalid date range: {value}, valid example: ' \
-              f'{DEFAULT_DATE_RANGE_CONFIG}'
-        raise ValueError(msg)
-
-    print(f'start: {start}, end: {end}')
-
-    if start > end:
-        msg = f'Invalid date range: {value}, "start" must older than ' \
-              f'"end", valid example: {DEFAULT_DATE_RANGE_CONFIG}'
-        raise ValueError(msg)
-    
-    return True
-    
 
 def is_valid_storage_platform(instance, attribute, value):
     if not obs_storage_platforms.is_valid(value):
@@ -133,42 +63,34 @@ class ObsSearchConfig(object):
 
     storage_platform = attr.ib(validator=is_valid_storage_platform)
     search_config = attr.ib()
-    date_range = attr.ib(
-        validator=is_valid_date_range,
-        default=DEFAULT_DATE_RANGE_CONFIG
-    )
+    date_range = attr.ib(default=None)
     cycle_intervals = attr.ib(init=False)
-    start = attr.ib(init=False)
-    end = attr.ib(init=False)
 
 
     def __attrs_post_init__(self):
-        self.cycle_intervals = DEFAULT_OBS_CYCLE_INTERVALS
-        self.start = set_datetime(
-            self.date_range['start'],
-            self.date_range['datestr']
-        )
-        self.end = set_datetime(
-            self.date_range['end'],
-            self.date_range['datestr']
-        )
-
+        self.cycle_intervals = time_utils.DEFAULT_OBS_CYCLE_INTERVALS
+        if not isinstance(self.date_range, DateRange):
+            self.date_range = DateRange()
 
     def get_storage_platform(self):
         return storage_platform
 
 
-    def get_start(self):
-        return self.start
-
-
-    def get_end(self):
-        return self.end
+    def get_date_range(self):
+        return self.date_range
 
 
     def get_cycle_intervals(self):
         return self.cycle_intervals
 
+
+    def get_current_search_path(self):
+        current = self.date_range.current
+        path = time_utils.get_datetime_str(
+            current, self.search_config.get(SEARCH_PATH_KEY)
+        )
+        print(f'path: {path}')
+        return path
 
 @attr.s(slots=True)
 class ObservationsConfig(object):
@@ -179,15 +101,17 @@ class ObservationsConfig(object):
 
     config_yaml = attr.ib(validator=is_valid_readable_file)
     obs_search_configs = attr.ib(default=attr.Factory(dict))
+    search_date_range = attr.ib(default=None)
+
 
     def load(self):
         
         config_data = yaml_utils.YamlLoader(self.config_yaml)
-        self.get_obs_inv_search_configs(config_data)
+        self.parse_obs_inv_search_configs(config_data)
         print(f'config_data: {config_data}')
 
 
-    def get_obs_inv_search_configs(self, config_data):
+    def parse_obs_inv_search_configs(self, config_data):
         obs_search_yaml_data = config_data.load()
 
         obs_search_configs = config_data.get_value(
@@ -196,13 +120,16 @@ class ObservationsConfig(object):
             return_type=list
         )
 
-        search_date_range = config_data.get_value(
+        config_date_range = config_data.get_value(
             key='date_range',
             document=obs_search_yaml_data,
             return_type=dict
         )
 
-        print(f'search_date_range: {search_date_range}')
+        self.search_date_range = time_utils.get_date_range_from_dict(
+            config_date_range)
+
+        print(f'search_date_range: {self.search_date_range}')
 
         try:
             for obs_search_config in obs_search_configs:
@@ -213,11 +140,16 @@ class ObservationsConfig(object):
                     document=obs_search_config,
                     return_type=str
                 )
+                
+                date_range = DateRange(
+                    self.search_date_range.start,
+                    self.search_date_range.end
+                )
 
                 obs_search_config_obj = ObsSearchConfig(
                     storage_platform,
                     obs_search_config,
-                    search_date_range
+                    date_range
                 )
                 search_key = obs_search_config['key']
                 hash_key = f'{storage_platform}-{search_key}'
@@ -231,5 +163,9 @@ class ObservationsConfig(object):
         return self.obs_search_configs
 
 
-    def get_all_obs_inv_search_configs(self):
+    def get_obs_inv_search_configs(self):
         return self.obs_search_configs
+
+
+    def get_search_date_range(self):
+        return self.search_date_range
