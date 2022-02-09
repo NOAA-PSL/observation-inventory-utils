@@ -35,7 +35,7 @@ HpssFileInfo = namedtuple(
         'permissions',
         'time',
         'size'
-    ]
+    ],
 )
 
 
@@ -45,17 +45,17 @@ HpssTarballContents = namedtuple(
         'parent_dir',
         'expected_count',
         'files'
-    ]
+    ],
 )
 
 EXPECTED_COMPONENTS_HTAR_TVF_FILE_OBJ = 7
-
+CMD_INSPECT_TARBALL = 'inspect_tarball'
 
 def inspect_tarball_args_valid(args):
     if not isinstance(args, list):
         msg = f'Args must be in the form of a list, args: {args}'
         raise TypeError(msg)
-    cmd = hpss_cmds['INSPECT_TARBALL'].command
+    cmd = hpss_cmds[CMD_INSPECT_TARBALL].command
     print(f'{nl}{nl}In inspect tarball args valid: cmd: {cmd}{nl}{nl}')
     if (len(args) > 1 or len(args) == 0):
         msg = f'Command "{cmd}" accepts exactly 1 argument, received ' \
@@ -111,13 +111,14 @@ def hpss_inspect_tarball_parser(response):
             raise ValueError(msg)
 
         fn = components[6]
-        files.append(HpssFileInfo(fn, permissions, file_datetime, size))
+        files.append(
+            HpssFileInfo(fn, permissions, file_datetime, size))
 
     return HpssTarballContents(parent_dir, expected_count, files)
 
 
 hpss_cmds = {
-    'INSPECT_TARBALL': HpssCommand(
+    'inspect_tarball': HpssCommand(
         ['htar', '-tvf'],
         inspect_tarball_args_valid,
         hpss_inspect_tarball_parser,
