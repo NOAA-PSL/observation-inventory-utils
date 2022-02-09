@@ -1,8 +1,8 @@
 cycling_interval: 21600
 date_range:
   datestr: '%Y%m%dT%H%M%SZ'
-  end: 20201231T180000Z
-  start: 20200101T000000Z
+  end: 20190103T000000Z
+  start: 20190101T000000Z
 search_info:
   -
     platform: hera_hpss
@@ -12,8 +12,8 @@ search_info:
     key: /3year/NCEPDEV/GEFSRR/GDAS_OBS/grib/OP_BUFR/%Y/gdas.%Y%m%d_grib.tar
   -
     platform: hera_hpss
-    key: /3year/NCEPDEV/GEFSRR/GDAS_OBS/satbufr/OP_BUFR/%Y/gdas.%Y%m%d__satbufr.tar
+    key: /3year/NCEPDEV/GEFSRR/GDAS_OBS/satbufr/OP_BUFR/%Y/gdas.%Y%m%d_satbufr.tar
   -
     platform: hera_hpss
-    key: /3year/NCEPDEV/GEFSRR/GDAS_OBS/satbufr/OP_BUFR/%Y/gdas.%Y%m%d__satbufr.tar
+    key: /3year/NCEPDEV/GEFSRR/GDAS_OBS/satbufr/OP_BUFR/%Y/gdas.%Y%m%d_satbufr.tar
 
