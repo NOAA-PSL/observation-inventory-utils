@@ -1,6 +1,5 @@
-import attr
-import os
 import re
+import attr
 from collections import namedtuple, OrderedDict
 import subprocess
 from datetime import datetime
@@ -23,17 +22,20 @@ HpssCommandRawResponse = namedtuple(
         'return_code',
         'error',
         'output',
-        'success'
+        'success',
+        'args_0',
+        'submitted_at',
+        'latency'
     ],
 )
 
 
-HpssFileInfo = namedtuple(
-    'HpssFileInfo',
+HpssFileMeta = namedtuple(
+    'HpssFileMeta',
     [
         'name',
         'permissions',
-        'time',
+        'last_modified',
         'size'
     ],
 )
@@ -44,7 +46,10 @@ HpssTarballContents = namedtuple(
     [
         'parent_dir',
         'expected_count',
-        'files'
+        'inspected_files',
+        'observation_day',
+        'submitted_at',
+        'latency'
     ],
 )
 
@@ -75,7 +80,7 @@ def inspect_tarball_args_valid(args):
     return True
 
 
-def hpss_inspect_tarball_parser(response):
+def inspect_tarball_parser(response, obs_day):
     if not isinstance(response, HpssCommandRawResponse):
         msg = f'Response needs to be an instance type HpssCommandRawResponse.'\
               f'Received type: {type(response)}'
@@ -88,7 +93,7 @@ def hpss_inspect_tarball_parser(response):
 
     expected_count = 0
     parent_dir = ''
-    files = []
+    files_meta = list()
     for output_line in output:
         print(f'out_line: {output_line}')
         components = output_line.split()
@@ -111,17 +116,24 @@ def hpss_inspect_tarball_parser(response):
             raise ValueError(msg)
 
         fn = components[6]
-        files.append(
-            HpssFileInfo(fn, permissions, file_datetime, size))
+        files_meta.append(
+            HpssFileMeta(fn, permissions, file_datetime, size))
 
-    return HpssTarballContents(parent_dir, expected_count, files)
+    return HpssTarballContents(
+        parent_dir,
+        expected_count,
+        files_meta,
+        obs_day,
+        response.submitted_at,
+        response.latency
+    )
 
 
 hpss_cmds = {
     'inspect_tarball': HpssCommand(
         ['htar', '-tvf'],
         inspect_tarball_args_valid,
-        hpss_inspect_tarball_parser,
+        inspect_tarball_parser,
     )
 }
 
@@ -140,31 +152,35 @@ class HpssCommandHandler(object):
 
     command = attr.ib(validator=is_valid_hpss_cmd)
     args = attr.ib(default=attr.Factory(list))
-    hpss_cmd_obj = attr.ib(init=False)
-    hpss_cmd_line = attr.ib(init=False)
+    cmd_obj = attr.ib(init=False)
+    cmd_line = attr.ib(init=False)
     raw_resp = attr.ib(default=None)
+    submitted_at = attr.ib(default=None)
+    finished_at = attr.ib(default=None)
 
     def __attrs_post_init__(self):
-        self.hpss_cmd_obj = hpss_cmds[self.command]
+        self.cmd_obj = hpss_cmds[self.command]
         print(f'In __attrs_post_init__: self.args: {self.args}')
-        if self.hpss_cmd_obj.arg_validator(self.args):
-            self.hpss_cmd_line = getattr(self.hpss_cmd_obj,'command').copy()
+        if self.cmd_obj.arg_validator(self.args):
+            self.cmd_line = getattr(self.cmd_obj,'command').copy()
             for arg in self.args:
-                self.hpss_cmd_line.append(arg)
-        print(f'hpss_cmd_line: {self.hpss_cmd_line}, args: {self.args}')
+                self.cmd_line.append(arg)
+        print(f'cmd_line: {self.cmd_line}, args: {self.args}')
 
 
     def send(self):
-        cmd_str = self.hpss_cmd_obj.command[0]
+        cmd_str = self.cmd_obj.command[0]
 
         proc = subprocess.Popen(
-            self.hpss_cmd_line,
+            self.cmd_line,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
 
         try:
+            self.submitted_at = datetime.utcnow()
             out, err = proc.communicate()
+            self.finished_at = datetime.utcnow()
             print(f'return_code: {proc.returncode}, out: {out}, err: {err}')
         except FileNotFoundError as e:
             msg = f'Command: {cmd_str} was not recognized. '\
@@ -175,12 +191,18 @@ class HpssCommandHandler(object):
             msg = f'Error after sending command {cmd_str}, error: {e}.'
             raise ValueError(msg)
 
+        cmd_str = ''
+        for cmd in self.cmd_obj.command:
+            cmd_str += f'{cmd} '
         self.raw_resp = HpssCommandRawResponse(
-            self.hpss_cmd_line,
+            cmd_str,
             proc.returncode,
             err.decode('utf-8'),
             out.decode('utf-8'),
-            (proc.returncode == 0)
+            (proc.returncode == 0),
+            self.args[0],
+            self.submitted_at,
+            float(self.get_cmd_duration())
         )
 
         print(f'raw_resp: {self.raw_resp}')
@@ -191,12 +213,23 @@ class HpssCommandHandler(object):
             return True
 
 
+    def can_retry_send(self):
+        # for now, we'll just send false for the retry until we
+        # know what kind of erors we see back.
+        return False
+
+
     def get_raw_response(self):
         return self.raw_resp
 
 
-    def parse_response(self):
+    def get_cmd_duration(self):
+        diff = self.finished_at - self.submitted_at
+        return (diff.seconds + diff.microseconds/1000000)
+
+
+    def parse_response(self, obs_day):
         if self.raw_resp is not None:
-            return self.hpss_cmd_obj.output_parser(self.raw_resp)
+            return self.cmd_obj.output_parser(self.raw_resp, obs_day)
         else:
             return None

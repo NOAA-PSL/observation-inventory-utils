@@ -1,8 +1,8 @@
 cycling_interval: 21600
 date_range:
   datestr: '%Y%m%dT%H%M%SZ'
-  end: 20190103T000000Z
-  start: 20190101T000000Z
+  end: 20190901T000000Z
+  start: 20190827T000000Z
 search_info:
   -
     platform: hera_hpss

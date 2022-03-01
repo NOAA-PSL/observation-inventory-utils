@@ -3,6 +3,8 @@ from typing import Optional
 from dataclasses import dataclass
 
 
+SECONDS_IN_A_DAY = 24 * 3600
+
 DEFAULT_START_TIME = datetime(year=1990, month=1, day=1)
 DEFAULT_END_TIME = datetime.utcnow()
 DEFAULT_DATE_STR = '%Y%m%dT%H%M%SZ'
@@ -35,9 +37,10 @@ def is_valid_increment_type(value):
 def set_datetime(time_str, format_str):
     try:
         time = datetime.strptime(time_str, format_str)
+        print(f'in set_datetime - time: {time}, time_str: {time_str}, format_str: {format_str}')
     except Exception as e:
-        print(f'Invalid time str: {time_str} or format string: {format_str}. {e}')
-        return None
+        msg = f'Invalid time str: {time_str} or format string: {format_str}. {e}'
+        raise ValueError(msg)
 
     return time
 
@@ -70,13 +73,15 @@ def get_date_range_from_dict(date_range):
 
     if start is None:
         start = DEFAULT_START_TIME
-        msg = f'Warning: invalid start time: {raw_start}, using default: ' \
+        msg = f'Error: invalid start time: {raw_start}, using default: ' \
               f'{DEFAULT_START_TIME}'
+        raise ValueError(msg)
     
     if end is None:
         end = DEFAULT_END_TIME 
-        msg = f'Warning: invalid end time: {raw_end}, using default: ' \
+        msg = f'Error: invalid end time: {raw_end}, using default: ' \
               f'{DEFAULT_END_TIME}'
+        raise ValueError(msg)
 
     print(f'start: {start}, end: {end}')
 
@@ -166,14 +171,13 @@ class DateRange:
 
         if new_time < self.start:
             self.current = self.start
-
-        if new_time > self.end:
+        elif new_time > self.end:
             self.current = self.end
+        else:
+            self.current = new_time
 
-        self.current = new_time
 
-
-    def increment_day(self):
+    def increment_day(self):    
         self.increment(days=1)
 
 
