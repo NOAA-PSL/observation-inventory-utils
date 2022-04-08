@@ -81,7 +81,7 @@ class ObsInventory(Base):
     prefix = Column(String(63))
     cycle_tag = Column(String(63))
     data_type = Column(String(63))
-    cycle_time = Column(Integer)
+    cycle_time = Column(Integer(), default=0)
     obs_day = Column(DateTime())
     data_format = Column(String(63))
     suffix = Column(String(63))
