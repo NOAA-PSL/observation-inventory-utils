@@ -12,7 +12,7 @@ OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
 OBS_INVENTORY_TABLE = 'obs_inventory'
 HPSS_CMD_RESULTS_TABLE = 'hpss_cmd_results'
 
-engine = db.create_engine(OBS_SQLITE_DATABASE, echo = True)
+engine = db.create_engine(OBS_SQLITE_DATABASE, echo=True)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
@@ -24,25 +24,25 @@ def create_obs_inventory_table():
     if not insp.has_table(OBS_INVENTORY_TABLE):
         metadata = MetaData(engine)
 
-        Table(OBS_INVENTORY_TABLE, metadata, 
-            Column('obs_id', Integer, primary_key = True), 
-            Column('filename', String), 
-            Column('parent_dir', String),
-            Column('platform', String),
-            Column('s3_bucket', String),
-            Column('prefix', String),
-            Column('cycle_tag', String),
-            Column('data_type', String),
-            Column('cycle_time', Integer),
-            Column('obs_day', DateTime),
-            Column('data_format', String),
-            Column('suffix', String),
-            Column('nr_tag', Boolean),
-            Column('file_size', Integer),
-            Column('permissions', String),
-            Column('last_modified', DateTime),
-            Column('inserted_at', DateTime),
-        )
+        Table(OBS_INVENTORY_TABLE, metadata,
+              Column('obs_id', Integer, primary_key=True),
+              Column('filename', String),
+              Column('parent_dir', String),
+              Column('platform', String),
+              Column('s3_bucket', String),
+              Column('prefix', String),
+              Column('cycle_tag', String),
+              Column('data_type', String),
+              Column('cycle_time', Integer),
+              Column('obs_day', DateTime),
+              Column('data_format', String),
+              Column('suffix', String),
+              Column('nr_tag', Boolean),
+              Column('file_size', Integer),
+              Column('permissions', String),
+              Column('last_modified', DateTime),
+              Column('inserted_at', DateTime),
+              )
 
         metadata.create_all(engine)
 
@@ -55,20 +55,19 @@ def create_hpss_cmd_results_table():
         metadata = MetaData(engine)
 
         Table(HPSS_CMD_RESULTS_TABLE, metadata,
-            Column('cmd_result_id', Integer, primary_key = True),
-            Column('command', String),
-            Column('arg0', String),
-            Column('raw_output', String),
-            Column('raw_error', String),
-            Column('error_code', String),
-            Column('obs_day', DateTime),
-            Column('submitted_at', DateTime),
-            Column('latency', String),
-            Column('inserted_at', DateTime),
-        )
+              Column('cmd_result_id', Integer, primary_key=True),
+              Column('command', String),
+              Column('arg0', String),
+              Column('raw_output', String),
+              Column('raw_error', String),
+              Column('error_code', String),
+              Column('obs_day', DateTime),
+              Column('submitted_at', DateTime),
+              Column('latency', String),
+              Column('inserted_at', DateTime),
+              )
 
         metadata.create_all(engine)
-
 
 
 class ObsInventory(Base):
@@ -113,7 +112,6 @@ def insert_obs_inv_items(obs_inv_items):
         msg = 'Inserted observation inventory items must be in the form' \
               f' of a list.  Received type: {type(obs_inv_items)}'
         raise TypeError(msg)
-
 
     rows = []
     for obs_item in obs_inv_items:

@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 
 from obs_inv_utils import inventory_table_factory as itf
 
-engine = db.create_engine(itf.OBS_SQLITE_DATABASE, echo = True)
+engine = db.create_engine(itf.OBS_SQLITE_DATABASE, echo=True)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
@@ -49,7 +49,6 @@ def get_filesize_timeline_data(min_instances):
     ).subquery()
 
     print(f'subquery unique_names: {unique_names}')
-    
 
     fn_fs = session.query(
         oi.prefix,
