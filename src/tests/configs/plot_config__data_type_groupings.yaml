@@ -1,0 +1,28 @@
+---
+plot_groupings:
+- hyperspectral_infrared:
+  - groups:
+    - name: cris
+      files:
+      - data_type: cris
+        suffix: ".tm00.bufr_d"
+      - data_type: crisf4
+        suffix: ".tm00.bufr_d"
+      - data_type: crisdb
+        suffix: ".tm00.bufr_d"
+    - name: iasi
+      files:
+      - data_type: iasidb
+        suffix: ".tm00.bufr_d"
+      - data_type: esiasi
+        suffix: ".tm00.bufr_d"
+      - data_type: mtiasi
+        suffix: ".tm00.bufr_d"
+    - name: airs
+      files:
+      - data_type: airs
+        suffix: ".tm00.bufr_d"
+      - data_type: airsev
+        suffix: ".tm00.bufr_d"
+      - data_type: airswm
+        suffix: ".tm00.bufr_d"

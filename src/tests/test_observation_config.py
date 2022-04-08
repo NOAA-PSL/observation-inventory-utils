@@ -8,7 +8,7 @@ Unit tests for io_utils
 import os
 import pathlib
 import pytest
-from obs_inv_utils import config_handler as conf
+from config_handlers import obs_search_conf as conf
 from datetime import datetime
 from collections import namedtuple, OrderedDict
 from obs_inv_utils import time_utils
