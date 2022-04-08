@@ -44,17 +44,12 @@ class ObsInvFilesizeTimeline(object):
     def plot_timeline(self):
         data = oiq.get_filesize_timeline_data(self.min_instances)
 
-        unique_rows = data.sort_values(
-            'inserted_at'
-        ).drop_duplicates(
-            subset=[
-                'filename',
-                'obs_day'
-            ],
-            keep='last'
-        )
-        data_index = unique_rows.index
-
+        # due to duplicate inserts of the same file, we need to select only
+        # the most recent insert.  Mutliple inserts can occur due to 
+        # multiple runs of the inventory search tool.  The most recent
+        # insert is considered the current status of that file.  After
+        # this operation, we should have a current and unique set of filenames
+        # spanning the entire date range of interest.
         uf = data.sort_values(
             'inserted_at'
         ).drop_duplicates(
@@ -62,9 +57,16 @@ class ObsInvFilesizeTimeline(object):
             keep='last'
         ).dropna(subset=['cycle_time'])
 
-        # bad = uf.loc[uf['cycle_time'] == np.nan]
-        # print(f'bad: {bad}')
-
+        # create a 'cycle_time_datetime' column from the 'cycle_time' column
+        # note the 'cycle_time' column does not contain date information.
+        # this new column will now be in the datetime format but will not
+        # be set to a specific date.  So adding this new column to the
+        # 'obs_day' column will help create a new 'obs_cycle_time' column
+        # which defines a combination of the 'obs_day' and 
+        # 'cycle_time_datetime'.
+        # for example: 'cycle_time_datetime' = 01/01/1970T06:00:00
+        # 'obs_day' = 01/01/2014T00:00:00 => 'obs_cycle_time' =
+        # 'obs_day' + 'cycle_time_datetime' = 01/01/2014T06:00:00
         uf['generic_fn'] = uf['prefix'] + '.tag.' + uf['un']
         uf['cycle_time'].replace(np.nan, 0)
         uf['cycle_sec_float'] = uf['cycle_time'].astype('float64')
@@ -74,14 +76,14 @@ class ObsInvFilesizeTimeline(object):
         uf['obs_day'] = pd.to_datetime(uf['obs_day'])
         obs_times = uf[['obs_day', 'cycle_time_datetime', 'cycle_time']]
 
-        # for obs_time in obs_times.itertuples():
-
-        #     print(f'obs_times: {obs_time}')
-        # print(f'obs_time.info {obs_time.info()}')
         uf['obs_cycle_time'] = uf['obs_day'] + uf['cycle_time_datetime']
 
-        print(f'uf: {len(uf.index)}, {uf}')
-
+        # This operation creates a unique list of generic filenames
+        # following the pattern 'prefix.tag.data_type.suffix' where
+        # the tag is 't00z', 't06z', 't12z', and 't18z'.  All records with
+        # the same prefix, data_type, and suffix are considered 1 generic
+        # filename.  Thus only 1 instance of any given generic filename
+        # represents all tags and obs_day records for that generic filename.
         uf_gn = uf.copy()
         unique_gn = uf_gn.drop_duplicates(
             'generic_fn',
@@ -94,6 +96,10 @@ class ObsInvFilesizeTimeline(object):
 
         last_generic_fn = ''
         plt_cnt = 0
+        # iterate through all the generic filenames
+        # to produce a time series (including all cycle times) of filename
+        # filesizes.  A negative value indicates the file did not exist at
+        # that particular obs_day/cycle_time.
         for unique_fn in unique_gn.itertuples():
 
             generic_fn = unique_fn.generic_fn
@@ -107,22 +113,10 @@ class ObsInvFilesizeTimeline(object):
                 uf['generic_fn'] == unique_fn.generic_fn
             ]
 
-            # print(
-            #     f'file_meta: records: {len(file_meta.index)}, file_meta data: {file_meta}')
-
-            # unique_tags = file_meta.drop_duplicates('cycle_tag', keep='last')
-            # print(f'unique_tags: {unique_tags}')
-
             plt.figure(figsize=(11, 8.5), dpi=160)
             plt.subplot(111)
 
-            # print(f'file_meta.info(): {file_meta.info()}')
-
             xy = file_meta.copy()
-            # .loc[
-            #     ['obs_day', 'obs_cycle_time', 'file_size']
-            # ].copy()
-            # .drop_duplicates('obs_cycle_time', keep='last').copy()
 
             xy.set_index('obs_cycle_time', inplace=True)
             max_file_size = xy['file_size'].max()
@@ -135,26 +129,6 @@ class ObsInvFilesizeTimeline(object):
             y = xy_new['file_size']
             plt.plot(x, y/1000000, linewidth=0.3)
 
-            # for tag in unique_tags.itertuples():
-
-            #     xy = file_meta.loc[
-            #         file_meta['cycle_tag'] == tag.cycle_tag,
-            #         ['obs_day', 'file_size']
-            #     ].drop_duplicates('obs_day', keep='last').copy()
-
-            #     xy.set_index('obs_day', inplace=True)
-            #     max_file_size = xy['file_size'].max()
-            #     xy_new = xy.reindex(OBS_INV_DATERANGE,
-            #                         fill_value=-(max_file_size*0.1))
-
-            #     missing_data = xy_new.loc[xy_new['file_size'] <= 0]
-
-            #     x = xy_new.index
-            #     y = xy_new['file_size']
-
-            #     plt.scatter(x, y/1000000, label=tag.cycle_tag, s=0.5)
-
-            # plt.legend()
             plt.gcf().autofmt_xdate()
 
             figure_title = 'file: ' + generic_fn + \
@@ -178,12 +152,3 @@ class ObsInvFilesizeTimeline(object):
             print(f'saving figure to {dest_path_png}')
             plt.savefig(dest_path_png)
 
-            # fig = plt.gcf()
-            # html_str = mpld3.fig_to_html(fig)
-            # Html_file = open(dest_path_html, "w")
-            # Html_file.write(html_str)
-            # Html_file.close()
-            # plt.show()
-
-            # if count == 10:
-            #     exit(1)
