@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  end: 20210101T000000Z
+  start: 19900512T000000Z
+search_info:
+  -
+    platform: aws_s3
+    key: observations/atmos/gefsv13_reanalysis-md5/%Y%m%d%H%M%S/bufr/
+

@@ -73,7 +73,7 @@ class ObsSearchConfig(object):
             self.date_range = DateRange()
 
     def get_storage_platform(self):
-        return storage_platform
+        return self.storage_platform
 
 
     def get_date_range(self):
