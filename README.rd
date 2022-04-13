@@ -7,3 +7,5 @@ $ cd obs_inventory_utils
 $ pip install .
 ```
 
+### Execution
+
