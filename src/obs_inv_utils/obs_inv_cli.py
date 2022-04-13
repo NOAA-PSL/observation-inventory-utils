@@ -15,7 +15,9 @@ import click
 
 # import obs_inv_utils.config_handlers as cf_hdlr
 from config_handlers.obsgrp_fs_plot_conf import ObsGroupFileSizePlotConfig
+from config_handlers.obsgrp_fs_plot_conf import ObsGrouping, ObsFamily
 from config_handlers.obs_search_conf import ObservationsConfig
+
 from obs_inv_utils import plot_generator as pg
 
 
@@ -47,7 +49,9 @@ def plot_files_filesize_vs_time(min_instances):
 def plot_groups_filesize_timeseries(config_yaml):
     config = ObsGroupFileSizePlotConfig(config_yaml)
     config.load()
-    print(repr(config))
+    # print(repr(config))
+    obgr = pg.ObsGroupFilesizeTimeline(config)
+    obgr.plot_obsgroups_fs_timeline()
 
 
 if __name__ == '__main__':
