@@ -150,6 +150,10 @@ plot_groupings:
       suffix: ".tm00.bufr_d"
     - data_type: 1bamub
       suffix: ".tm00.bufr_d"
+  - data_type_family_name: 1bmsu
+    family_members:
+    - data_type: 1bmsu
+      suffix: ".tm00.bufr_d"
 - grouping_name: Snow Cover
   data_type_families:
   - data_type_family_name: imssnow
