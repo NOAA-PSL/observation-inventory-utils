@@ -10,10 +10,12 @@ import pathlib
 import numpy as np
 
 from obs_inv_utils import obs_inv_queries as oiq
+from config_handlers.obsgrp_fs_plot_conf import ObsGroupFileSizePlotConfig
+from config_handlers.obsgrp_fs_plot_conf import ObsGrouping, ObsFamily
 
 CALLING_DIR = pathlib.Path(__file__).parent.resolve()
 
-DEFAULT_MIN_DATETIME = datetime.strptime('1999-12-30', '%Y-%m-%d')
+DEFAULT_MIN_DATETIME = datetime.strptime('1989-12-30', '%Y-%m-%d')
 DEFAULT_MAX_DATETIME = datetime.strptime('2021-01-01', '%Y-%m-%d')
 
 OBS_INV_DATERANGE = pd.date_range(
@@ -29,6 +31,98 @@ OBS_INV_DATERANGE_6H_CYCLE = pd.date_range(
 )
 
 print(f'OBS_INV_DATERANGE: {OBS_INV_DATERANGE}')
+
+
+@dataclass
+class ObsGroupFilesizeTimeline(object):
+    config: ObsGroupFileSizePlotConfig
+
+    def plot_obsgroups_fs_timeline(self):
+
+        groupings = self.config.get_plot_groupings()
+        print(f'{os.linesep}groupings: {groupings}, type(groupings): {type(groupings)}')
+
+        for grouping in groupings:
+            print(f'{os.linesep}type(grouping): {type(grouping)}')
+            families = grouping.get_plot_families()
+            print(f'{os.linesep}families: {families}')
+
+            fmly_cnt = len(families)
+            fig, ax = plt.subplots(
+                fmly_cnt, 1, sharex=True, figsize=(25, 11), dpi=160)
+            figure_title = grouping.get_grouping_name()
+            fig.suptitle(figure_title, y=0.95, fontsize=20)
+
+            for idx, family in enumerate(families):
+                plt.subplot(fmly_cnt, 1, idx+1)
+                print(f'{os.linesep}family: {family}')
+
+                data = oiq.get_family_fs_data(family)
+                data['generic_fn'] = data['prefix'] + \
+                    '.tag.' + data['data_type'] + data['suffix']
+                print(f'data: {data}')
+                print(f'type(ax): {type(ax)}')
+                members = family.get_members()
+                if type(ax) == np.ndarray:
+                    ax_sub = ax[idx]
+                else:
+                    ax_sub = ax
+                for member in members:
+                    data_type = member.get('data_type')
+                    xy = data.loc[
+                        data['data_type'] == data_type
+                    ].copy()
+
+                    print(f'file_meta: {xy}')
+                    xy.set_index('obs_day', inplace=True)
+                    max_file_size = xy['file_size'].max()
+                    print(f'max_file_size: {max_file_size/1000000}')
+                    xy_new = xy.reindex(
+                        OBS_INV_DATERANGE_6H_CYCLE,
+                        fill_value=-(max_file_size*0.1)
+                    )
+
+                    x = xy_new.index
+                    y = xy_new['file_size']
+                    ax_sub.plot(x, y/1000000, linewidth=0.3, label=data_type)
+                    leg = ax_sub.legend(loc='center left', facecolor="white")
+
+                    leg_lines = leg.get_lines()
+                    print(f'leg_lines: {leg_lines}')
+                    # leg_texts = leg.get_texts()
+
+                    for leg_line in leg_lines:
+                        leg_line.set_linewidth(4)
+                        # plt.setp(leg_texts, fontsize=10)
+
+                subplot_title = family.get_family_name()
+                print(f'ax_sub: {ax_sub}')
+
+                ax_sub.minorticks_on()
+                ax_sub.text(0.02, 0.85, subplot_title,
+                            transform=ax_sub.transAxes, fontsize=15, backgroundcolor='white')
+                ax_sub.grid(which='both', color='grey',
+                            linestyle='--', linewidth=0.2)
+                plt.ylabel('File Size(Mb)', fontsize=15)
+
+            plt.gcf().autofmt_xdate()
+
+            plt.xlabel('Observation Datetime', fontsize=15)
+            y_axis = plt.gca()
+            y_axis.ticklabel_format(style='plain', axis='y')
+
+            dest_fn = figure_title.replace(' ', '_').lower()
+            dest_path_png = os.path.join(
+                CALLING_DIR, 'figures', dest_fn + '.png'
+            )
+            parent_dir = pathlib.Path(dest_path_png).parent
+            pathlib.Path(parent_dir).mkdir(parents=True, exist_ok=True)
+            dest_path_html = os.path.join(
+                CALLING_DIR, 'figures', dest_fn + '.html'
+            )
+            print(f'saving figure to {dest_path_png}')
+            plt.savefig(dest_path_png)
+
 
 @dataclass
 class ObsInvFilesizeTimeline(object):

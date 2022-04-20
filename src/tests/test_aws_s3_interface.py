@@ -10,7 +10,7 @@ import pathlib
 import pytest
 from obs_inv_utils import aws_s3_interface as s3
 from unittest.mock import patch
-from obs_inv_utils import config_handler as conf
+from config_handlers import obs_search_conf as conf
 from datetime import datetime, timedelta
 from collections import namedtuple, OrderedDict
 from obs_inv_utils import time_utils

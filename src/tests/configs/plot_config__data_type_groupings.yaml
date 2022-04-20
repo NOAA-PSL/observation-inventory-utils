@@ -1,0 +1,250 @@
+---
+plot_groupings:
+- grouping_name: Hyperspectral Infrared
+  data_type_families:
+  - data_type_family_name: cris
+    family_members:
+    - data_type: cris
+      suffix: ".tm00.bufr_d"
+    - data_type: crisf4
+      suffix: ".tm00.bufr_d"
+    - data_type: crisdb
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: iasi
+    family_members:
+    - data_type: iasidb
+      suffix: ".tm00.bufr_d"
+    - data_type: esiasi
+      suffix: ".tm00.bufr_d"
+    - data_type: mtiasi
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: airs
+    family_members:
+    - data_type: airs
+      suffix: ".tm00.bufr_d"
+    - data_type: airsev
+      suffix: ".tm00.bufr_d"
+    - data_type: airswm
+      suffix: ".tm00.bufr_d"
+- grouping_name: Conventional
+  data_type_families:
+  - data_type_family_name: prepbufr
+    family_members:
+    - data_type: prepbufr
+      suffix: ".nr"
+  - data_type_family_name: acft profiles
+    family_members:
+    - data_type: prepbufr
+      suffix: ".acft_profiles.nr"
+- grouping_name: Geo Radiances
+  data_type_families:
+  - data_type_family_name: goes
+    family_members:
+    - data_type: goesnd
+      suffix: ".tm00.bufr_d"
+    - data_type: goesfv
+      suffix: ".tm00.bufr_d"
+    - data_type: geoimr
+      suffix: ".tm00.bufr_d"
+- grouping_name: Multispectral Infrared
+  data_type_families:
+  - data_type_family_name: HIRS
+    family_members:
+    - data_type: 1bhrs2
+      suffix: ".tm00.bufr_d"
+    - data_type: 1bhrs3
+      suffix: ".tm00.bufr_d"
+    - data_type: 1bhrs4
+      suffix: ".tm00.bufr_d"
+    - data_type: eshrs3
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: seviri
+    family_members:
+    - data_type: sevcsr
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: TOVS
+    family_members:
+    - data_type: rtovs
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: ssu
+    family_members:
+    - data_type: 1bssu
+      suffix: ".tm00.bufr_d"
+- grouping_name: Microwave Images
+  data_type_families:
+  - data_type_family_name: amsr
+    family_members:
+    - data_type: amsr2
+      suffix: ".tm00.bufr_d"
+    - data_type: amsr-e
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: ssmis
+    family_members:
+    - data_type: ssmipn
+      suffix: ".tm00.bufr_d"
+    - data_type: ssmit
+      suffix: ".tm00.bufr_d"
+    - data_type: ssmisu
+      suffix: ".tm00.bufr_d"
+    - data_type: ssmip
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: TRMM
+    family_members:
+    - data_type: trmm
+      suffix: ".tm00.bufr_d"
+    - data_type: sptrmm
+      suffix: ".tm00.bufr_d"
+- grouping_name: Microwave Images
+  data_type_families:
+  - data_type_family_name: amsr
+    family_members:
+    - data_type: amsr2
+      suffix: ".tm00.bufr_d"
+    - data_type: amsr-e
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: ssmis
+    family_members:
+    - data_type: ssmipn
+      suffix: ".tm00.bufr_d"
+    - data_type: ssmit
+      suffix: ".tm00.bufr_d"
+    - data_type: ssmisu
+      suffix: ".tm00.bufr_d"
+    - data_type: ssmip
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: TRMM
+    family_members:
+    - data_type: trmm
+      suffix: ".tm00.bufr_d"
+    - data_type: sptrmm
+      suffix: ".tm00.bufr_d"
+- grouping_name: Microwave Sounders
+  data_type_families:
+  - data_type_family_name: saphir
+    family_members:
+    - data_type: saphir
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: mhs
+    family_members:
+    - data_type: 1bmhs
+      suffix: ".tm00.bufr_d"
+    - data_type: esmhs
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: atms
+    family_members:
+    - data_type: atms
+      suffix: ".tm00.bufr_d"
+    - data_type: atmsdb
+      suffix: ".tm00.bufr_d"
+    - data_type: esatms
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: amsua
+    family_members:
+    - data_type: esamua
+      suffix: ".tm00.bufr_d"
+    - data_type: 1bamua
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: amsub
+    family_members:
+    - data_type: esamub
+      suffix: ".tm00.bufr_d"
+    - data_type: 1bamub
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: 1bmsu
+    family_members:
+    - data_type: 1bmsu
+      suffix: ".tm00.bufr_d"
+- grouping_name: Snow Cover
+  data_type_families:
+  - data_type_family_name: imssnow
+    family_members:
+    - data_type: imssnow96
+      suffix: ".grib2"
+  - data_type_family_name: snogrb
+    family_members:
+    - data_type: snogrb_t1534
+      suffix: ".3072.1536"
+- grouping_name: Advanced Vidicon Camera System
+  data_type_families:
+  - data_type_family_name: avcs
+    family_members:
+    - data_type: avcsam
+      suffix: ".tm00.bufr_d"
+    - data_type: avcspm
+      suffix: ".tm00.bufr_d"
+    - data_type: avcs17
+      suffix: ".tm00.bufr_d"
+    - data_type: avcs18
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: wnd
+    family_members:
+    - data_type: satwnd
+      suffix: ".tm00.bufr_d"
+    - data_type: vadwnd
+      suffix: ".tm00.bufr_d"
+- grouping_name: GPS Radio Occultation Data
+  data_type_families:
+  - data_type_family_name: gpsro
+    family_members:
+    - data_type: gpsro
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: gpsipw
+    family_members:
+    - data_type: gpsipw
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: gpsipw.nr
+    family_members:
+    - data_type: gpsipw
+      suffix: ".tm00.bufr_d.nr"
+- grouping_name: Scatterometer
+  data_type_families:
+  - data_type_family_name: qks
+    family_members:
+    - data_type: qkscat
+      suffix: ".tm00.bufr_d"
+    - data_type: qkswnd
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: asc
+    family_members:
+    - data_type: ascatw
+      suffix: ".tm00.bufr_d.nr"
+    - data_type: ascatt
+      suffix: ".tm00.bufr_d.nr"
+  - data_type_family_name: wnd
+    family_members:
+    - data_type: wdsatr
+      suffix: ".tm00.bufr_d"
+    - data_type: wndsat
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: ers
+    family_members:
+    - data_type: erscat
+      suffix: ".tm00.bufr_d"
+    - data_type: erswnd
+      suffix: ".tm00.bufr_d"
+- grouping_name: Ozone
+  data_type_families:
+  - data_type_family_name: gome
+    family_members:
+    - data_type: gome
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: sbu
+    family_members:
+    - data_type: osbuv
+      suffix: ".tm00.bufr_d"
+    - data_type: osbuv8
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: mls
+    family_members:
+    - data_type: mls
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: omps
+    family_members:
+    - data_type: ompsn8
+      suffix: ".tm00.bufr_d"
+    - data_type: ompst8
+      suffix: ".tm00.bufr_d"
+
+
+
+
