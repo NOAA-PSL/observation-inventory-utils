@@ -10,17 +10,19 @@ class ObsFamily:
     yaml_loader: YamlLoader
     data_type_family_name: str
     data_type_family_members: list
+    external_obs_intervals: list
 
     def __post_init__(self):
         print(f'data_type_family_name: {self.data_type_family_name}')
         print(f'data_type_family_members: {self.data_type_family_members}')
         for family_member in self.data_type_family_members:
             print(f'type(family_member): {type(family_member)}')
+            if family_member is None:
+                continue
             if (family_member.get('data_type') is None or
                     family_member.get('suffix') is None):
                 msg = f'data type family member did not contain both ' \
                     f'data_type\' and \'suffix\' keys.'
-                raise KeyError(msg)
 
     def get_members(self):
         return self.data_type_family_members
@@ -28,6 +30,8 @@ class ObsFamily:
     def get_family_name(self):
         return self.data_type_family_name
 
+    def get_ext_obs_intrvls(self):
+        return self.external_obs_intervals
 
 @dataclass
 class ObsGrouping:
@@ -54,14 +58,32 @@ class ObsGrouping:
             print(
                 f'family_name: {family_name}, data_type_family: {data_type_family}')
 
-            family_members = self.yaml_loader.get_value(
-                key='family_members',
-                document=data_type_family,
-                return_type=list
-            )
+            try:
+                family_members = self.yaml_loader.get_value(
+                    key='family_members',
+                    document=data_type_family,
+                    return_type=list
+                )
+            except Exception as e:
+                print(f'No family members found.')
+                family_members = []
+
+            try:
+                ext_obs_intrvls = self.yaml_loader.get_value(
+                    key='external_obs_intervals',
+                    document=data_type_family,
+                    return_type=list
+                )
+            except Exception as e:
+                ext_obs_intrvls = []
+                print(f'No external intervals found')
 
             obs_family = ObsFamily(
-                self.yaml_loader, family_name, family_members)
+                self.yaml_loader,
+                family_name,
+                family_members,
+                ext_obs_intrvls
+            )
 
             print(f'{os.linesep}type(obs_family): {type(obs_family)}')
 

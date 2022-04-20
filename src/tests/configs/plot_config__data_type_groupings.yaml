@@ -2,7 +2,37 @@
 plot_groupings:
 - grouping_name: Hyperspectral Infrared
   data_type_families:
+  - data_type_family_name: airs
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 10-01-2002
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 10-01-2002
+        end: 01-01-2030
+    family_members:
+    - data_type: airs
+      suffix: ".tm00.bufr_d"
+    - data_type: airsev
+      suffix: ".tm00.bufr_d"
+    - data_type: airswm
+      suffix: ".tm00.bufr_d"
   - data_type_family_name: cris
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-2015
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 01-01-2013
+        end: 01-01-2030
     family_members:
     - data_type: cris
       suffix: ".tm00.bufr_d"
@@ -11,6 +41,17 @@ plot_groupings:
     - data_type: crisdb
       suffix: ".tm00.bufr_d"
   - data_type_family_name: iasi
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 02-01-2007
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 10-01-2008
+        end: 01-01-2030
     family_members:
     - data_type: iasidb
       suffix: ".tm00.bufr_d"
@@ -18,17 +59,20 @@ plot_groupings:
       suffix: ".tm00.bufr_d"
     - data_type: mtiasi
       suffix: ".tm00.bufr_d"
-  - data_type_family_name: airs
-    family_members:
-    - data_type: airs
-      suffix: ".tm00.bufr_d"
-    - data_type: airsev
-      suffix: ".tm00.bufr_d"
-    - data_type: airswm
-      suffix: ".tm00.bufr_d"
 - grouping_name: Conventional
   data_type_families:
   - data_type_family_name: prepbufr
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-1979
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 01-01-1990
+        end: 01-01-2030
     family_members:
     - data_type: prepbufr
       suffix: ".nr"
@@ -36,9 +80,20 @@ plot_groupings:
     family_members:
     - data_type: prepbufr
       suffix: ".acft_profiles.nr"
-- grouping_name: Geo Radiances
+- grouping_name: Geostationary Radiance
   data_type_families:
   - data_type_family_name: goes
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 05-01-2001
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 05-01-2001
+        end: 01-01-2030
     family_members:
     - data_type: goesnd
       suffix: ".tm00.bufr_d"
@@ -49,6 +104,17 @@ plot_groupings:
 - grouping_name: Multispectral Infrared
   data_type_families:
   - data_type_family_name: HIRS
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-1979
+        end: 01-01-2016
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 05-01-1997
+        end: 01-01-2016
     family_members:
     - data_type: 1bhrs2
       suffix: ".tm00.bufr_d"
@@ -58,27 +124,66 @@ plot_groupings:
       suffix: ".tm00.bufr_d"
     - data_type: eshrs3
       suffix: ".tm00.bufr_d"
-  - data_type_family_name: seviri
+  - data_type_family_name: SEVIRI
+    external_obs_intervals:
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 02-01-2012
+        end: 01-01-2030
     family_members:
     - data_type: sevcsr
+      suffix: ".tm00.bufr_d"
+  - data_type_family_name: SSU
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-1979
+        end: 03-01-2006
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 05-01-1997
+        end: 03-01-2006
+    family_members:
+    - data_type: 1bssu
       suffix: ".tm00.bufr_d"
   - data_type_family_name: TOVS
     family_members:
     - data_type: rtovs
       suffix: ".tm00.bufr_d"
-  - data_type_family_name: ssu
-    family_members:
-    - data_type: 1bssu
-      suffix: ".tm00.bufr_d"
 - grouping_name: Microwave Images
   data_type_families:
   - data_type_family_name: amsr
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 06-01-2012
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 10-01-2012
+        end: 01-01-2030
     family_members:
     - data_type: amsr2
       suffix: ".tm00.bufr_d"
     - data_type: amsr-e
       suffix: ".tm00.bufr_d"
   - data_type_family_name: ssmis
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 06-01-1987
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 01-01-1997
+        end: 01-01-2010
     family_members:
     - data_type: ssmipn
       suffix: ".tm00.bufr_d"
@@ -89,34 +194,44 @@ plot_groupings:
     - data_type: ssmip
       suffix: ".tm00.bufr_d"
   - data_type_family_name: TRMM
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 06-01-2005
+        end: 02-01-2015
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 01-01-1998
+        end: 06-01-2014
     family_members:
     - data_type: trmm
       suffix: ".tm00.bufr_d"
     - data_type: sptrmm
       suffix: ".tm00.bufr_d"
-- grouping_name: Microwave Images
-  data_type_families:
-  - data_type_family_name: amsr
+  - data_type_family_name: GMI
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 06-01-2014
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 06-01-2014
+        end: 01-01-2030
     family_members:
-    - data_type: amsr2
-      suffix: ".tm00.bufr_d"
-    - data_type: amsr-e
-      suffix: ".tm00.bufr_d"
-  - data_type_family_name: ssmis
+  - data_type_family_name: amsr-e
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-2009
+        end: 10-01-2011
     family_members:
-    - data_type: ssmipn
-      suffix: ".tm00.bufr_d"
-    - data_type: ssmit
-      suffix: ".tm00.bufr_d"
-    - data_type: ssmisu
-      suffix: ".tm00.bufr_d"
-    - data_type: ssmip
-      suffix: ".tm00.bufr_d"
-  - data_type_family_name: TRMM
-    family_members:
-    - data_type: trmm
-      suffix: ".tm00.bufr_d"
-    - data_type: sptrmm
+    - data_type: amsre
       suffix: ".tm00.bufr_d"
 - grouping_name: Microwave Sounders
   data_type_families:
@@ -125,12 +240,34 @@ plot_groupings:
     - data_type: saphir
       suffix: ".tm00.bufr_d"
   - data_type_family_name: mhs
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-2006
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 06-01-2005
+        end: 01-01-2030
     family_members:
     - data_type: 1bmhs
       suffix: ".tm00.bufr_d"
     - data_type: esmhs
       suffix: ".tm00.bufr_d"
   - data_type_family_name: atms
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 10-01-2012
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 01-01-2012
+        end: 01-01-2030
     family_members:
     - data_type: atms
       suffix: ".tm00.bufr_d"
@@ -138,25 +275,64 @@ plot_groupings:
       suffix: ".tm00.bufr_d"
     - data_type: esatms
       suffix: ".tm00.bufr_d"
-  - data_type_family_name: amsua
+  - data_type_family_name: amsu-a
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 06-01-1998
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 01-01-1999
+        end: 01-01-2030
     family_members:
     - data_type: esamua
       suffix: ".tm00.bufr_d"
     - data_type: 1bamua
       suffix: ".tm00.bufr_d"
-  - data_type_family_name: amsub
+  - data_type_family_name: amsu-b
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 06-01-2001
+        end: 01-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 01-01-1999
+        end: 01-01-2010
     family_members:
     - data_type: esamub
       suffix: ".tm00.bufr_d"
     - data_type: 1bamub
       suffix: ".tm00.bufr_d"
-  - data_type_family_name: 1bmsu
+  - data_type_family_name: msu
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-1979
+        end: 11-01-2006
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 01-01-1997
+        end: 11-01-2006
     family_members:
     - data_type: 1bmsu
       suffix: ".tm00.bufr_d"
 - grouping_name: Snow Cover
   data_type_families:
   - data_type_family_name: imssnow
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-2004
+        end: 01-01-2030
     family_members:
     - data_type: imssnow96
       suffix: ".grib2"
@@ -164,9 +340,15 @@ plot_groupings:
     family_members:
     - data_type: snogrb_t1534
       suffix: ".3072.1536"
-- grouping_name: Advanced Vidicon Camera System
+- grouping_name: SST Radiance
   data_type_families:
-  - data_type_family_name: avcs
+  - data_type_family_name: avhrr
+    external_obs_intervals:
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 01-01-1999
+        end: 01-01-2030
     family_members:
     - data_type: avcsam
       suffix: ".tm00.bufr_d"
@@ -176,7 +358,15 @@ plot_groupings:
       suffix: ".tm00.bufr_d"
     - data_type: avcs18
       suffix: ".tm00.bufr_d"
+- grouping_name: Atmospheric Motion Vectors
+  data_type_families:
   - data_type_family_name: wnd
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-1982
+        end: 01-01-2030
     family_members:
     - data_type: satwnd
       suffix: ".tm00.bufr_d"
@@ -185,6 +375,12 @@ plot_groupings:
 - grouping_name: GPS Radio Occultation Data
   data_type_families:
   - data_type_family_name: gpsro
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-2002
+        end: 01-01-2030
     family_members:
     - data_type: gpsro
       suffix: ".tm00.bufr_d"
@@ -199,12 +395,24 @@ plot_groupings:
 - grouping_name: Scatterometer
   data_type_families:
   - data_type_family_name: qks
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-2000
+        end: 01-01-2010
     family_members:
     - data_type: qkscat
       suffix: ".tm00.bufr_d"
     - data_type: qkswnd
       suffix: ".tm00.bufr_d"
-  - data_type_family_name: asc
+  - data_type_family_name: ASCAT
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 02-01-2007
+        end: 01-01-2030
     family_members:
     - data_type: ascatw
       suffix: ".tm00.bufr_d.nr"
@@ -216,7 +424,13 @@ plot_groupings:
       suffix: ".tm00.bufr_d"
     - data_type: wndsat
       suffix: ".tm00.bufr_d"
-  - data_type_family_name: ers
+  - data_type_family_name: ERS
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 03-01-1992
+        end: 01-01-2030
     family_members:
     - data_type: erscat
       suffix: ".tm00.bufr_d"
@@ -225,20 +439,57 @@ plot_groupings:
 - grouping_name: Ozone
   data_type_families:
   - data_type_family_name: gome
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 06-01-1995
+        end: 08-01-2003
+      - 
+        start: 03-01-2007
+        end: 01-01-2030
     family_members:
     - data_type: gome
       suffix: ".tm00.bufr_d"
-  - data_type_family_name: sbu
+  - data_type_family_name: sbuv
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 01-01-1979
+        end: 06-01-2014
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 06-01-1996
+        end: 02-01-2004
     family_members:
     - data_type: osbuv
       suffix: ".tm00.bufr_d"
     - data_type: osbuv8
       suffix: ".tm00.bufr_d"
   - data_type_family_name: mls
+    external_obs_intervals:
+    - obs_src: era5
+      intervals:
+      - 
+        start: 07-01-2004
+        end: 06-01-2030
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 02-01-2004
+        end: 01-01-2030
     family_members:
     - data_type: mls
       suffix: ".tm00.bufr_d"
   - data_type_family_name: omps
+    external_obs_intervals:
+    - obs_src: mera20cr
+      intervals:
+      -
+        start: 03-01-2012
+        end: 01-01-2030
     family_members:
     - data_type: ompsn8
       suffix: ".tm00.bufr_d"
