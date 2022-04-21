@@ -65,6 +65,11 @@ class ObsGroupFilesizeTimeline(object):
                 members = family.get_members()
                 print(f'members: {members}')
                 if len(members) > 0:
+
+                    # if there are any family members, collect file meta
+                    # data from our obs_inventory table.  This is based
+                    # on our archive stored on AWS s3 bdp bucket
+
                     data = oiq.get_family_fs_data(family)
                     data['generic_fn'] = data['prefix'] + \
                         '.tag.' + data['data_type'] + data['suffix']
@@ -91,7 +96,6 @@ class ObsGroupFilesizeTimeline(object):
 
                     print(f'file_meta: {xy}')
                     xy.set_index('obs_day', inplace=True)
-                    # max_file_size = xy['file_size'].max()
 
                     xy_new = xy.reindex(
                         OBS_INV_DATERANGE_6H_CYCLE,
@@ -102,8 +106,6 @@ class ObsGroupFilesizeTimeline(object):
                     y = xy_new['file_size']
                     ax_sub.plot(x, y/1000000, linewidth=1,
                                 label=data_type, color=colors[m_idx+2])
-
-                    # plt.setp(leg_texts, fontsize=10)
 
                 ext_obs = family.get_ext_obs_intrvls()
                 print(f'ext_obs: {ext_obs}')
@@ -148,7 +150,6 @@ class ObsGroupFilesizeTimeline(object):
 
                 leg_lines = leg.get_lines()
                 print(f'leg_lines: {leg_lines}')
-                # leg_texts = leg.get_texts()
 
                 for leg_line in leg_lines:
                     leg_line.set_linewidth(4)
@@ -182,7 +183,6 @@ class ObsGroupFilesizeTimeline(object):
             )
             print(f'saving figure to {dest_path_png}')
             plt.savefig(dest_path_png)
-            # exit(1)
 
 
 @dataclass
