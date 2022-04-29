@@ -15,8 +15,8 @@ from config_handlers.obsgrp_fs_plot_conf import ObsGrouping, ObsFamily
 
 CALLING_DIR = pathlib.Path(__file__).parent.resolve()
 
-DEFAULT_MIN_DATETIME = datetime.strptime('1989-12-30', '%Y-%m-%d')
-DEFAULT_MAX_DATETIME = datetime.strptime('2021-01-01', '%Y-%m-%d')
+DEFAULT_MIN_DATETIME = datetime.strptime('1987-12-30', '%Y-%m-%d')
+DEFAULT_MAX_DATETIME = datetime.strptime('2023-01-01', '%Y-%m-%d')
 
 OBS_INV_DATERANGE = pd.date_range(
     DEFAULT_MIN_DATETIME,
@@ -29,6 +29,9 @@ OBS_INV_DATERANGE_6H_CYCLE = pd.date_range(
     DEFAULT_MAX_DATETIME,
     freq='6H'
 )
+
+EXT_OBS_ERA5 = 'era5'
+EXT_OBS_MERA20CR = 'mera20cr'
 
 print(f'OBS_INV_DATERANGE: {OBS_INV_DATERANGE}')
 
@@ -54,20 +57,38 @@ class ObsGroupFilesizeTimeline(object):
             fig.suptitle(figure_title, y=0.95, fontsize=20)
 
             for idx, family in enumerate(families):
+                mx_fl_sz = -1000000
                 plt.subplot(fmly_cnt, 1, idx+1)
-                print(f'{os.linesep}family: {family}')
+                print(
+                    f'{os.linesep}family: {family}, len(families): {len(families)}')
 
-                data = oiq.get_family_fs_data(family)
-                data['generic_fn'] = data['prefix'] + \
-                    '.tag.' + data['data_type'] + data['suffix']
-                print(f'data: {data}')
-                print(f'type(ax): {type(ax)}')
                 members = family.get_members()
+                print(f'members: {members}')
+                if len(members) > 0:
+
+                    # if there are any family members, collect file meta
+                    # data from our obs_inventory table.  This is based
+                    # on our archive stored on AWS s3 bdp bucket
+
+                    data = oiq.get_family_fs_data(family)
+                    data['generic_fn'] = data['prefix'] + \
+                        '.tag.' + data['data_type'] + data['suffix']
+                    print(f'data: {data}')
+                    print(f'type(ax): {type(ax)}')
+                    mx_fl_sz = -(data['file_size'].max())
+                    print(f'mx_fl_sz: {mx_fl_sz}')
+
                 if type(ax) == np.ndarray:
                     ax_sub = ax[idx]
                 else:
                     ax_sub = ax
-                for member in members:
+
+                # set color set.
+                prop_cycle = plt.rcParams['axes.prop_cycle']
+                colors = prop_cycle.by_key()['color']
+                for m_idx, member in enumerate(members):
+                    if len(members) == 0:
+                        continue
                     data_type = member.get('data_type')
                     xy = data.loc[
                         data['data_type'] == data_type
@@ -75,34 +96,74 @@ class ObsGroupFilesizeTimeline(object):
 
                     print(f'file_meta: {xy}')
                     xy.set_index('obs_day', inplace=True)
-                    max_file_size = xy['file_size'].max()
-                    print(f'max_file_size: {max_file_size/1000000}')
+
                     xy_new = xy.reindex(
                         OBS_INV_DATERANGE_6H_CYCLE,
-                        fill_value=-(max_file_size*0.1)
+                        fill_value=mx_fl_sz*0.1
                     )
 
                     x = xy_new.index
                     y = xy_new['file_size']
-                    ax_sub.plot(x, y/1000000, linewidth=0.3, label=data_type)
-                    leg = ax_sub.legend(loc='center left', facecolor="white")
+                    ax_sub.plot(x, y/1000000, linewidth=1,
+                                label=data_type, color=colors[m_idx+2])
 
-                    leg_lines = leg.get_lines()
-                    print(f'leg_lines: {leg_lines}')
-                    # leg_texts = leg.get_texts()
+                ext_obs = family.get_ext_obs_intrvls()
+                print(f'ext_obs: {ext_obs}')
 
-                    for leg_line in leg_lines:
-                        leg_line.set_linewidth(4)
-                        # plt.setp(leg_texts, fontsize=10)
+                # overlay external observation intervals on each subplot
+                for ext_ob in ext_obs:
+                    source = ext_ob.get('obs_src')
+                    if source == EXT_OBS_ERA5:
+                        ln_color = colors[0]
+                        y_lvl = mx_fl_sz*0.2/1000000
+                    elif source == EXT_OBS_MERA20CR:
+                        ln_color = colors[1]
+                        y_lvl = mx_fl_sz*0.3/1000000
+                    else:
+                        ln_color = 'grey'
+                        y_lvl = mx_fl_sz*0.4/1000000
+
+                    y = [y_lvl, y_lvl]
+
+                    intervals = ext_ob.get('intervals', [])
+
+                    for intrvl_idx, interval in enumerate(intervals):
+                        x = []
+                        start = datetime.strptime(
+                            interval.get('start'), '%m-%d-%Y')
+                        if start < DEFAULT_MIN_DATETIME:
+                            start = DEFAULT_MIN_DATETIME
+                        x.append(start)
+                        end = datetime.strptime(
+                            interval.get('end'), '%m-%d-%Y')
+                        if end > DEFAULT_MAX_DATETIME:
+                            end = DEFAULT_MAX_DATETIME
+                        x.append(end)
+                        if intrvl_idx == 0:
+                            ax_sub.plot(x, y, linewidth=6,
+                                        label=source, color=ln_color)
+                        else:
+                            ax_sub.plot(x, y, linewidth=8, color=ln_color)
+
+                leg = ax_sub.legend(loc='center right', facecolor="white")
+                plt.ylim((mx_fl_sz*0.4/1000000, -mx_fl_sz*1.1/1000000))
+
+                leg_lines = leg.get_lines()
+                print(f'leg_lines: {leg_lines}')
+
+                for leg_line in leg_lines:
+                    leg_line.set_linewidth(4)
 
                 subplot_title = family.get_family_name()
                 print(f'ax_sub: {ax_sub}')
 
                 ax_sub.minorticks_on()
-                ax_sub.text(0.02, 0.85, subplot_title,
+                ax_sub.text(0.01, 0.8, subplot_title,
                             transform=ax_sub.transAxes, fontsize=15, backgroundcolor='white')
-                ax_sub.grid(which='both', color='grey',
+                ax_sub.grid(which='minor', color='grey',
                             linestyle='--', linewidth=0.2)
+                ax_sub.grid(which='major', color='grey',
+                            linestyle='--', linewidth=0.8)
                 plt.ylabel('File Size(Mb)', fontsize=15)
 
             plt.gcf().autofmt_xdate()
@@ -134,12 +195,11 @@ class ObsInvFilesizeTimeline(object):
                   f'be greater than or equal to 0.'
             raise ValueError(msg)
 
-
     def plot_timeline(self):
         data = oiq.get_filesize_timeline_data(self.min_instances)
 
         # due to duplicate inserts of the same file, we need to select only
-        # the most recent insert.  Mutliple inserts can occur due to 
+        # the most recent insert.  Mutliple inserts can occur due to
         # multiple runs of the inventory search tool.  The most recent
         # insert is considered the current status of that file.  After
         # this operation, we should have a current and unique set of filenames
@@ -156,7 +216,7 @@ class ObsInvFilesizeTimeline(object):
         # this new column will now be in the datetime format but will not
         # be set to a specific date.  So adding this new column to the
         # 'obs_day' column will help create a new 'obs_cycle_time' column
-        # which defines a combination of the 'obs_day' and 
+        # which defines a combination of the 'obs_day' and
         # 'cycle_time_datetime'.
         # for example: 'cycle_time_datetime' = 01/01/1970T06:00:00
         # 'obs_day' = 01/01/2014T00:00:00 => 'obs_cycle_time' =
@@ -245,4 +305,3 @@ class ObsInvFilesizeTimeline(object):
             )
             print(f'saving figure to {dest_path_png}')
             plt.savefig(dest_path_png)
-
