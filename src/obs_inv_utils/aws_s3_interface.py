@@ -1,11 +1,14 @@
 import re
-import attr
+import os
+from pathlib import Path
 from collections import namedtuple, OrderedDict
+import attr
 import boto3
 from datetime import datetime
 from botocore.config import Config
 from botocore import UNSIGNED
 
+session = boto3.Session()
 
 bdp_config = Config(
     region_name = 'us-east-1',
@@ -66,7 +69,7 @@ AwsS3Command = namedtuple(
 
 AWS_BDP_BUCKET = 'noaa-reanalyses-pds'
 CMD_GET_S3_OBJ_LIST = 'list_objects'
-
+CMD_DOWNLOAD_S3_OBJ = 'download_file'
 
 def get_bdp_s3_client():
     try:
@@ -77,6 +80,63 @@ def get_bdp_s3_client():
 
     return client
 
+
+def download_s3_object(
+        client,
+        bucket=None,
+        s3_object_key=None,
+        dest_full_path=None,
+        expected_size=None
+):
+    print(f'client: {client}, bucket: {bucket}, s3_object_key: ' \
+        f'{s3_object_key}, dest_full_path: {dest_full_path}, ' \
+        f'expected_size: {expected_size}')
+
+    # remove file if it exists
+    try:
+        if os.path.exists(dest_full_path):
+            os.remove(dest_full_path)
+    except Exception as e:
+        print(f'Problem deleting file: {dest_full_path}, error: {e}')
+        return None    
+    
+    try:
+        client.download_file(
+            Bucket=bucket, Key=s3_object_key, Filename=dest_full_path)
+    except Exception as e:
+        print(f'Problem downloading s3 file - key: {s3_object_key}, error: {e}')
+
+    statusCode = 404
+    actual_size = 0
+    try:
+        actual_size = Path(dest_full_path).stat().st_size
+    except Exception as e:
+        msg = f'Problem getting actual file size for file: {dest_full_path}'
+        reason = msg
+    else:
+        statusCode = 200
+        msg = f'Download succeeded.'
+
+    if actual_size != expected_size:
+        msg = f'Incomplete download or corrupt file, expected_size: ' \
+            f'{expected_size}, actual_size: {actual_size}'
+
+    response = {
+        'ResponseMetadata': {
+            'HTTPStatusCode': statusCode,
+            'Bucket': bucket,
+            'Key': s3_object_key,
+            'Filename': dest_full_path,
+            'actual_size': actual_size,
+            'expected_size': expected_size
+        },
+        'Contents': {'file_downloaded': True},
+        'success': (statusCode == 200),
+        'message': msg
+    }
+    print(f'response: {response}')
+
+    return response
 
 def get_s3_objects_list(client, bucket=None, prefix=None):
     try:
@@ -109,7 +169,22 @@ def get_objects_list_args_valid(args):
     except Exception as e:
         raise ValueError(f'Invalid file path: {e}')
 
-    return True
+    return {'bucket': AWS_BDP_BUCKET, 'prefix': args[0]}
+
+
+def download_s3_obj_args_valid(args):
+    print(f'inside download_s3_obj_args_valid - args: {args}')
+    return {
+        'bucket': AWS_BDP_BUCKET,
+        's3_object_key': args[0],
+        'dest_full_path': args[1],
+        'expected_size': args[2]
+    }
+
+
+def download_s3_obj_resp_parser(response, obs_cycle_time):
+    print(f'inside download_s3_obj_resp_parser - response: {response}')
+    return None
 
 
 def s3_object_list_v2_parser(obj_list_contents, obs_cycle_time):
@@ -156,6 +231,11 @@ aws_s3_cmds = {
         get_s3_objects_list,
         get_objects_list_args_valid,
         s3_object_list_v2_parser,
+    ),
+    'download_file': AwsS3Command(
+        download_s3_object,
+        download_s3_obj_args_valid,
+        download_s3_obj_resp_parser,
     )
 }
 
@@ -184,8 +264,8 @@ class AwsS3CommandHandler(object):
     def __attrs_post_init__(self):
         self.cmd_obj = aws_s3_cmds[self.command]
         print(f'In __attrs_post_init__: self.args: {self.args}')
-        if self.cmd_obj.arg_validator(self.args):
-            self.kwargs = {'bucket': AWS_BDP_BUCKET, 'prefix': self.args[0]}
+        # it will blow up here if the arguments are invalid
+        self.kwargs = self.cmd_obj.arg_validator(self.args)
 
         self.client = get_bdp_s3_client()
         print(f'kwargs: {self.kwargs}')
@@ -200,7 +280,7 @@ class AwsS3CommandHandler(object):
             msg = f'Error after sending command {self.command}, error: {e}.'
             raise ValueError(msg)
         response_type = type(response)
-        # print(f'type(response): {response_type}, response: {response}')
+        print(f'type(response): {response_type}, response: {response}')
         resp_meta = response.get('ResponseMetadata')
         # print(f'resp_meta: {resp_meta}')
         self.raw_resp = response
