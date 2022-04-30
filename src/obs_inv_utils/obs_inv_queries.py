@@ -136,3 +136,64 @@ def get_filesize_timeline_data(min_instances):
     df = DataFrame(fn_fs)
 
     return df
+
+
+def get_bufr_files_data(filenames, start, end):
+
+    insp = inspect(engine)
+    table_exists = insp.has_table(itf.OBS_INVENTORY_TABLE)
+
+    if not table_exists:
+        msg = f'Table \'{itf.OBS_INVENTORY_TABLE}\' does not ' \
+              f'exist in database: \'{itf.OBS_SQLITE_DATABASE}\'.'
+        raise ValueError(msg)
+
+    session = Session()
+    oi = itf.ObsInventory
+
+    print(
+        f'Here in sql query - bufr_filenames: {filenames}, {start}, {end}')
+    unique_filenames = set()
+    for filename in filenames:
+        unique_filenames.add(filename)
+    
+    fn_fs = session.query(
+        oi.obs_id,
+        oi.prefix,
+        oi.filename,
+        oi.cycle_tag,
+        oi.cycle_time,
+        oi.data_type,
+        oi.file_size,
+        oi.obs_day,
+        oi.inserted_at,
+        oi.suffix,
+        oi.parent_dir.concat(oi.filename).label('full_path'),
+        func.max(oi.inserted_at).label('latest_record')
+    ).select_from(
+        oi
+    ).filter(
+        and_(
+            oi.platform == 'aws_s3',
+            or_(
+                oi.filename.like(fn) for fn in unique_filenames
+            ),
+            oi.obs_day >= start,
+            oi.obs_day <= end
+        )
+    ).group_by(
+        'full_path'
+        # ).order_by(
+        #     oi.filename, oi.obs_day, oi.cycle_time, oi.inserted_at
+    ).order_by(
+        oi.obs_day,
+        oi.filename
+    ).all()
+
+    print(f'fn_fs: {fn_fs}')
+
+    df = DataFrame(fn_fs)
+
+    print(f'df: {df}')
+
+    return df

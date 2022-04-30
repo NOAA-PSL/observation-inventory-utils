@@ -1,5 +1,6 @@
 import sqlalchemy as db
 from datetime import datetime
+from collections import namedtuple, OrderedDict
 from obs_inv_utils import search_engine as se
 from sqlalchemy import Table, Column, MetaData
 from sqlalchemy import Integer, String, Boolean, DateTime, Float
@@ -10,12 +11,25 @@ from sqlalchemy.orm import sessionmaker
 
 OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
 OBS_INVENTORY_TABLE = 'obs_inventory'
-HPSS_CMD_RESULTS_TABLE = 'hpss_cmd_results'
+CMD_RESULTS_TABLE = 'cmd_results'
 
 engine = db.create_engine(OBS_SQLITE_DATABASE, echo=True)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
+CmdResultData = namedtuple(
+    'CmdResultData',
+    [
+        'command',
+        'arg0',
+        'raw_output',
+        'raw_error',
+        'error_code',
+        'obs_day',
+        'submitted_at',
+        'latency'
+    ],
+)
 
 def create_obs_inventory_table():
     insp = inspect(engine)
@@ -47,14 +61,14 @@ def create_obs_inventory_table():
         metadata.create_all(engine)
 
 
-def create_hpss_cmd_results_table():
+def create_cmd_results_table():
     insp = inspect(engine)
-    table_exists = insp.has_table(HPSS_CMD_RESULTS_TABLE)
-    print(f'hpss_cmd_results table exists: {table_exists}')
-    if not insp.has_table(HPSS_CMD_RESULTS_TABLE):
+    table_exists = insp.has_table(CMD_RESULTS_TABLE)
+    print(f'cmd_results table exists: {table_exists}')
+    if not insp.has_table(CMD_RESULTS_TABLE):
         metadata = MetaData(engine)
 
-        Table(HPSS_CMD_RESULTS_TABLE, metadata,
+        Table(CMD_RESULTS_TABLE, metadata,
               Column('cmd_result_id', Integer, primary_key=True),
               Column('command', String),
               Column('arg0', String),
@@ -92,8 +106,8 @@ class ObsInventory(Base):
     inserted_at = Column(DateTime())
 
 
-class HpssCmdResult(Base):
-    __tablename__ = HPSS_CMD_RESULTS_TABLE
+class CmdResult(Base):
+    __tablename__ = CMD_RESULTS_TABLE
 
     cmd_result_id = Column(Integer, primary_key=True)
     command = Column(String(512))
@@ -146,21 +160,21 @@ def insert_obs_inv_items(obs_inv_items):
     session.close()
 
 
-def insert_hpss_cmd_result(hpss_cmd_result):
-    if not isinstance(hpss_cmd_result, se.HpssCmdResult):
-        msg = 'Inserted hpss command result item must be in the form' \
-              f' of type: HpssCmdResult.  Received type: {type(hpss_cmd_result)}'
+def insert_cmd_result(cmd_result):
+    if not isinstance(cmd_result, CmdResultData):
+        msg = 'Inserted command result item must be in the form' \
+              f' of type: CmdResult.  Received type: {type(cmd_result)}'
         raise TypeError(msg)
 
-    tbl_item = HpssCmdResult(
-        command=hpss_cmd_result.command,
-        arg0=hpss_cmd_result.arg0,
-        raw_output=hpss_cmd_result.raw_output,
-        raw_error=hpss_cmd_result.raw_error,
-        error_code=hpss_cmd_result.error_code,
-        obs_day=hpss_cmd_result.obs_day,
-        submitted_at=hpss_cmd_result.submitted_at,
-        latency=hpss_cmd_result.latency,
+    tbl_item = CmdResult(
+        command=cmd_result.command,
+        arg0=cmd_result.arg0,
+        raw_output=cmd_result.raw_output,
+        raw_error=cmd_result.raw_error,
+        error_code=cmd_result.error_code,
+        obs_day=cmd_result.obs_day,
+        submitted_at=cmd_result.submitted_at,
+        latency=cmd_result.latency,
         inserted_at=datetime.utcnow()
     )
 
@@ -171,4 +185,4 @@ def insert_hpss_cmd_result(hpss_cmd_result):
 
 
 create_obs_inventory_table()
-create_hpss_cmd_results_table()
+create_cmd_results_table()
