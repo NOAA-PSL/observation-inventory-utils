@@ -6,6 +6,8 @@ from datetime import datetime
 from typing import Optional
 from dataclasses import dataclass, field
 
+from obs_inv_utils import inventory_table_factory as tbl_factory
+
 nl = '\n'
 
 SubprocessCmd = namedtuple(
@@ -14,7 +16,7 @@ SubprocessCmd = namedtuple(
         'command',
         'validate_args',
         'parse_output',
-        'post_results'
+        'post_parsed_results'
     ],
 )
 
@@ -52,6 +54,7 @@ class SubprocessCmdHandler(object):
     raw_resp: CmdRawResponse = field(default=CmdRawResponse, init=False)
     submitted_at: datetime = field(default=datetime, init=False)
     finished_at: datetime = field(default=datetime, init=False)
+    cmd_id: int = field(default=int, init=False)
 
     def __post_init__(self):
         self.cmd_obj = self.subprocess_cmds[self.command]
@@ -129,3 +132,24 @@ class SubprocessCmdHandler(object):
             return self.cmd_obj.parse_output(self.raw_resp.output, context)
         else:
             return None
+
+
+    def post_cmd_result(self, obs_datetime):
+        cmd_result_data = tbl_factory.CmdResultData(
+            self.raw_resp.command,
+            self.raw_resp.args_0,
+            self.raw_resp.output,
+            self.raw_resp.error,
+            self.raw_resp.return_code,
+            obs_datetime,
+            self.raw_resp.submitted_at,
+            self.raw_resp.latency,
+            datetime.utcnow()
+        )
+
+        self.cmd_id = tbl_factory.insert_cmd_result(cmd_result_data)
+        print(f'In subproc, cmd result id: {self.cmd_id}')
+
+
+    def post_parsed_result(self, parsed_data, context):
+        return self.cmd_obj.post_parsed_results(self.cmd_id, parsed_data, context)

@@ -11,7 +11,7 @@ nceplibs_cmds = {
         ['sinv'],
         ncep_sinv.validate_args,
         ncep_sinv.parse_output,
-        ncep_sinv.post_obs_meta
+        ncep_sinv.post_obs_meta_data
     )
 }
 

@@ -1,5 +1,6 @@
 from typing import Optional
 from dataclasses import dataclass, field
+from datetime import datetime
 import json
 import os
 
@@ -29,7 +30,7 @@ nceplibs_bufr_cmds = {
         ['sinv'],
         ncep_sinv.validate_args,
         ncep_sinv.parse_output,
-        ncep_sinv.post_obs_meta
+        ncep_sinv.post_obs_meta_data
     )
 }
 
@@ -44,7 +45,7 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
         default=time_utils.default_datetime_converter
     )
 
-    cmd_result = itf.CmdResultData(
+    cmd_result_data = itf.CmdResultData(
         raw_response.command,
         raw_response.args_0,
         output_str,
@@ -52,10 +53,11 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
         raw_response.return_code,
         obs_cycle_time,
         raw_response.submitted_at,
-        raw_response.latency
+        raw_response.latency,
+        datetime.utcnow()
     )
 
-    itf.insert_cmd_result(cmd_result)
+    itf.insert_cmd_result(cmd_result_data)
 
 
 def download_bufr_file_from_s3(bufr_file):
@@ -141,11 +143,12 @@ class ObsBufrFileMetaHandler(object):
         if not cmd.send():
             return False
 
-        raw_output = cmd.get_raw_response()
+        cmd.post_cmd_result(bufr_file.obs_day)
+
         sinv_lines_meta = cmd.parse_output(bufr_file)
         for meta in sinv_lines_meta:
             print(f'meta: {meta}')
 
     
-
+        cmd.post_parsed_result(sinv_lines_meta, bufr_file)
         
