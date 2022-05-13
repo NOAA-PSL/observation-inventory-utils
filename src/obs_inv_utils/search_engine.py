@@ -36,6 +36,7 @@ FilenameMeta = namedtuple(
 TarballFileMeta = namedtuple(
     'TarballFileMeta',
     [
+        'cmd_result_id',
         'filename',
         'parent_dir',
         'platform',
@@ -191,14 +192,14 @@ def parse_filename(filename):
     return filename_meta
 
 
-def process_aws_s3_list_objects_v2_resp(contents):
+def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
     if not isinstance(contents, s3.AwsS3ObjectsListContents):
         return None
 
     listed_objects = contents.listed_objects
 
     files_meta = []
-
+    print(f'inside process_aws_s3_list_objects - cmd_result_id: {cmd_result_id}')
     for listed_object in listed_objects:
         fn = listed_object.name
         print(f'filename: {fn}')
@@ -206,6 +207,7 @@ def process_aws_s3_list_objects_v2_resp(contents):
         print(f'filename meta: {fn_meta}')
 
         file_meta = TarballFileMeta(
+            cmd_result_id,
             fn,
             contents.prefix,
             platforms.AWS_S3,
@@ -231,7 +233,7 @@ def process_aws_s3_list_objects_v2_resp(contents):
         tbl_factory.insert_obs_inv_items(files_meta)
 
 
-def process_inspect_tarball_resp(contents):
+def process_inspect_tarball_resp(cmd_result_id, contents):
     if not isinstance(contents, hpss.HpssTarballContents):
         return None
 
@@ -246,9 +248,10 @@ def process_inspect_tarball_resp(contents):
         print(f'filename meta: {fn_meta}')
 
         tarball_file_meta = TarballFileMeta(
+            cmd_result_id,
             fn,
             contents.parent_dir,
-            platforms.HERA_HPSS,
+            platforms.HPSS_HERA,
             '',
             fn_meta.prefix,
             fn_meta.cycle_tag,
@@ -283,7 +286,7 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
 
     output_str = json.dumps(raw_response.output,
                             default=default_datetime_converter)
-    aws_s3_cmd_result = HpssCmdResult(
+    cmd_result_data = tbl_factory.CmdResultData(
         raw_response.command,
         raw_response.args_0,
         output_str,
@@ -291,10 +294,12 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
         raw_response.return_code,
         obs_cycle_time,
         raw_response.submitted_at,
-        raw_response.latency
+        raw_response.latency,
+        datetime.utcnow()
     )
 
-    tbl_factory.insert_hpss_cmd_result(aws_s3_cmd_result)
+    cmd_result_id = tbl_factory.insert_cmd_result(cmd_result_data)
+    return cmd_result_id
 
 
 def post_hpss_cmd_result(raw_response, obs_day):
@@ -303,7 +308,7 @@ def post_hpss_cmd_result(raw_response, obs_day):
               f' actually of type: {type(raw_response)}'
         raise TypeError(msg)
 
-    hpss_cmd_result = HpssCmdResult(
+    cmd_result_data = tbl_factory.CmdResultData(
         raw_response.command,
         raw_response.args_0,
         raw_response.output,
@@ -311,17 +316,21 @@ def post_hpss_cmd_result(raw_response, obs_day):
         raw_response.return_code,
         obs_day,
         raw_response.submitted_at,
-        raw_response.latency
+        raw_response.latency,
+        datetime.utcnow()
     )
 
-    print(f'hpss_cmd_result: {hpss_cmd_result}')
-    tbl_factory.insert_hpss_cmd_result(hpss_cmd_result)
+    print(f'HPSS cmd_result: {cmd_result_data}')
+    cmd_result_id = tbl_factory.insert_cmd_result(cmd_result_data)
+
+    return cmd_result_id
 
 
 @dataclass
 class ObsInventorySearchEngine(object):
     obs_inv_conf: ObservationsConfig
     search_configs: list[ObsSearchConfig] = field(default_factory=list)
+    cmd_post_id: int = field(default_factory=int, init=False)
 
     def __post_init__(self):
         self.search_configs = self.obs_inv_conf.get_obs_inv_search_configs()
@@ -356,7 +365,7 @@ class ObsInventorySearchEngine(object):
                 n_days = 0
                 if platform == platforms.AWS_S3:
                     cmd = s3.AwsS3CommandHandler(s3.CMD_GET_S3_OBJ_LIST, args)
-                elif platform == platforms.HPSS_HERA:
+                elif platform == platforms.HERA_HPSS:
                     cmd = hpss.HpssCommandHandler(
                         hpss.CMD_INSPECT_TARBALL, args)
                     n_hours = 0
@@ -364,33 +373,44 @@ class ObsInventorySearchEngine(object):
 
                 print(f'cmd: {cmd}, finished_count: {finished_count}')
 
-                if cmd.send():
+                success = cmd.send()
+
+                raw_resp = cmd.get_raw_response()
+
+                if platform == platforms.AWS_S3:
+                    print('posting command results for aws s3')
+                    self.cmd_post_id = post_aws_s3_cmd_result(
+                        raw_resp,
+                        search_config.get_date_range().current
+                    )
+                elif platform == platforms.HERA_HPSS:
+                    self.cmd_post_id = post_hpss_cmd_result(
+                        raw_resp,
+                        search_config.get_date_range().current
+                    )
+
+                print(f'self.cmd_post_id: {self.cmd_post_id}')
+
+                if success:
                     current_time = search_config.get_date_range().current
                     print(f'current_time: {current_time}')
                     contents = cmd.parse_response(current_time)
 
                     if platform == platforms.AWS_S3:
                         file_meta = process_aws_s3_list_objects_v2_resp(
-                            contents)
-                    elif platform == platforms.HPSS_HERA:
-                        file_meta = process_inspect_tarball_resp(contents)
+                            self.cmd_post_id,
+                            contents
+                        )
+                    elif platform == platforms.HERA_HPSS:
+                        file_meta = process_inspect_tarball_resp(
+                            self.cmd_post_id,
+                            contents
+                        )
                 else:
                     msg = f'Command failed!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - error code: {cmd.get_raw_response}.'
                     print(msg)
 
                 raw_resp = cmd.get_raw_response()
-
-                if platform == platforms.AWS_S3:
-                    print('posting command results for aws s3')
-                    post_aws_s3_cmd_result(
-                        raw_resp,
-                        search_config.get_date_range().current
-                    )
-                elif platform == platforms.HPSS_HERA:
-                    post_hpss_cmd_result(
-                        raw_resp,
-                        search_config.get_date_range().current
-                    )
 
                 search_config.get_date_range().increment(days=n_days, hours=n_hours)
                 print(f'Current search path: {search_path}')
