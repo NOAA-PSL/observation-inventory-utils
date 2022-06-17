@@ -1,0 +1,10 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/atmos/gefsv13_reanalysis-md5/%Y%m%d%H%M%S/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  end: 20150101T060000Z
+  start: 20150101T000000Z
+bufr_files:
+  - gdas.t%z.1bamua.tm00.bufr_d
+  - gdas.t%z.1bhrs4.tm00.bufr_d
+

@@ -16,7 +16,13 @@ DEFAULT_DATE_RANGE_CONFIG = {
     'end': DEFAULT_END_TIME
 }
 
-DEFAULT_OBS_CYCLE_INTERVALS = [0, 3600*6, 3600*12, 3600*18] 
+DEFAULT_OBS_CYCLE_INTERVALS = [0, 3600*6, 3600*12, 3600*18]
+
+
+def default_datetime_converter(obj):
+   if isinstance(obj, datetime):
+      return obj.__str__()
+
 
 def get_datetime_str(value, format_str):
     try:

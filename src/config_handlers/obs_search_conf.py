@@ -7,7 +7,10 @@ from dataclasses import dataclass, field
 import attr
 
 # local imports
+import obs_inv_utils
 from obs_inv_utils import config_base
+from obs_inv_utils.config_base import ConfigInterface
+from obs_inv_utils.yaml_utils import YamlLoader
 from obs_inv_utils import time_utils
 from obs_inv_utils.time_utils import DateRange
 
@@ -51,13 +54,14 @@ class ObsSearchConfig(object):
 
 
 @dataclass
-class ObservationsConfig(object):
+class ObservationsConfig(ConfigInterface):
     """
     Class responsible for loading in the observations inventory search
     configuration.
     """
 
     config_yaml: str
+    config_data: dict = field(default_factory=dict, init=False)
     obs_search_configs: dict = field(default_factory=dict, init=False)
     search_date_range: DateRange = field(
         default_factory=DateRange, init=False)
@@ -66,22 +70,22 @@ class ObservationsConfig(object):
         super().__init__(self.config_yaml)
 
     def load(self):
-        config_data = yaml_utils.YamlLoader(self.config_yaml)
-        self.parse_obs_inv_search_configs(config_data)
-        print(f'config_data: {config_data}')
+        self.config_data = self.yaml_loader.load()
+        self.parse()
+        print(f'config_data: {self.config_data}')
 
-    def parse_obs_inv_search_configs(self, config_data):
-        obs_search_yaml_data = config_data.load()
+    def parse(self):
+        
 
-        obs_search_configs = config_data.get_value(
+        obs_search_configs = self.yaml_loader.get_value(
             key='search_info',
-            document=obs_search_yaml_data,
+            document=self.config_data,
             return_type=list
         )
 
-        config_date_range = config_data.get_value(
+        config_date_range = self.yaml_loader.get_value(
             key='date_range',
-            document=obs_search_yaml_data,
+            document=self.config_data,
             return_type=dict
         )
 
@@ -94,7 +98,7 @@ class ObservationsConfig(object):
             for obs_search_config in obs_search_configs:
                 print(f'obs_search_config: {obs_search_config}')
 
-                storage_platform = config_data.get_value(
+                storage_platform = self.yaml_loader.get_value(
                     key='platform',
                     document=obs_search_config,
                     return_type=str

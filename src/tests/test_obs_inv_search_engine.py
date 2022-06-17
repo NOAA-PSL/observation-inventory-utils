@@ -8,9 +8,11 @@ Unit tests for io_utils
 import os
 import pathlib
 import pytest
-from config_handlers import obs_search_conf as conf
 from datetime import datetime, timedelta
 from collections import namedtuple, OrderedDict
+import obs_inv_utils
+import config_handlers
+from config_handlers.obs_search_conf import ObservationsConfig
 from obs_inv_utils import time_utils
 from obs_inv_utils import search_engine as se
 from tests.cmd_outputs import hpss_cmd_helpers as hpss_helpers
@@ -19,7 +21,7 @@ import subprocess
 
 
 PYTEST_CALLING_DIR = pathlib.Path(__file__).parent.resolve()
-OBS_INV_YAML_CONFIG__VALID = 'obs_inv_config__valid.yaml'
+OBS_INV_YAML_CONFIG__VALID = 'obs_inv_config__valid_s3.yaml'
 
 DATA_DIR = 'data'
 CONFIGS_DIR = 'configs'
@@ -34,7 +36,7 @@ def test_search_engine__init():
         OBS_INV_YAML_CONFIG__VALID
     )
 
-    obs_conf = conf.ObservationsConfig(conf_filepath)
+    obs_conf = ObservationsConfig(conf_filepath)
     obs_conf.load()
     print(f'obs_conf: {obs_conf}')
     inv_search = se.ObsInventorySearchEngine(obs_conf)
