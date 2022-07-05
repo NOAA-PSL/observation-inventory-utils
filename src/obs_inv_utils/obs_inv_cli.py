@@ -24,7 +24,7 @@ from config_handlers import obs_meta_sinv
 from obs_inv_utils.nceplibs_bufr_cmd_handler import ObsBufrFileMetaHandler
 
 from obs_inv_utils import plot_generator as pg
-
+from obs_inv_utils import search_engine as se
 
 @click.group()
 def cli():
@@ -38,9 +38,8 @@ def get_obs_inventory(config_yaml):
     print(f'Inventory config to use: {config_yaml}')
     cf = ObservationsConfig(config_yaml)
     cf.load()
-    # harvester = harvester_engine.HarvesterEngine(cf)
-    # harvester.get_obs_file_sizes()
-
+    inv_search = se.ObsInventorySearchEngine(cf)
+    inv_search.get_obs_file_info()
 
 @cli.command()
 @click.option('-m', '--min-instances', 'min_instances', required=True, type=int)
