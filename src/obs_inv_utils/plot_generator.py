@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pl
-import mpld3
 import os
 import pandas as pd
 from pandas import DataFrame
@@ -71,12 +70,14 @@ class ObsGroupFilesizeTimeline(object):
                     # on our archive stored on AWS s3 bdp bucket
 
                     data = oiq.get_family_fs_data(family)
-                    data['generic_fn'] = data['prefix'] + \
-                        '.tag.' + data['data_type'] + data['suffix']
                     print(f'data: {data}')
-                    print(f'type(ax): {type(ax)}')
-                    mx_fl_sz = -(data['file_size'].max())
-                    print(f'mx_fl_sz: {mx_fl_sz}')
+                    if data is not None and data.shape[0] > 0:
+                        data['generic_fn'] = data['prefix'] + \
+                            '.tag.' + data['data_type'] + data['suffix']
+                        print(f'data: {data}')
+                        print(f'type(ax): {type(ax)}')
+                        mx_fl_sz = -(data['file_size'].max())
+                        print(f'mx_fl_sz: {mx_fl_sz}')
 
                 if type(ax) == np.ndarray:
                     ax_sub = ax[idx]
@@ -87,8 +88,8 @@ class ObsGroupFilesizeTimeline(object):
                 prop_cycle = plt.rcParams['axes.prop_cycle']
                 colors = prop_cycle.by_key()['color']
                 for m_idx, member in enumerate(members):
-                    if len(members) == 0:
-                        continue
+                    if (len(members) == 0 or data.shape[0] == 0):
+                        continue                    
                     data_type = member.get('data_type')
                     xy = data.loc[
                         data['data_type'] == data_type
