@@ -1,8 +1,8 @@
 cycling_interval: 21600
 date_range:
   datestr: '%Y%m%dT%H%M%SZ'
-  end: 20210101T120000Z
-  start: 19900101T000000Z
+  end: 20150103T180000Z
+  start: 20150101T000000Z
 search_info:
   -
     platform: aws_s3

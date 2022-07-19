@@ -3,6 +3,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import json
 import os
+from pathlib import Path
+import shutil
+import uuid
 
 import pandas as pd
 from pandas import DataFrame
@@ -60,10 +63,23 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
     itf.insert_cmd_result(cmd_result_data)
 
 
-def download_bufr_file_from_s3(bufr_file):
+def download_bufr_file_from_s3(work_dir, bufr_file):
     object_key = bufr_file['full_path']
-    dest_filename = os.path.join(
-        CALLING_DIR, TMP_OBS_DATA_DIR, bufr_file['filename'])
+
+    obs_day = datetime.strftime(bufr_file['obs_day'], '%Y%m%d')
+
+    dest_path = os.path.join(
+        work_dir, obs_day, bufr_file['filename'])
+
+    try:
+        Path(dest_path).mkdir(parents=True, exist_ok=True)
+    except Exception as err:
+        msg = f'\'work_dir\' is not a directory - err: {err}'
+        raise ValueError(msg) from err
+
+    dest_filename = os.path.join(dest_path, bufr_file['filename'])
+    
+    print(f'dest_filename: {dest_filename}')
 
     # setup command arguments, [file s3 key, destination location,
     # and expected filesize
@@ -114,21 +130,30 @@ class ObsBufrFileMetaHandler(object):
             self.bufr_files,
             self.date_range.start,
             self.date_range.end
-        )        
+        )
+
+        temp_uuid = str(uuid.uuid4())
+
+        work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
 
         print(f'inventory_bufr_files: {inventory_bufr_files}')
         for idx, bufr_file in inventory_bufr_files.iterrows():
             file_downloaded = False
             print(
                f'bufr_file: {bufr_file}')
-            
-            saved_filename = download_bufr_file_from_s3(bufr_file)
+
+            saved_filename = download_bufr_file_from_s3(work_dir, bufr_file)
 
             if saved_filename is None:
                 continue
-                
+
             self.get_obs_counts_with_sinv(saved_filename, bufr_file)
-           
+
+        # clean up files
+        print(f'scrub_files: {self.meta_config.scrub_files}')
+        if self.meta_config.scrub_files:
+            shutil.rmtree( work_dir )
+
 
     def get_obs_counts_with_sinv(self, filename, bufr_file):
         
@@ -152,3 +177,4 @@ class ObsBufrFileMetaHandler(object):
     
         cmd.post_parsed_result(sinv_lines_meta, bufr_file)
         
+

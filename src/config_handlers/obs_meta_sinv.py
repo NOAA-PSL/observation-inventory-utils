@@ -19,6 +19,8 @@ class ObsMetaSinvConfig(ConfigInterface):
     s3_bucket: str = field(default_factory=str, init=False)
     s3_prefix: str = field(default_factory=str, init=False)
     bufr_files: list = field(default_factory=list, init=False)
+    work_dir: str = field(default_factory=str, init=False)
+    scrub_files: bool = field(default_factory=bool, init=False)
     date_range: DateRange = field(
         default_factory=DateRange, init=False)
 
@@ -72,6 +74,21 @@ class ObsMetaSinvConfig(ConfigInterface):
             document=self.config_data,
             return_type=list
         )
+
+        self.work_dir = self.yaml_loader.get_value(
+            key='work_dir',
+            document=self.config_data,
+            return_type=str
+        )
+
+        self.scrub_files = self.yaml_loader.get_value(
+            key='scrub_files',
+            document=self.config_data,
+            return_type=bool
+        )
+
+
+
 
     def get_date_range(self):
         return self.date_range
