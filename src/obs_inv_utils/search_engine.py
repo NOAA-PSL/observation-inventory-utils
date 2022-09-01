@@ -192,6 +192,23 @@ def parse_filename(filename):
     return filename_meta
 
 
+def parse_filename_clean_bucket(filename):
+    parts = filename.split('.')
+    del parts[1] # clean bucket has one extra part. the rest are the same as the dirty bucket
+    cycle_tag = get_cycle_tag(parts)
+    filename_meta = FilenameMeta(
+        parts[PREFIX],
+        cycle_tag,
+        get_data_type(parts),
+        get_cycle_time(cycle_tag),
+        get_data_format(filename),
+        get_combined_suffix(parts),
+        filename.endswith('.nr')
+    )
+
+    return filename_meta
+
+
 def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
     if not isinstance(contents, s3.AwsS3ObjectsListContents):
         return None
@@ -232,6 +249,45 @@ def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
     if len(files_meta) > 0:
         tbl_factory.insert_obs_inv_items(files_meta)
 
+def process_aws_s3_clean_resp(cmd_result_id, contents):
+    if not isinstance(contents, s3.AwsS3ObjectsListContents):
+        return None
+
+    listed_objects = contents.listed_objects
+
+    files_meta = []
+    print(f'inside process_aws_s3_list_objects - cmd_result_id: {cmd_result_id}')
+    print(f'inside process_aws_s3_list_objects - contents: {contents}')
+    fn = os.path.basename(contents.prefix)
+    print(f'filename: {fn}')
+    fn_meta = parse_filename_clean_bucket(fn)
+    print(f'filename meta: {fn_meta}')
+
+    listed_object = listed_objects[0]
+    files_meta.append(TarballFileMeta(
+            cmd_result_id,
+            fn,
+            os.path.dirname(contents.prefix),
+            platforms.AWS_S3_CLEAN,
+            s3.AWS_BDP_BUCKET,
+            fn_meta.prefix,
+            fn_meta.cycle_tag,
+            fn_meta.data_type,
+            fn_meta.cycle_time,
+            contents.obs_cycle_time,
+            fn_meta.data_format,
+            fn_meta.suffix,
+            fn_meta.not_restricted_tag,
+            listed_object.size,
+            '',
+            listed_object.last_modified,
+            contents.submitted_at,
+            contents.latency,
+            datetime.utcnow()
+    ))
+
+    if len(files_meta) > 0:
+        tbl_factory.insert_obs_inv_items(files_meta)
 
 def process_inspect_tarball_resp(cmd_result_id, contents):
     if not isinstance(contents, hpss.HpssTarballContents):
@@ -363,7 +419,7 @@ class ObsInventorySearchEngine(object):
                 platform = search_config.get_storage_platform()
                 n_hours = 6
                 n_days = 0
-                if platform == platforms.AWS_S3:
+                if platform == platforms.AWS_S3 or platform == platforms.AWS_S3_CLEAN:
                     cmd = s3.AwsS3CommandHandler(s3.CMD_GET_S3_OBJ_LIST, args)
                 elif platform == platforms.HERA_HPSS:
                     cmd = hpss.HpssCommandHandler(
@@ -377,7 +433,7 @@ class ObsInventorySearchEngine(object):
 
                 raw_resp = cmd.get_raw_response()
 
-                if platform == platforms.AWS_S3:
+                if platform == platforms.AWS_S3 or platform == platforms.AWS_S3_CLEAN:
                     print('posting command results for aws s3')
                     self.cmd_post_id = post_aws_s3_cmd_result(
                         raw_resp,
@@ -398,6 +454,11 @@ class ObsInventorySearchEngine(object):
 
                     if platform == platforms.AWS_S3:
                         file_meta = process_aws_s3_list_objects_v2_resp(
+                            self.cmd_post_id,
+                            contents
+                        )
+                    elif platform == platforms.AWS_S3_CLEAN:
+                        file_meta = process_aws_s3_clean_resp(
                             self.cmd_post_id,
                             contents
                         )
