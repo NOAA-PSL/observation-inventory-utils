@@ -267,8 +267,8 @@ def process_aws_s3_clean_resp(cmd_result_id, contents):
     files_meta.append(TarballFileMeta(
             cmd_result_id,
             fn,
-            os.path.dirname(contents.prefix),
-            platforms.AWS_S3_CLEAN,
+            os.path.dirname(contents.prefix) + "/",
+            platforms.AWS_S3, # using AWS_S3 instead of AWS_S3_CLEAN to enable sinv work properly
             s3.AWS_BDP_BUCKET,
             fn_meta.prefix,
             fn_meta.cycle_tag,
