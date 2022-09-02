@@ -137,6 +137,7 @@ class ObsBufrFileMetaHandler(object):
         work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
 
         print(f'inventory_bufr_files: {inventory_bufr_files}')
+        print(f'scrub_files: {self.meta_config.scrub_files}')
         for idx, bufr_file in inventory_bufr_files.iterrows():
             file_downloaded = False
             print(
@@ -149,11 +150,10 @@ class ObsBufrFileMetaHandler(object):
 
             self.get_obs_counts_with_sinv(saved_filename, bufr_file)
 
-        # clean up files
-        print(f'scrub_files: {self.meta_config.scrub_files}')
-        if self.meta_config.scrub_files:
-            shutil.rmtree( work_dir )
-
+            # clean up files
+            if self.meta_config.scrub_files:
+                #os.remove( saved_filename )
+                shutil.rmtree( work_dir )
 
     def get_obs_counts_with_sinv(self, filename, bufr_file):
         
