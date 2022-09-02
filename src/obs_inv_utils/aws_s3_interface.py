@@ -53,7 +53,8 @@ AwsS3FileMeta = namedtuple(
         'name',
         'permissions',
         'last_modified',
-        'size'
+        'size',
+        'etag'
     ],
 )
 
@@ -209,11 +210,12 @@ def s3_object_list_v2_parser(obj_list_contents, obs_cycle_time):
         size = object_item.get('Size')
         last_modified = object_item.get('LastModified')
         fn_str = object_item.get('Key')
+        etag = object_item.get('ETag')[1:-1]
         fn = fn_str[len(prefix):]
         
         print(f'fn: {fn}')
         files_meta.append(
-            AwsS3FileMeta(fn, permissions, last_modified, size))
+            AwsS3FileMeta(fn, permissions, last_modified, size, etag))
 
     # print(f'files_meta: {files_meta}')
     return AwsS3ObjectsListContents(
