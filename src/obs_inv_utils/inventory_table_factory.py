@@ -62,6 +62,7 @@ def create_obs_inventory_table():
               Column('suffix', String),
               Column('nr_tag', Boolean),
               Column('file_size', Integer),
+              Column('etag', String),
               Column('permissions', String),
               Column('last_modified', DateTime),
               Column('inserted_at', DateTime),
@@ -165,6 +166,7 @@ class ObsInventory(Base):
     suffix = Column(String(63))
     nr_tag = Column(Boolean())
     file_size = Column(Integer())
+    etag = Column(String(34))
     permissions = Column(String(15))
     last_modified = Column(DateTime())
     inserted_at = Column(DateTime())
@@ -220,6 +222,7 @@ def insert_obs_inv_items(obs_inv_items):
             suffix=obs_item.suffix,
             nr_tag=obs_item.nr_tag,
             file_size=obs_item.file_size,
+            etag=obs_item.etag,
             permissions=obs_item.permissions,
             last_modified=obs_item.last_modified,
             inserted_at=obs_item.inserted_at,
