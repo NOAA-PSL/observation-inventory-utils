@@ -6,7 +6,7 @@ import numpy as np
 import sqlite3, pandas , matplotlib.pyplot as plt
 from datetime import datetime, date
 import matplotlib.dates as mdates
-#from IPython.display import display
+from IPython.display import display
 import os
 from scipy import interpolate
 import argparse
@@ -32,7 +32,12 @@ daterange=[date(1990,1,1), date(2022,1,1)]
 sat_dictionary={"NOAA 10":"n10","NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13","NOAA 14":"n14",
                "NOAA 15":"n15","NOAA 16":"n16","NOAA 17":"n17","NOAA 18":"n18","NOAA 19":"n19","NOAA 20":"n20",
                "METOP-1":"metop-a","METOP-2":"metop-b","METOP-3":"metop-c",
-               "METOP-1 (Metop-A":"metop-a","METOP-2 (Metop-B":"metop-b","METOP-3 (Metop-C":"metop-c"}
+               "METOP-1 (Metop-A":"metop-a","METOP-2 (Metop-B":"metop-b","METOP-3 (Metop-C":"metop-c",
+               "AQUA":"aqua", "NPP":"npp",
+               "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
+               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15",
+               "METEOSAT 8": "m08", "METEOSAT 9": "m09", "METEOSAT 10": "m10", "METEOSAT 11": "m11",
+                "":""}
 
 
 #read raw satinfo files
@@ -46,12 +51,17 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
         tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
             ,columns=['datetime','status'])
         satinfo=pandas.concat([satinfo,tmp_frame])
+    #if empty make 
+    if (satinfo.empty):
+      satinfo.loc[len(satinfo.index)] = [date(1900,1,1), False, np.nan]
+      satinfo.loc[len(satinfo.index)] = [date(2100,1,1), False, np.nan]
     #convert logical to floats with nans for plotting
     satinfo['status_nan'] = satinfo.status.astype('int')
     satinfo['status_nan'].replace(0, np.nan, inplace=True)
     #make sure the end of the series is in the future
     satinfo.loc[len(satinfo.index)]=[date(2100,1,1), satinfo.status.iat[-1], satinfo.status_nan.iat[-1]]    
     satinfo.datetime = pandas.to_datetime(satinfo.datetime)
+    display(satinfo)
     return satinfo
 
 
