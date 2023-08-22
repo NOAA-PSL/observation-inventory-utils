@@ -1,3 +1,4 @@
+import os
 import sqlalchemy as db
 from datetime import datetime
 from collections import namedtuple, OrderedDict
@@ -8,13 +9,24 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import credentials
 
-OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
+
 OBS_INVENTORY_TABLE = 'obs_inventory'
 CMD_RESULTS_TABLE = 'cmd_results'
 OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
 
-engine = db.create_engine(OBS_SQLITE_DATABASE, echo=True)
+OBS_DATABASE = ''
+OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
+database_type = os.getenv('DATABASE_TYPE', 'sqlite')
+if(database_type.lower() == 'mysql'):
+    mysql_password = os.getenv('MYSQL_PASSWORD')
+    OBS_DATABASE = f'mysql://obsinvuser:{mysql_password}@observation-inventory.cuydilmgclji.us-east-1.rds.amazonaws.com:3306'
+else:
+    OBS_DATABASE = OBS_SQLITE_DATABASE
+
+
+engine = db.create_engine(OBS_DATABASE, echo=True)
 Base = declarative_base()
 metadata = MetaData(engine)
 Session = sessionmaker(bind=engine)

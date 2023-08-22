@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 
 from obs_inv_utils import inventory_table_factory as itf
 
-engine = db.create_engine(itf.OBS_SQLITE_DATABASE, echo=True)
+engine = db.create_engine(itf.OBS_DATABASE, echo=True)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
@@ -25,7 +25,7 @@ def get_family_fs_data(obs_family):
 
     if not table_exists:
         msg = f'Table \'{itf.OBS_INVENTORY_TABLE}\' does not ' \
-              f'exist in database: \'{itf.OBS_SQLITE_DATABASE}\'.'
+              f'exist in database: \'{itf.OBS_DATABASE}\'.'
         raise ValueError(msg)
 
     session = Session()
@@ -76,7 +76,7 @@ def get_filesize_timeline_data(min_instances):
 
     if not table_exists:
         msg = f'Table \'{itf.OBS_INVENTORY_TABLE}\' does not ' \
-              f'exist in database: \'{itf.OBS_SQLITE_DATABASE}\'.'
+              f'exist in database: \'{itf.OBS_DATABASE}\'.'
         raise ValueError(msg)
 
     session = Session()
@@ -145,7 +145,7 @@ def get_bufr_files_data(filenames, start, end):
 
     if not table_exists:
         msg = f'Table \'{itf.OBS_INVENTORY_TABLE}\' does not ' \
-              f'exist in database: \'{itf.OBS_SQLITE_DATABASE}\'.'
+              f'exist in database: \'{itf.OBS_DATABASE}\'.'
         raise ValueError(msg)
 
     session = Session()
