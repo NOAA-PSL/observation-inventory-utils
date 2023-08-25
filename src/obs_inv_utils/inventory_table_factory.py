@@ -10,22 +10,25 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import credentials
-
+import sqlalchemy.dialects.mysql
 
 OBS_INVENTORY_TABLE = 'obs_inventory'
 CMD_RESULTS_TABLE = 'cmd_results'
 OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
-
+print(os.environ)
 OBS_DATABASE = ''
-OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
+# OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
 database_type = os.getenv('DATABASE_TYPE', 'sqlite')
+print('dt: ' + database_type)
 if(database_type.lower() == 'mysql'):
     mysql_password = os.getenv('MYSQL_PASSWORD')
-    OBS_DATABASE = f'mysql://obsinvuser:{mysql_password}@observation-inventory.cuydilmgclji.us-east-1.rds.amazonaws.com:3306'
+    OBS_DATABASE = f'mysql+mysqlconnector://obsinvuser:{mysql_password}@observation-inventory.cuydilmgclji.us-east-1.rds.amazonaws.com:3306/obsinvdb'
 else:
-    OBS_DATABASE = OBS_SQLITE_DATABASE
+#    OBS_DATABASE = OBS_SQLITE_DATABASE
+    print('manually trying')
+    OBS_DATABASE = f'mysql+mysqlconnector://obsinvuser:[PASSWORD HERE]@observation-inventory.cuydilmgclji.us-east-1.rds.amazonaws.com:3306/obsinvdb'    
 
-
+print('database: ' + OBS_DATABASE)
 engine = db.create_engine(OBS_DATABASE, echo=True)
 Base = declarative_base()
 metadata = MetaData(engine)
@@ -306,8 +309,9 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
     session.close()
 
 
-
-create_obs_inventory_table()
-create_cmd_results_table()
-create_obs_meta_nceplibs_bufr_table()
-metadata.create_all(engine)
+print('about to create tables')
+#create_obs_inventory_table()
+#create_cmd_results_table()
+#create_obs_meta_nceplibs_bufr_table()
+Base.metadata.create_all(engine)
+print('after creating table')
