@@ -17,16 +17,16 @@ OBS_INVENTORY_TABLE = 'obs_inventory'
 CMD_RESULTS_TABLE = 'cmd_results'
 OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
 OBS_DATABASE = ''
-# OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
+OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
+
 database_type = os.getenv('DATABASE_TYPE', 'sqlite')
 print('dt: ' + database_type)
 if(database_type.lower() == 'mysql'):
     mysql_password = os.getenv('MYSQL_PASSWORD')
     OBS_DATABASE = f'mysql+mysqlconnector://obsinvuser:{mysql_password}@observation-inventory.cuydilmgclji.us-east-1.rds.amazonaws.com:3306/obsinvdb'
 else:
-#    OBS_DATABASE = OBS_SQLITE_DATABASE
-    print('manually trying')
-    OBS_DATABASE = f'mysql+mysqlconnector://obsinvuser:[PASSWORD HERE]@observation-inventory.cuydilmgclji.us-east-1.rds.amazonaws.com:3306/obsinvdb'    
+    OBS_DATABASE = OBS_SQLITE_DATABASE
+    
 
 print('database: ' + OBS_DATABASE)
 engine = db.create_engine(OBS_DATABASE, echo=True)
