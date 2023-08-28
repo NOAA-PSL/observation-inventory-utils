@@ -9,13 +9,13 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import credentials
-import sqlalchemy.dialects.mysql
+from dotenv import load_dotenv
+
+load_dotenv()
 
 OBS_INVENTORY_TABLE = 'obs_inventory'
 CMD_RESULTS_TABLE = 'cmd_results'
 OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
-print(os.environ)
 OBS_DATABASE = ''
 # OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
 database_type = os.getenv('DATABASE_TYPE', 'sqlite')
@@ -310,8 +310,11 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
 
 
 print('about to create tables')
-#create_obs_inventory_table()
-#create_cmd_results_table()
-#create_obs_meta_nceplibs_bufr_table()
-Base.metadata.create_all(engine)
+if(database_type.lower() == 'mysql'):
+    Base.metadata.create_all(engine)
+else:
+    create_obs_inventory_table()
+    create_cmd_results_table()
+    create_obs_meta_nceplibs_bufr_table()
+
 print('after creating table')
