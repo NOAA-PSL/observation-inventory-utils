@@ -20,7 +20,7 @@ OBS_DATABASE = ''
 OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
 
 database_type = os.getenv('DATABASE_TYPE', 'sqlite')
-print('dt: ' + database_type)
+print('database type: ' + database_type)
 if(database_type.lower() == 'mysql'):
     mysql_password = os.getenv('MYSQL_PASSWORD')
     OBS_DATABASE = f'mysql+mysqlconnector://obsinvuser:{mysql_password}@observation-inventory.cuydilmgclji.us-east-1.rds.amazonaws.com:3306/obsinvdb'
@@ -309,7 +309,6 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
     session.close()
 
 
-print('about to create tables')
 if(database_type.lower() == 'mysql'):
     Base.metadata.create_all(engine)
 else:
@@ -317,4 +316,3 @@ else:
     create_cmd_results_table()
     create_obs_meta_nceplibs_bufr_table()
 
-print('after creating table')
