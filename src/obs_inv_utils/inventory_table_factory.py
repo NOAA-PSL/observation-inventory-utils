@@ -315,4 +315,4 @@ else:
     create_obs_inventory_table()
     create_cmd_results_table()
     create_obs_meta_nceplibs_bufr_table()
-
+    metadata.create_all(engine)
