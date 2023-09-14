@@ -22,20 +22,12 @@ from obs_inv_utils import subprocess_cmd_handler as sch
 from obs_inv_utils.subprocess_cmd_handler import SubprocessCmd
 from obs_inv_utils import nceplibs_cmds as nc_cmds
 from obs_inv_utils import nceplibs_cmd_sinv as ncep_sinv
+from obs_inv_utils import nceplibs_cmd_cmpbqm as ncep_cmpbqm
 
 NCEPLIBS_BUFR_SINV = 'nceplibs_bufr_sinv_cmd'
 #get_bufr_file_meta(meta_hdlr.NCEPLIBS_BUFR_SINV)
 CALLING_DIR = pathlib.Path(__file__).parent.resolve()
 TMP_OBS_DATA_DIR = 'tmp_obs_data'
-
-nceplibs_bufr_cmds = {
-    'sinv': SubprocessCmd(
-        ['sinv'],
-        ncep_sinv.validate_args,
-        ncep_sinv.parse_output,
-        ncep_sinv.post_obs_meta_data
-    )
-}
 
 def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
     if not isinstance(raw_response, s3.AwsS3CommandRawResponse):
