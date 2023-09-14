@@ -27,6 +27,9 @@ if(database_type.lower() == 'mysql'):
         mysql_password = os.getenv('MYSQL_PASSWORD')
         mysql_host = os.getenv('MYSQL_HOST')
         mysql_database = os.getenv('MYSQL_DATABASE')
+
+        if(mysql_username == None or mysql_password == None or mysql_host == None or mysql_database == None):
+            raise Exception
     except: 
         print('There was an error pulling the required values for the MySQL database from the .env file.')
         print('Required values for MySQL database: MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_DATABASE.')
@@ -36,6 +39,8 @@ else:
     sqlite_database = OBS_SQLITE_DEFAULT
     try: 
         sqlite_database = os.getenv('SQLITE_DATABASE')
+        if(sqlite_database == None):
+            raise Exception
     except:
         print('No SQLITE_DATABASE value found in .env file. Defaulting to observations_inventory.db.')
         pass
