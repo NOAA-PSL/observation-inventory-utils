@@ -33,11 +33,11 @@ if(database_type.lower() == 'mysql'):
 
     OBS_DATABASE = f'mysql+mysqlconnector://{mysql_username}:{mysql_password}@{mysql_host}:3306/{mysql_database}'
 else:
+    sqlite_database = OBS_SQLITE_DEFAULT
     try: 
         sqlite_database = os.getenv('SQLITE_DATABASE')
     except:
         print('No SQLITE_DATABASE value found in .env file. Defaulting to observations_inventory.db.')
-        sqlite_database = OBS_SQLITE_DEFAULT
         pass
 
     OBS_DATABASE = "sqlite:///" + sqlite_database
