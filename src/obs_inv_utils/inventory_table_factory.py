@@ -17,15 +17,30 @@ OBS_INVENTORY_TABLE = 'obs_inventory'
 CMD_RESULTS_TABLE = 'cmd_results'
 OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
 OBS_DATABASE = ''
-OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
+OBS_SQLITE_DEFAULT = 'observations_inventory.db'
 
 database_type = os.getenv('DATABASE_TYPE', 'sqlite')
 print('database type: ' + database_type)
 if(database_type.lower() == 'mysql'):
-    mysql_password = os.getenv('MYSQL_PASSWORD')
-    OBS_DATABASE = f'mysql+mysqlconnector://obsinvuser:{mysql_password}@observation-inventory.cuydilmgclji.us-east-1.rds.amazonaws.com:3306/obsinvdb'
+    try: 
+        mysql_username = os.getenv('MYSQL_USERNAME')
+        mysql_password = os.getenv('MYSQL_PASSWORD')
+        mysql_host = os.getenv('MYSQL_HOST')
+        mysql_database = os.getenv('MYSQL_DATABASE')
+    except: 
+        print('There was an error pulling the required values for the MySQL database from the .env file.')
+        print('Required values for MySQL database: MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_DATABASE.')
+
+    OBS_DATABASE = f'mysql+mysqlconnector://{mysql_username}:{mysql_password}@{mysql_host}:3306/{mysql_database}'
 else:
-    OBS_DATABASE = OBS_SQLITE_DATABASE
+    try: 
+        sqlite_database = os.getenv('SQLITE_DATABASE')
+    except:
+        print('No SQLITE_DATABASE value found in .env file. Defaulting to observations_inventory.db.')
+        sqlite_database = OBS_SQLITE_DEFAULT
+        pass
+
+    OBS_DATABASE = "sqlite:///" + sqlite_database
     
 
 print('database: ' + OBS_DATABASE)
