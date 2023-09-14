@@ -1,3 +1,4 @@
+import os
 import sqlalchemy as db
 from datetime import datetime
 from collections import namedtuple, OrderedDict
@@ -8,13 +9,47 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
-OBS_SQLITE_DATABASE = 'sqlite:///observations_inventory.db'
+load_dotenv()
+
 OBS_INVENTORY_TABLE = 'obs_inventory'
 CMD_RESULTS_TABLE = 'cmd_results'
 OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
+OBS_DATABASE = ''
+OBS_SQLITE_DEFAULT = 'observations_inventory.db'
 
-engine = db.create_engine(OBS_SQLITE_DATABASE, echo=True)
+database_type = os.getenv('DATABASE_TYPE', 'sqlite')
+print('database type: ' + database_type)
+if(database_type.lower() == 'mysql'):
+    try: 
+        mysql_username = os.getenv('MYSQL_USERNAME')
+        mysql_password = os.getenv('MYSQL_PASSWORD')
+        mysql_host = os.getenv('MYSQL_HOST')
+        mysql_database = os.getenv('MYSQL_DATABASE')
+
+        if(mysql_username == None or mysql_password == None or mysql_host == None or mysql_database == None):
+            raise Exception
+    except: 
+        print('There was an error pulling the required values for the MySQL database from the .env file.')
+        print('Required values for MySQL database: MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_DATABASE.')
+
+    OBS_DATABASE = f'mysql+mysqlconnector://{mysql_username}:{mysql_password}@{mysql_host}:3306/{mysql_database}'
+else:
+    sqlite_database = OBS_SQLITE_DEFAULT
+    try: 
+        sqlite_database = os.getenv('SQLITE_DATABASE')
+        if(sqlite_database == None):
+            raise Exception
+    except:
+        print('No SQLITE_DATABASE value found in .env file. Defaulting to observations_inventory.db.')
+        sqlite_database = OBS_SQLITE_DEFAULT
+        pass
+
+    OBS_DATABASE = f"sqlite:///{sqlite_database}"
+    print('sqlite database: ' + OBS_DATABASE)   
+
+engine = db.create_engine(OBS_DATABASE, echo=True)
 Base = declarative_base()
 metadata = MetaData(engine)
 Session = sessionmaker(bind=engine)
@@ -294,8 +329,10 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
     session.close()
 
 
-
-create_obs_inventory_table()
-create_cmd_results_table()
-create_obs_meta_nceplibs_bufr_table()
-metadata.create_all(engine)
+if(database_type.lower() == 'mysql'):
+    Base.metadata.create_all(engine)
+else:
+    create_obs_inventory_table()
+    create_cmd_results_table()
+    create_obs_meta_nceplibs_bufr_table()
+    metadata.create_all(engine)
