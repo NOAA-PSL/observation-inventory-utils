@@ -40,7 +40,7 @@ else:
         print('No SQLITE_DATABASE value found in .env file. Defaulting to observations_inventory.db.')
         pass
 
-    OBS_DATABASE = "sqlite:///" + sqlite_database
+    OBS_DATABASE = f"sqlite:///{sqlite_database}"
     
 
 print('database: ' + OBS_DATABASE)
