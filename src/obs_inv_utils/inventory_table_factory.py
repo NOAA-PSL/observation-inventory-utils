@@ -43,12 +43,12 @@ else:
             raise Exception
     except:
         print('No SQLITE_DATABASE value found in .env file. Defaulting to observations_inventory.db.')
+        sqlite_database = OBS_SQLITE_DEFAULT
         pass
 
     OBS_DATABASE = f"sqlite:///{sqlite_database}"
-    
+    print('sqlite database: ' + OBS_DATABASE)   
 
-print('database: ' + OBS_DATABASE)
 engine = db.create_engine(OBS_DATABASE, echo=True)
 Base = declarative_base()
 metadata = MetaData(engine)
