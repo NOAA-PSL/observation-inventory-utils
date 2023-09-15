@@ -20,8 +20,9 @@ from config_handlers.obsgrp_fs_plot_conf import ObsGroupFileSizePlotConfig
 from config_handlers.obsgrp_fs_plot_conf import ObsGrouping, ObsFamily
 from config_handlers.obs_search_conf import ObservationsConfig
 from config_handlers.obs_meta_sinv import ObsMetaSinvConfig
-from config_handlers import obs_meta_sinv
-from obs_inv_utils.nceplibs_bufr_cmd_handler import ObsBufrFileMetaHandler
+from config_handlers.obs_meta_cmpbqm import ObsMetaCMPBQMConfig
+from config_handlers import obs_meta_sinv, obs_meta_cmpbqm
+from obs_inv_utils.nceplibs_bufr_cmd_handler import ObsBufrFileMetaHandler, ObsPrepBufrFileMetaHandler
 
 from obs_inv_utils import plot_generator as pg
 from obs_inv_utils import search_engine as se
@@ -65,6 +66,16 @@ def get_obs_count_meta_sinv(config_yaml):
     print(repr(config))
     mh = ObsBufrFileMetaHandler(config)
     mh.get_bufr_file_meta(obs_meta_sinv.NCEPLIBS_BUFR_SINV)
+
+@cli.command()
+@click.option('-c, --config-yaml', 'config_yaml', required=True, type=str)
+def get_obs_count_meta_cmpbqm(config_yaml):
+    config = ObsMetaCMPBQMConfig(config_yaml)
+    config.load()
+    print(repr(config))
+    mh = ObsPrepBufrFileMetaHandler(config)
+    mh.get_prepbufr_file_meta(obs_meta_cmpbqm.NCEPLIBS_PREPBUFR_CMPBQM)
+    
 
 if __name__ == '__main__':
     print(f'in cli - input arguments: {sys.argv[1:]}')

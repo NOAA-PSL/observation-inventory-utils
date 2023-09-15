@@ -12,7 +12,6 @@ from pandas import DataFrame
 import pathlib
 import numpy as np
 
-from config_handlers.obs_meta_sinv import ObsMetaSinvConfig
 from config_handlers.obs_meta_cmpbqm import ObsMetaCMPBQMConfig
 from obs_inv_utils import obs_inv_queries as oiq
 from obs_inv_utils import aws_s3_interface as s3
@@ -22,6 +21,7 @@ from obs_inv_utils import inventory_table_factory as itf
 from obs_inv_utils import subprocess_cmd_handler as sch
 from obs_inv_utils.subprocess_cmd_handler import SubprocessCmd
 from obs_inv_utils import nceplibs_cmds as nc_cmds
+from obs_inv_utils import nceplibs_cmd_cmpbqm as ncep_cmpbqm
 
 CALLING_DIR = pathlib.Path(__file__).parent.resolve()
 TMP_OBS_DATA_DIR = 'tmp_obs_data'
@@ -52,7 +52,7 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
     itf.insert_cmd_result(cmd_result_data)
 
 
-def download_bufr_file_from_s3(work_dir, bufr_file):
+def download_prepbufr_file_from_s3(work_dir, bufr_file):
     object_key = bufr_file['full_path']
 
     obs_day = datetime.strftime(bufr_file['obs_day'], '%Y%m%d')
@@ -107,7 +107,7 @@ class ObsBufrFileMetaHandler(object):
 
     def __repr__(self):
         """
-        string representation of ObsBufrFileMetaHandler globals
+        string representation of ObsBufrFileNetaHandler globals
         """
         return f'meta_config: {self.meta_config}, ' \
             f'bufr_files: {self.bufr_files}, ' \
@@ -132,7 +132,7 @@ class ObsBufrFileMetaHandler(object):
             print(
                f'bufr_file: {bufr_file}')
 
-            saved_filename = download_bufr_file_from_s3(work_dir, bufr_file)
+            saved_filename = download_prepbufr_file_from_s3(work_dir, bufr_file)
 
             if saved_filename is None:
                 continue
@@ -167,72 +167,3 @@ class ObsBufrFileMetaHandler(object):
         cmd.post_parsed_result(sinv_lines_meta, bufr_file)
         
 
-@dataclass
-class ObsPrepBufrFileMetaHandler(object):
-    meta_config: ObsMetaCMPBQMConfig
-    prepbufr_files: list = field(default_factory=list, init=False)
-    date_range: DateRange = field(init=False)
-
-    def __post_init__(self):
-        self.date_range = self.meta_config.get_date_range()
-        self.prepbufr_files = self.meta_config.get_prepbufr_file_list()
-
-    def __repr__(self):
-        """
-        string representation of ObsPrepBufrFileMetaHandler globals
-        """
-        return f'meta_config: {self.meta_config}, ' \
-            f'prepbufr_files: {self.prepbufr_files}, ' \
-            f'date_range: {self.date_range}'
-
-    def get_prepbufr_file_meta(self, cmd_type):
-
-        inventory_prepbufr_files = oiq.get_bufr_files_data(
-            self.prepbufr_files,
-            self.date_range.start,
-            self.date_range.end
-        )
-
-        temp_uuid = str(uuid.uuid4())
-
-        work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
-
-        print(f'inventory_prepbufr_files: {inventory_prepbufr_files}')
-        print(f'scrub_files: {self.meta_config.scrub_files}')
-        for idx, prepbufr_file in inventory_prepbufr_files.iterrows():
-            file_downloaded = False
-            print(
-               f'bufr_file: {prepbufr_file}')
-
-            saved_filename = download_bufr_file_from_s3(work_dir, prepbufr_file)
-
-            if saved_filename is None:
-                continue
-
-            self.get_obs_counts_with_sinv(saved_filename, prepbufr_file)
-
-            # clean up files
-            if self.meta_config.scrub_files:
-                #os.remove( saved_filename )
-                shutil.rmtree( work_dir )
-
-    def get_obs_counts_with_cmpbqm(self, filename, prepbufr_file):
-        args = [filename]
-        cmd = sch.SubprocessCmdHandler(
-            nc_cmds.NCEPLIBS_CMPBQM,
-            nc_cmds.nceplibs_cmds,
-            args
-        )
-        print(f'cmd: {cmd}')
-
-        if not cmd.send():
-            return False
-        
-        cmd.post_cmd_result(prepbufr_file.obs_day)
-
-        # NOTE: this may need to change to handle the difference in commands or it may just be in the lower layer
-        cmpbqm_lines_meta = cmd.parse_output(prepbufr_file)
-        for meta in cmpbqm_lines_meta:
-            print(f'meta: {meta}')
-        
-        cmd.post_parsed_result(cmpbqm_lines_meta, prepbufr_file)
