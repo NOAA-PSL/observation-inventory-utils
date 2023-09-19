@@ -19,4 +19,10 @@ def post_obs_meta_data(cmd_id, lines_meta, prepbufr_file):
     #this will be based on the new name for these items
     #iterate over lines meta for each object to save
     # this will probably handle the variations of table inputs we want to calculate
-    # call itf.insert_... make a new call for inserting to our new table 
+    # calculate the aggregates --- probably using list(filter(lambda)) or all(x with name) like Linq
+    #since we have to loop anyway is it better to just map as looping?? 
+    # call itf.insert_... make a new call for inserting to our new table
+
+    obs_meta_data_items = []
+    obs_meta_data_agg_items = []
+    

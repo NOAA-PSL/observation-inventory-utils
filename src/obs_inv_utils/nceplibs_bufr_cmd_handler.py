@@ -200,7 +200,6 @@ class ObsPrepBufrFileMetaHandler(object):
         print(f'inventory_prepbufr_files: {inventory_prepbufr_files}')
         print(f'scrub_files: {self.meta_config.scrub_files}')
         for idx, prepbufr_file in inventory_prepbufr_files.iterrows():
-            file_downloaded = False
             print(
                f'bufr_file: {prepbufr_file}')
 
@@ -213,7 +212,6 @@ class ObsPrepBufrFileMetaHandler(object):
 
             # clean up files
             if self.meta_config.scrub_files:
-                #os.remove( saved_filename )
                 shutil.rmtree( work_dir )
 
     def get_obs_counts_with_cmpbqm(self, filename, prepbufr_file):
