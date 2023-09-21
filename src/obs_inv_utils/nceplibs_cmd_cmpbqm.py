@@ -99,7 +99,10 @@ def parse_output(output, bufr_file):
         if cleaned_line[0] is '-':
             continue
         
-        # TODO: HANDLE THE EARLY LINES from DATA VALID and lines that end with *** 
+        #TODO: see if I can improve this statement or if it's a necessary evil 
+        #skip the lines with info starting with either DATA or ***
+        if cleaned_line.contains('*') or cleaned_line.contains('DATA'):
+            continue
 
         # either on a heading row for the variable or reached the next variable in the list
         # save new variable name for harvested lines below
@@ -152,9 +155,6 @@ def parse_output(output, bufr_file):
     return lines_meta
 
 def post_obs_meta_data(cmd_id, lines_meta, prepbufr_file):
-    #TO DO: make sure that lines_meta is in the format expected here
-    # if not, need to update the lines_meta calls below!! 
-    
     obs_meta_data_items = []
     obs_meta_data_agg_items = []
     aggregate_dict = {}
