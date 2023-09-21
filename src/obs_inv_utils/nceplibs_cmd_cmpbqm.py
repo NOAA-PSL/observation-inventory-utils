@@ -4,7 +4,28 @@ import re
 
 from obs_inv_utils import nceplibs_cmds
 from obs_inv_utils import inventory_table_factory as itf
- 
+
+CmpbqmMeta = namedtuple(
+    'CmpbqmMeta',
+    [
+        'variable',
+        'typ',
+        'tot',
+        'qm0thru3',
+        'qm4thru7',
+        'qm8',
+        'qm9',
+        'qm10',
+        'qm11',
+        'qm12',
+        'qm13',
+        'qm14',
+        'qm15',
+        'cka',
+        'ckb',
+    ]
+)
+
 ObsMetaNceplibsPrepbufrData = namedtuple(
     'ObsMetaNceplibsPrepbufrData',
     [
@@ -62,9 +83,73 @@ def validate_args(args):
     return True
 
 
-def parse_output():
-    #call score hv
-    return "to be added"
+def parse_output(output, bufr_file):
+    # is the file actually spitting out the lines of the log file? do i need to open or pass the file
+    # check the section in cmd_handler about this
+    output_lines = output.split('\n')
+    lines_meta = []
+    current_variable = ""
+    for line in output_lines:
+        # skip any lines which are all whitespace
+        if line.isspace():
+            continue
+
+        cleaned_line = line.strip() # strip to remove whitespace so calls can be to first character of line
+        # skip lines which are all ----
+        if cleaned_line[0] is '-':
+            continue
+        
+        # TODO: HANDLE THE EARLY LINES from DATA VALID and lines that end with *** 
+
+        # either on a heading row for the variable or reached the next variable in the list
+        # save new variable name for harvested lines below
+        if cleaned_line[0].isalpha():
+            if cleaned_line[0:3] == 'typ':
+                continue
+            else:
+                current_variable = cleaned_line.upper()
+                #fix potential humidity spelling issue coming from cmpbqm output
+                current_variable.replace('HUMIDTY', 'HUMIDITY')
+            break
+
+            
+        # harvest line of data and save to list
+        if line[0].isdigit():
+            cleaned_line.replace('|', ' ')
+            split = cleaned_line.split()
+            typ = split[0]
+            tot = split[1]
+            qm0thru3 = split[2]
+            qm4thru7 = split[3]
+            qm8 = split[4]
+            qm9 = split[5]
+            qm10 = split[6]
+            qm11 = split[7]
+            qm12 = split[8]
+            qm13 = split[9]
+            qm14 = split[10]
+            qm15 = split[11]
+            cka = split[12]
+            ckb = split[13]
+            item = CmpbqmMeta(
+                current_variable,
+                typ,
+                tot,
+                qm0thru3,
+                qm4thru7,
+                qm8,
+                qm9,
+                qm10,
+                qm11,
+                qm12,
+                qm13,
+                qm14,
+                qm15,
+                cka,
+                ckb
+            )
+            lines_meta.append(item)
+    return lines_meta
 
 def post_obs_meta_data(cmd_id, lines_meta, prepbufr_file):
     #TO DO: make sure that lines_meta is in the format expected here
