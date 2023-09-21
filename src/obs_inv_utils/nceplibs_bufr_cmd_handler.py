@@ -208,7 +208,7 @@ class ObsPrepBufrFileMetaHandler(object):
             if saved_filename is None:
                 continue
 
-            self.get_obs_counts_with_sinv(saved_filename, prepbufr_file)
+            self.get_obs_counts_with_cmpbqm(saved_filename, prepbufr_file)
 
             # clean up files
             if self.meta_config.scrub_files:
