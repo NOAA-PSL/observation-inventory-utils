@@ -84,8 +84,6 @@ def validate_args(args):
 
 
 def parse_output(output, bufr_file):
-    # is the file actually spitting out the lines of the log file? do i need to open or pass the file
-    # check the section in cmd_handler about this
     output_lines = output.split('\n')
     lines_meta = []
     current_variable = ""
@@ -99,7 +97,6 @@ def parse_output(output, bufr_file):
         if cleaned_line[0] is '-':
             continue
         
-        #TODO: see if I can improve this statement or if it's a necessary evil 
         #skip the lines with info starting with either DATA or ***
         if cleaned_line.contains('*') or cleaned_line.contains('DATA'):
             continue
