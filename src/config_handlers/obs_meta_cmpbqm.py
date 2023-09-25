@@ -35,8 +35,8 @@ class ObsMetaCMPBQMConfig(ConfigInterface):
         return f'config_yaml: {self.config_yaml}, ' \
             f'config_data: {self.config_data}, ' \
             f's3_bucket: {self.s3_bucket}, ' \
-            f's3_bucket: {self.date_range}, ' \
-            f's3_bucket: {self.prepbufr_files}, '
+            f'date_range: {self.date_range}, ' \
+            f'prepbufr_files: {self.prepbufr_files}, '
 
 
     def load(self):
