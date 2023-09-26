@@ -97,8 +97,12 @@ def parse_output(output, bufr_file):
         if cleaned_line[0] is '-':
             continue
         
-        #skip the lines with info starting with either DATA or ***
-        if cleaned_line.contains('*') or cleaned_line.contains('DATA'):
+        #skip lines with *
+        if '*' in cleaned_line:
+            continue
+
+        #skip lines with 'DATA' in it since this is just a header
+        if cleaned_line.find('DATA') != -1:
             continue
 
         # either on a heading row for the variable or reached the next variable in the list
