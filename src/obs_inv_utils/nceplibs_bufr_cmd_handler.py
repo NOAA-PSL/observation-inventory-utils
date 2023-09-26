@@ -228,7 +228,6 @@ class ObsPrepBufrFileMetaHandler(object):
         
         cmd.post_cmd_result(prepbufr_file.obs_day)
 
-        # NOTE: this may need to change to handle the difference in commands or it may just be in the lower layer
         cmpbqm_lines_meta = cmd.parse_output(prepbufr_file)
         for meta in cmpbqm_lines_meta:
             print(f'meta: {meta}')
