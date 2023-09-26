@@ -68,7 +68,7 @@ def get_obs_count_meta_sinv(config_yaml):
     mh.get_bufr_file_meta(obs_meta_sinv.NCEPLIBS_BUFR_SINV)
 
 @cli.command()
-@click.option('-c, --config-yaml', 'config_yaml', required=True, type=str)
+@click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
 def get_obs_count_meta_cmpbqm(config_yaml):
     config = ObsMetaCMPBQMConfig(config_yaml)
     config.load()
