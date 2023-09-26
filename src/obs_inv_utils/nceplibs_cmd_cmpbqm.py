@@ -153,9 +153,12 @@ def parse_output(output, bufr_file):
                 ckb
             )
             lines_meta.append(item)
+            print("item added: ")
+            print(item)
     return lines_meta
 
 def post_obs_meta_data(cmd_id, lines_meta, prepbufr_file):
+    print("in post obs meta data")
     obs_meta_data_items = []
     obs_meta_data_agg_items = []
     aggregate_dict = {}
@@ -243,7 +246,7 @@ def post_obs_meta_data(cmd_id, lines_meta, prepbufr_file):
     
     #make an aggregate list to pass to insert
     obs_meta_data_agg_items = list(aggregate_dict.values())
-
+    print("items processed about to insert")
     #insert items into appropriate tables
     itf.insert_obs_meta_nceplibs_prepbufr_item(obs_meta_data_items)
     itf.insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_data_agg_items)
