@@ -84,10 +84,13 @@ def validate_args(args):
 
 
 def parse_output(output, bufr_file):
+    print("in parse output")
     output_lines = output.split('\n')
     lines_meta = []
     current_variable = ""
     for line in output_lines:
+        print("line in output_lines:")
+        print(line)
         # skip any lines which are all whitespace
         if line.isspace():
             continue
@@ -155,6 +158,8 @@ def parse_output(output, bufr_file):
             lines_meta.append(item)
             print("item added: ")
             print(item)
+    print("lines_meta: ")
+    print(lines_meta)
     return lines_meta
 
 def post_obs_meta_data(cmd_id, lines_meta, prepbufr_file):
