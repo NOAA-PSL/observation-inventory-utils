@@ -85,7 +85,10 @@ def validate_args(args):
 
 def parse_output(output, bufr_file):
     print("in parse output")
+    print(output)
     output_lines = output.split('\n')
+    print("output lines")
+    print(output_lines)
     lines_meta = []
     current_variable = ""
     for line in output_lines:
