@@ -120,7 +120,8 @@ def parse_output(output, bufr_file):
                 current_variable = cleaned_line.upper()
                 #fix potential humidity spelling issue coming from cmpbqm output
                 current_variable.replace('HUMIDTY', 'HUMIDITY')
-            break
+                continue
+            
 
             
         # harvest line of data and save to list
