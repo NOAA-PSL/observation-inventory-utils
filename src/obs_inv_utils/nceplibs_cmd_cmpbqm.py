@@ -126,7 +126,13 @@ def parse_output(output, bufr_file):
             
         # harvest line of data and save to list
         if line[0].isdigit():
-            cleaned_line.replace('|', ' ')
+            cleaned_line = cleaned_line.replace('|', ' ')
+            #check in case typ and total run into each other to split it properly
+            if cleaned_line[3].isdigit():
+                    cleaned_line = cleaned_line[0:2] + ' ' + cleaned_line[2:]
+            #check in case typ includes R to add space at right place
+            if cleaned_line[3].isalpha():
+                    cleaned_line = cleaned_line[0:3] + ' ' + cleaned_line[3:]
             split = cleaned_line.split()
             typ = split[0]
             tot = split[1]
