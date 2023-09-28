@@ -463,8 +463,6 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
     session.close()
 
 def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
-    print("inserting nceplibs prepbufr item")
-    print(obs_meta_items)
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs nceplibs prepbufr meta items must be in the form' \
               f' of a list.  Received type: {type(obs_meta_items)}'
@@ -505,8 +503,6 @@ def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
     session.close()
 
 def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
-    print("inserting nceplibs prepbufr agg item")
-    print(obs_meta_items)
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs nceplibs prepbufr aggregate meta items must be in the form' \
               f' of a list.  Received type: {type(obs_meta_items)}'
