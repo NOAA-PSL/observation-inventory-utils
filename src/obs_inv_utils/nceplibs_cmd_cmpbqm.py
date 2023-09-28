@@ -90,8 +90,6 @@ def parse_output(output, prepbufr_file):
         lines_meta = []
         current_variable = ""
         for line in output_lines:
-            print("line in output_lines:")
-            print(line)
             # skip any lines which are all whitespace
             if line.isspace():
                 continue
