@@ -477,6 +477,7 @@ def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
             cmd_result_id=item.cmd_result_id,
             cmd_str=item.cmd_str,
             variable=item.variable,
+            typ = item.typ,
             tot=item.tot,
             qm0thru3=item.qm0thru3,
             qm4thru7=item.qm4thru7,
