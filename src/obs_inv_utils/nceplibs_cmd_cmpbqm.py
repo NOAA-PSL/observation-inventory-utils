@@ -99,12 +99,12 @@ def parse_output(output, bufr_file):
             continue
 
         cleaned_line = line.strip() # strip to remove whitespace so calls can be to first character of line
+        #file is done when line starts with * 
+        if '*' in cleaned_line:
+            break
+
         # skip lines which are all ----
         if cleaned_line[0] is '-':
-            continue
-        
-        #skip lines with *
-        if '*' in cleaned_line:
             continue
 
         #skip lines with 'DATA' in it since this is just a header
@@ -129,10 +129,10 @@ def parse_output(output, bufr_file):
             cleaned_line = cleaned_line.replace('|', ' ')
             #check in case typ and total run into each other to split it properly
             if cleaned_line[3].isdigit():
-                    cleaned_line = cleaned_line[0:2] + ' ' + cleaned_line[2:]
+                    cleaned_line = cleaned_line[0:3] + ' ' + cleaned_line[3:]
             #check in case typ includes R to add space at right place
             if cleaned_line[3].isalpha():
-                    cleaned_line = cleaned_line[0:3] + ' ' + cleaned_line[3:]
+                    cleaned_line = cleaned_line[0:4] + ' ' + cleaned_line[4:]
             split = cleaned_line.split()
             typ = split[0]
             tot = split[1]
