@@ -1,0 +1,10 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/conv/prepbufr/%Y/%m/prepbufr/
+date_range:
+    datestr: '%Y%m%dT%H%M%SZ'
+    start: 20200101T000000Z
+    end: 20210101T000000Z
+prepbufr_files:
+    - gdas.%z.prepbufr.nr
+work_dir: '/lustre/work'
+scrub_files: False

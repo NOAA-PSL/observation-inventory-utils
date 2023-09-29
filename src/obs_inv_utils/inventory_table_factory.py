@@ -16,6 +16,8 @@ load_dotenv()
 OBS_INVENTORY_TABLE = 'obs_inventory'
 CMD_RESULTS_TABLE = 'cmd_results'
 OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
+OBS_META_NCEPLIBS_PREPBUFR_TABLE = 'obs_meta_nceplibs_prepbufr'
+OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE = 'obs_meta_nceplibs_prepbufr_aggregate'
 OBS_DATABASE = ''
 OBS_SQLITE_DEFAULT = 'observations_inventory.db'
 
@@ -74,7 +76,6 @@ def create_obs_inventory_table():
     table_exists = insp.has_table(OBS_INVENTORY_TABLE)
     print(f'obs_inventory table exists: {table_exists}')
     if not insp.has_table(OBS_INVENTORY_TABLE):
- #       metadata = MetaData(engine)
 
         Table(OBS_INVENTORY_TABLE, metadata,
               Column(
@@ -103,7 +104,6 @@ def create_obs_inventory_table():
               Column('inserted_at', DateTime),
         )
 
-  #      metadata.create_all(engine)
 
 
 def create_cmd_results_table():
@@ -111,7 +111,6 @@ def create_cmd_results_table():
     table_exists = insp.has_table(CMD_RESULTS_TABLE)
     print(f'cmd_results table exists: {table_exists}')
     if not insp.has_table(CMD_RESULTS_TABLE):
-  #      metadata = MetaData(engine)
 
         Table(CMD_RESULTS_TABLE, metadata,
               Column('cmd_result_id', Integer, primary_key=True),
@@ -126,7 +125,6 @@ def create_cmd_results_table():
               Column('inserted_at', DateTime),
         )
 
-        # metadata.create_all(engine)
 
 
 def create_obs_meta_nceplibs_bufr_table():
@@ -134,7 +132,6 @@ def create_obs_meta_nceplibs_bufr_table():
     table_exists = insp.has_table(OBS_META_NCEPLIBS_BUFR_TABLE)
     print(f'obs_meta_nceplibs_bufr table exists: {table_exists}')
     if not insp.has_table(OBS_META_NCEPLIBS_BUFR_TABLE):
-  #      metadata = MetaData(engine)
 
         Table(OBS_META_NCEPLIBS_BUFR_TABLE, metadata,
               Column('meta_id', Integer, primary_key=True),
@@ -162,9 +159,88 @@ def create_obs_meta_nceplibs_bufr_table():
               Column('inserted_at', DateTime),
         )
 
-   #     metadata.create_all(engine)
+def create_obs_meta_nceplibs_prepbufr_table():
+    insp = inspect(engine)
+    table_exists = insp.has_table(OBS_META_NCEPLIBS_PREPBUFR_TABLE)
+    print(f'{OBS_META_NCEPLIBS_PREPBUFR_TABLE} table exists: {table_exists}')
+    if not insp.has_table(OBS_META_NCEPLIBS_PREPBUFR_TABLE):
 
+        Table(OBS_META_NCEPLIBS_PREPBUFR_TABLE, metadata,
+              Column('meta_id', Integer, primary_key=True),
+              Column(
+                  'obs_id',
+                  Integer,
+                  ForeignKey('obs_inventory.obs_id'),
+                  nullable=False
+              ),
+              Column(
+                  'cmd_result_id',
+                  Integer,
+                  ForeignKey('cmd_results.cmd_result_id'),
+                  nullable=False
+              ),
+              Column('cmd_str', String),
+              Column('variable', String),
+              Column('typ', Integer),
+              Column('tot', Integer),
+              Column('qm0thru3', Integer),
+              Column('qm4thru7', Integer),
+              Column('qm8', Integer),
+              Column('qm9', Integer),
+              Column('qm10', Integer),
+              Column('qm11', Integer),
+              Column('qm12', Integer),
+              Column('qm13', Integer),
+              Column('qm14', Integer),
+              Column('qm15', Integer),
+              Column('cka', Integer),
+              Column('ckb', Integer),
+              Column('filename', String),
+              Column('file_size', Integer),
+              Column('obs_day', DateTime),
+              Column('inserted_at', DateTime)
+        )
 
+def create_obs_meta_nceplibs_prepbufr_agg_table():
+    insp = inspect(engine)
+    table_exists = insp.has_table(OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE)
+    print(f'{OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE} table exists: {table_exists}')
+    if not insp.has_table(OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE):
+
+        Table(OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE, metadata,
+              Column('meta_id', Integer, primary_key=True),
+              Column(
+                  'obs_id',
+                  Integer,
+                  ForeignKey('obs_inventory.obs_id'),
+                  nullable=False
+              ),
+              Column(
+                  'cmd_result_id',
+                  Integer,
+                  ForeignKey('cmd_results.cmd_result_id'),
+                  nullable=False
+              ),
+              Column('cmd_str', String),
+              Column('variable', String),
+              Column('tot', Integer),
+              Column('qm0thru3', Integer),
+              Column('qm4thru7', Integer),
+              Column('qm8', Integer),
+              Column('qm9', Integer),
+              Column('qm10', Integer),
+              Column('qm11', Integer),
+              Column('qm12', Integer),
+              Column('qm13', Integer),
+              Column('qm14', Integer),
+              Column('qm15', Integer),
+              Column('cka', Integer),
+              Column('ckb', Integer),
+              Column('filename', String),
+              Column('file_size', Integer),
+              Column('obs_day', DateTime),
+              Column('inserted_at', DateTime)
+        )
 
 class CmdResult(Base):
     __tablename__ = CMD_RESULTS_TABLE
@@ -227,6 +303,63 @@ class ObsMetaNceplibsBufr(Base):
     inserted_at = Column(DateTime())
 
     cmd_result = relationship("ObsInventory", foreign_keys=[obs_id])
+    cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
+class ObsMetaNceplibsPrepbufr(Base):
+    __tablename__ = OBS_META_NCEPLIBS_PREPBUFR_TABLE
+
+    meta_id = Column(Integer, primary_key=True)
+    obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
+    cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
+    cmd_str = Column(String(31))
+    variable = Column(String(63))
+    typ = Column(Integer())
+    tot = Column(Integer())
+    qm0thru3 = Column(Integer())
+    qm4thru7 = Column(Integer())
+    qm8 = Column(Integer())
+    qm9 = Column(Integer())
+    qm10 = Column(Integer())
+    qm11 = Column(Integer())
+    qm12 = Column(Integer())
+    qm13 = Column(Integer())
+    qm14 = Column(Integer())
+    qm15 = Column(Integer())
+    cka = Column(Integer())
+    ckb = Column(Integer())
+    filename = Column(String(63))
+    file_size = Column(Integer(), default=-1)
+    obs_day = Column(DateTime())
+    inserted_at = Column(DateTime())
+
+    cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
+class ObsMetaNceplibsPrepbufrAggregate(Base):
+    __tablename__ = OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE
+
+    meta_id = Column(Integer, primary_key=True)
+    obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
+    cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
+    cmd_str = Column(String(31))
+    variable = Column(String(63))
+    tot = Column(Integer())
+    qm0thru3 = Column(Integer())
+    qm4thru7 = Column(Integer())
+    qm8 = Column(Integer())
+    qm9 = Column(Integer())
+    qm10 = Column(Integer())
+    qm11 = Column(Integer())
+    qm12 = Column(Integer())
+    qm13 = Column(Integer())
+    qm14 = Column(Integer())
+    qm15 = Column(Integer())
+    cka = Column(Integer())
+    ckb = Column(Integer())
+    filename = Column(String(63))
+    file_size = Column(Integer(), default=-1)
+    obs_day = Column(DateTime())
+    inserted_at = Column(DateTime())
+
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
 
 def insert_obs_inv_items(obs_inv_items):
@@ -302,6 +435,7 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs nceplibs bufr meta items must be in the form' \
               f' of a list.  Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
 
     rows = []
     for item in obs_meta_items:
@@ -328,6 +462,84 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
     session.commit()
     session.close()
 
+def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
+    if not isinstance(obs_meta_items, list):
+        msg = 'Inserted obs nceplibs prepbufr meta items must be in the form' \
+              f' of a list.  Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
+
+    rows = []
+    for item in obs_meta_items:
+        tbl_item = ObsMetaNceplibsPrepbufr(
+            obs_id=item.obs_id,
+            cmd_result_id=item.cmd_result_id,
+            cmd_str=item.cmd_str,
+            variable=item.variable,
+            typ = item.typ,
+            tot=item.tot,
+            qm0thru3=item.qm0thru3,
+            qm4thru7=item.qm4thru7,
+            qm8=item.qm8,
+            qm9=item.qm9,
+            qm10=item.qm10,
+            qm11=item.qm11,
+            qm12=item.qm12,
+            qm13=item.qm13,
+            qm14=item.qm14,
+            qm15=item.qm15,
+            cka=item.cka,
+            ckb=item.ckb,
+            filename=item.filename,
+            file_size=item.file_size,
+            obs_day=item.obs_day,
+            inserted_at=datetime.utcnow()
+        )
+
+        rows.append(tbl_item)
+
+    session = Session()
+    session.bulk_save_objects(rows)
+    session.commit()
+    session.close()
+
+def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
+    if not isinstance(obs_meta_items, list):
+        msg = 'Inserted obs nceplibs prepbufr aggregate meta items must be in the form' \
+              f' of a list.  Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
+
+    rows = []
+    for item in obs_meta_items:
+        tbl_item = ObsMetaNceplibsPrepbufrAggregate(
+            obs_id=item.obs_id,
+            cmd_result_id=item.cmd_result_id,
+            cmd_str=item.cmd_str,
+            variable=item.variable,
+            tot=item.tot,
+            qm0thru3=item.qm0thru3,
+            qm4thru7=item.qm4thru7,
+            qm8=item.qm8,
+            qm9=item.qm9,
+            qm10=item.qm10,
+            qm11=item.qm11,
+            qm12=item.qm12,
+            qm13=item.qm13,
+            qm14=item.qm14,
+            qm15=item.qm15,
+            cka=item.cka,
+            ckb=item.ckb,
+            filename=item.filename,
+            file_size=item.file_size,
+            obs_day=item.obs_day,
+            inserted_at=datetime.utcnow()
+        )
+
+        rows.append(tbl_item)
+
+    session = Session()
+    session.bulk_save_objects(rows)
+    session.commit()
+    session.close()
 
 if(database_type.lower() == 'mysql'):
     Base.metadata.create_all(engine)
@@ -335,4 +547,6 @@ else:
     create_obs_inventory_table()
     create_cmd_results_table()
     create_obs_meta_nceplibs_bufr_table()
+    create_obs_meta_nceplibs_prepbufr_table()
+    create_obs_meta_nceplibs_prepbufr_agg_table()
     metadata.create_all(engine)
