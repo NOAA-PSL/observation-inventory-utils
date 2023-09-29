@@ -123,6 +123,71 @@ CREATE TABLE obs_meta_nceplibs_bufr (
 	FOREIGN KEY(cmd_result_id) REFERENCES cmd_results (cmd_result_id)
 ```
 
+```sh
+obs_meta_nceplibs_prepbufr
+
+CREATE TABLE obs_meta_nceplibs_prepbufr (
+	meta_id INTEGER NOT NULL, 
+	obs_id INTEGER NOT NULL, 
+	cmd_result_id INTEGER NOT NULL, 
+	cmd_str VARCHAR, 
+	typ INTEGER, 
+  tot INTETER,
+	qm0thru3 INTEGER,
+  qm4thru7 INTEGER,
+  qm8 INTEGER,
+  qm9 INTEGER,
+  qm10 INTEGER,
+  qm11 INTEGER,
+  qm12 INTEGER,
+  qm13 INTEGER,
+  qm14 INTEGER,
+  qm15 INTEGER,
+  cka INTEGER,
+  ckb INTEGER, 
+	filename VARCHAR, 
+	file_size INTEGER, 
+	obs_day DATETIME, 
+	inserted_at DATETIME, 
+	PRIMARY KEY (meta_id), 
+	FOREIGN KEY(obs_id) REFERENCES obs_inventory (obs_id), 
+	FOREIGN KEY(cmd_result_id) REFERENCES cmd_results (cmd_result_id)
+```
+
+```sh
+obs_meta_nceplibs_prepbufr_aggregate
+
+CREATE TABLE obs_meta_nceplibs_prepbufr (
+	meta_id INTEGER NOT NULL, 
+	obs_id INTEGER NOT NULL, 
+	cmd_result_id INTEGER NOT NULL, 
+	cmd_str VARCHAR, 
+	typ INTEGER, 
+  tot INTETER,
+	qm0thru3 INTEGER,
+  qm4thru7 INTEGER,
+  qm8 INTEGER,
+  qm9 INTEGER,
+  qm10 INTEGER,
+  qm11 INTEGER,
+  qm12 INTEGER,
+  qm13 INTEGER,
+  qm14 INTEGER,
+  qm15 INTEGER,
+  cka INTEGER,
+  ckb INTEGER, 
+	filename VARCHAR, 
+	file_size INTEGER, 
+	obs_day DATETIME, 
+	inserted_at DATETIME, 
+	PRIMARY KEY (meta_id), 
+	FOREIGN KEY(obs_id) REFERENCES obs_inventory (obs_id), 
+	FOREIGN KEY(cmd_result_id) REFERENCES cmd_results (cmd_result_id)
+```
+
+Information regarding the values in the columns for the prepbufr tables can be found from the EMC documentation for [typ](https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_2.htm)
+and [quality markers](https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm)
+
 Example row data from the cmd_results table. Note: an error_code with a
 negative value indicates that the command failed.  The reason for the command
 failure can be found in the raw_error column.
@@ -211,6 +276,27 @@ date_range:
 bufr_files:
   - gdas.t%z.1bamua.tm00.bufr_d
   - gdas.t%z.1bhrs4.tm00.bufr_d
+work_dir: '/lustre/work'
+scrub_files: False
+```
+
+Syntax for the NCEPLIBS-bufr `cmpbqm` command after running the `get-obs-inventory` command on the necessary files.
+
+```sh
+$ python3 src/obs_inv_utils/obs_inv_cli.py get-obs-count-meta-cmpbqm -c src/tests/configs/obs_meta_cmpbqm__valid_s3.yaml
+```
+
+Example yaml config file contents for `cmpbqm` command to collect observation count file meta.
+
+```
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/conv/prepbufr/%Y/%m/prepbufr/
+date_range:
+    datestr: '%Y%m%dT%H%M%SZ'
+    start: 20200101T000000Z
+    end: 20210101T000000Z
+prepbufr_files:
+    - gdas.%z.prepbufr.nr
 work_dir: '/lustre/work'
 scrub_files: False
 ```
