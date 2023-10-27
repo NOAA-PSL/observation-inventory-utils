@@ -158,7 +158,7 @@ ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 #ax.yaxis.grid(False)
 
-fnout=os.path.join(args.out_dir,f"{obs_stream}_line_observations_inventory.png")
+fnout=os.path.join(args.out_dir,f"all_line_observations_inventory.png")
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
 mysql_conn.close()
