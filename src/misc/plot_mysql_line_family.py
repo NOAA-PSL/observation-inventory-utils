@@ -16,8 +16,8 @@ import obs_inv_utils.inventory_table_factory as itf
 #argparse section
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
-parser.add_argument("-d", dest='root_dir', help="directory with observations_inventory.db",type=str)
-parser.add_argument("-n", dest='obs_stream', help="obs stream name",default='1bamua',type=str)
+#parser.add_argument("-d", dest='root_dir', help="directory with observations_inventory.db",type=str)
+parser.add_argument("-n", dest='obs_stream', help="obs stream name",default='gmao_r21c_repro',type=str)
 parser.add_argument("-s", dest='sensor_name', help="sensor name",default='amsua',type=str)
 parser.add_argument("--sidb", dest='satinfo_db_root', help="root for sat info db files",default='satellites/satinfo/',type=str)
 args = parser.parse_args()
@@ -98,9 +98,10 @@ def select_sensor_satelite_combo(sat_id, db_frame, satinfo):
 
 
 #read data from sql database of obs counts
-fnin=os.path.join(args.root_dir,"observations_inventory.db")
-print(f"opeinign db file {fnin}")
-conn = sqlite3.connect(fnin)
+#fnin=os.path.join(args.root_dir,"observations_inventory.db")
+#print(f"opeinign db file {fnin}")
+#conn = sqlite3.connect(fnin)
+print('connecting to mysql db')
 mysql_conn = itf.engine.connect()
 sql = f"""select * from obs_meta_nceplibs_bufr where filename like '%{obs_stream}%' """
 data = pandas.read_sql(sql, mysql_conn)
