@@ -104,7 +104,7 @@ def select_sensor_satelite_combo(sat_id, db_frame, satinfo):
 print('connecting to mysql db')
 mysql_conn = itf.engine.connect()
 #sql = f"""select * from obs_meta_nceplibs_bufr where filename like '%{obs_stream}%' """
-sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id'"""
+sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
 data = pandas.read_sql(sql, mysql_conn)
 db_frame = data.sort_values('inserted_at'
         ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
