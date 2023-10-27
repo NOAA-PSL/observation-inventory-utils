@@ -38,7 +38,7 @@ sat_dictionary={"NOAA 10":"n10","NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13",
                "METOP-1 (Metop-B":"metop-b","METOP-2 (Metop-A":"metop-a",
                "AQUA":"aqua", "NPP":"npp",
                "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
-               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15",
+               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16",
                "MTSAT-2":"MTSAT-2",
                "METEOSAT 5": "m05", "METEOSAT 6": "m06", "METEOSAT 7": "m7","MTSAT-1R":"MTSAT-1R",
                "METEOSAT 8": "m08", "METEOSAT 9": "m09", "METEOSAT 10": "m10", "METEOSAT 11": "m11",
@@ -48,7 +48,7 @@ sat_dictionary={"NOAA 10":"n10","NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13",
                "CHAMP":"CHAMP","COSMIC-1":"COSMIC-1","COSMIC-2":"COSMIC-2","COSMIC-3":"COSMIC-3","COSMIC-4":"COSMIC-4",
                "COSMIC-5":"COSMIC-5","COSMIC-6":"COSMIC-6","COSMIC-7":"COSMIC-7",
                "GRACE A":"GRACE A","GRACE B":"GRACE B","SAC-C":"SAC C","TerraSAR-X":"TerraSAR-X","TERRA":"TERRA",
-               "ERS 2":"ERS 2", "GMS 3" : "GMS3 ","GMS 4":"GMS 4","GMS 5":"GMS 5","INSAT 3A":"INSAT 3A","INSAT 3D":"INSAT 3D"}
+               "ERS 2":"ERS 2", "GMS 3" : "GMS 3 ","GMS 4":"GMS 4","GMS 5":"GMS 5","INSAT 3A":"INSAT 3A","INSAT 3D":"INSAT 3D"}
 
 
 #read raw satinfo files
