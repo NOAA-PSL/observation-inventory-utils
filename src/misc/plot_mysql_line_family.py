@@ -120,9 +120,9 @@ height=step*len(unique_sat_id)
 sat_labels=[]
 for index, row in unique_sat_id.iterrows():
   if row.sat_id_name.strip():
-    sat_labels.append(row.parent_dir + row.sat_id_name)
+    sat_labels.append(row.parent_dir + str(row.sat_id_name))
   else:
-    sat_labels.append(row.parent_dir + row.sat_id)
+    sat_labels.append(row.parent_dir + str(row.sat_id))
 
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
