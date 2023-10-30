@@ -115,30 +115,43 @@ data = pandas.read_sql(sql, mysql_conn)
 db_frame = data.sort_values('inserted_at'
         ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
+db_frame['sensor'] = db_frame.parent_dir.split("/")[2]
 
-
+#THIS AREA NEEDS TO CHANGE TO ADDRESS THE VARIOUS SENSORS ON SINGLE SATS
 #loop and plot satelites
-unique_sat_id = db_frame.sort_values('sat_id_name').drop_duplicates('sat_id')
+# unique_sat_id = db_frame.sort_values('sat_id_name').drop_duplicates('sat_id')
+# step=0.05
+# height=step*len(unique_sat_id)
+
+#loop and plot sensors
+unique_sensor = db_frame.sort_values('sensor')
 step=0.05
-height=step*len(unique_sat_id)
+height=step*len(unique_sensor)
 
 #make list of sat labels
-sat_labels=[]
-for index, row in unique_sat_id.iterrows():
-  if row.sat_id_name.strip():
-    sat_labels.append(row.parent_dir + str(row.sat_id_name))
-  else:
-    sat_labels.append(row.parent_dir + str(row.sat_id))
+# sat_labels=[]
+# for index, row in unique_sat_id.iterrows():
+#   if row.sat_id_name.strip():
+#     sat_labels.append(row.parent_dir + str(row.sat_id_name))
+#   else:
+#     sat_labels.append(row.parent_dir + str(row.sat_id))
+
+#make list of sensor labels
+sensor_labels = []
+for index, row in unique_sensor.iterrows():
+    sensor_labels.append(row.sensor)
 
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
+#plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
+plt.title("Clean Bucket Data")
 plt.xlabel('Observation Date')
 
 counter=0
-for index, row in unique_sat_id.iterrows():
-    satinfo_string_ = sensor_name+"_"+sat_dictionary[row['sat_id_name']]
+# for index, row in unique_sat_id.iterrows():
+for index, row in unique_sensor.iterrows():
+    satinfo_string_ = row['sensor']+"_"+sat_dictionary[row['sat_id_name']]
     satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
@@ -155,7 +168,8 @@ for index, row in unique_sat_id.iterrows():
 
 ax.set_yticks(step/2+step*np.arange(counter))
 #ax.set_yticklabels(unique_sat_id.sat_id_name)
-ax.set_yticklabels(sat_labels)
+# ax.set_yticklabels(sat_labels)
+ax.set_yticklabels(sensor_labels)
 ax.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
 ax.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax.set_xlim(daterange)
