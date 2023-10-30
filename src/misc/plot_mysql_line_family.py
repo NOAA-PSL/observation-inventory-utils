@@ -129,7 +129,7 @@ db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 # height=step*len(unique_sat_id)
 
 #loop and plot sensors
-unique_sensor = db_frame.sort_values('sensor')
+unique_sensor = db_frame.sort_values('sensor').drop_duplicates('sensor')
 step=0.05
 height=step*len(unique_sensor)
 
