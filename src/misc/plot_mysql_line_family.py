@@ -102,6 +102,16 @@ def select_sensor_satelite_combo(sat_id, db_frame, satinfo):
     dftmp['obs_count_nan']=dftmp.obs_count*dftmp.active
     return dftmp
 
+#TODO: finish writing out this function to pull data for the sensor instead of sat 
+def select_sensor(sensor, db_frame):
+    dftmp = db_frame.loc[db_frame['sensor']==sensor]
+    f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
+          satinfo.status_nan.to_numpy().astype('float'),
+          kind='previous')
+    dftmp['active']=f(dftmp.datetime.to_numpy().astype('float')).tolist()
+    dftmp['obs_count_nan']=dftmp.obs_count*dftmp.active
+    return dftmp
+
 def get_sensor(row):
     directory = row['parent_dir']
     sensor = directory.split("/")[2]
@@ -160,12 +170,13 @@ for index, row in unique_sensor.iterrows():
     satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
-    dftmp = select_sensor_satelite_combo(row['sat_id'], db_frame, satinfo)
+    # dftmp = select_sensor_satelite_combo(row['sat_id'], db_frame, satinfo)
+    dftmp = select_sensor(row['sensor'], db_frame)
     pandas.options.mode.chained_assignment = 'warn'
     
-    l=len(dftmp)
-    sid=row['sat_id']
-    print(f"{satinfo_string_} sat_id = {sid} dftmp len={l}")
+    # l=len(dftmp)
+    # sid=row['sat_id']
+    # print(f"{satinfo_string_} sat_id = {sid} dftmp len={l}")
     #display(satinfo)
 
     plot_one_line(satinfo, dftmp, step/2+step*counter)
