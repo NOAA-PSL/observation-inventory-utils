@@ -115,7 +115,10 @@ data = pandas.read_sql(sql, mysql_conn)
 db_frame = data.sort_values('inserted_at'
         ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
-db_frame['sensor'] = db_frame.parent_dir.split("/")[2]
+print(db_frame.parent_dir)
+parent_dir_string = db_frame.parent_dir[0]
+print(parent_dir_string)
+db_frame['sensor'] = parent_dir_string.split("/")[2]
 
 #THIS AREA NEEDS TO CHANGE TO ADDRESS THE VARIOUS SENSORS ON SINGLE SATS
 #loop and plot satelites
