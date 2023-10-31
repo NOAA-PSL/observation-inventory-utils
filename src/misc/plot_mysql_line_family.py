@@ -29,7 +29,7 @@ args = parser.parse_args()
 obs_stream=args.obs_stream
 sensor_name=args.sensor_name
 satinfo_db_root=args.satinfo_db_root
-daterange=[date(1975,1,1), date(2025,1,1)]
+daterange=[date(1975,1,1), date(2024,1,1)]
 
 sat_dictionary={"NOAA 10":"n10","NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13","NOAA 14":"n14",
                "NOAA 15":"n15","NOAA 16":"n16","NOAA 17":"n17","NOAA 18":"n18","NOAA 19":"n19","NOAA 20":"n20",
