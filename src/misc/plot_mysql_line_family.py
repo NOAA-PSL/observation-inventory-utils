@@ -29,7 +29,7 @@ args = parser.parse_args()
 obs_stream=args.obs_stream
 sensor_name=args.sensor_name
 satinfo_db_root=args.satinfo_db_root
-daterange=[date(1970,1,1), date(2024,1,1)]
+daterange=[date(1975,1,1), date(2025,1,1)]
 
 sat_dictionary={"NOAA 10":"n10","NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13","NOAA 14":"n14",
                "NOAA 15":"n15","NOAA 16":"n16","NOAA 17":"n17","NOAA 18":"n18","NOAA 19":"n19","NOAA 20":"n20",
@@ -160,8 +160,9 @@ fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
 #plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
-plt.title("Clean Bucket Data")
+plt.title("Inventory of Clean Bucket Atmosphere Sensors in 'bufr' format")
 plt.xlabel('Observation Date')
+plt.ylabel('Sensor')
 
 counter=0
 # for index, row in unique_sat_id.iterrows():
@@ -194,7 +195,7 @@ ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 #ax.yaxis.grid(False)
 
-fnout=os.path.join(args.out_dir,f"all_line_observations_inventory.png")
+fnout=os.path.join(args.out_dir,f"all_line_observations_inventory_sensor_grey.png")
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
 mysql_conn.close()
