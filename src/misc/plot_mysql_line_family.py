@@ -54,7 +54,7 @@ sat_dictionary={"NOAA 10":"n10","NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13",
                "COSMIC-2 E2":"COSMIC-2 E2", "COSMIC-2 E3":"COSMIC-2 E3", "COSMIC-2 E4":"COSMIC-2 E4", "COSMIC-2 E5":"COSMIC-2 E5",
                "COSMIC-2 E6":"COSMIC-2 E6", "KOMPSAT-5": "KOMPSAT-5", "GOES 7" : "g7", "METEOSAT 4": "m04", "METEOSAT 2" : "m02",
                "METEOSAT 3": "m03", "LANDSAT 5":"LANDSAT 5", "MTSAT-1R":"MTSAT-1R", "GPM-core":"GPM-core", "TRMM":"TRMM",
-               "Himawari-8":"Himawari-8", "Himawari-9":"Himawari-9", "GOES 17":"g17", "INSAT 3DR":"INSAT 3DR"}
+               "Himawari-8":"himawari8", "Himawari-9":"himawari9", "GOES 17":"g17", "INSAT 3DR":"INSAT 3DR"}
 
 
 #read raw satinfo files
