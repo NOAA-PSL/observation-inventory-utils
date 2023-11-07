@@ -81,19 +81,21 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
     display(satinfo)
     return satinfo
 
-def plot_one_line(satinfo, dftmp, yloc):
-    f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
-          satinfo.status_nan.to_numpy().astype('float'),
-          kind='previous')
-    satinfo_tmp = pandas.DataFrame()
-    satinfo_tmp['datetime']=pandas.date_range(start='1/1/1900', end='1/1/2050')
-    satinfo_tmp['status_nan']=f(satinfo_tmp.datetime.to_numpy().astype('float')).tolist()
+
+# def plot_one_line(satinfo, dftmp, yloc):
+def plot_one_line(dftmp, yloc):
+    # f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
+    #       satinfo.status_nan.to_numpy().astype('float'),
+    #       kind='previous')
+    # satinfo_tmp = pandas.DataFrame()
+    # satinfo_tmp['datetime']=pandas.date_range(start='1/1/1900', end='1/1/2050')
+    # satinfo_tmp['status_nan']=f(satinfo_tmp.datetime.to_numpy().astype('float')).tolist()
     
-    plt.plot(satinfo_tmp.datetime, yloc*satinfo_tmp.status_nan,'b')
+    # plt.plot(satinfo_tmp.datetime, yloc*satinfo_tmp.status_nan,'b')
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'s',color='gray',markersize=5)
     plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
 
-def select_sensor_satelite_combo(sat_id, db_frame, satinfo):
+def select_sensor_satelite_combo(sensor, sat_id, db_frame, satinfo):
     dftmp = db_frame.loc[db_frame['sat_id']==sat_id]
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
           satinfo.status_nan.to_numpy().astype('float'),
@@ -102,14 +104,13 @@ def select_sensor_satelite_combo(sat_id, db_frame, satinfo):
     dftmp['obs_count_nan']=dftmp.obs_count*dftmp.active
     return dftmp
 
-#TODO: finish writing out this function to pull data for the sensor instead of sat 
 def select_sensor(sensor, db_frame):
     dftmp = db_frame.loc[db_frame['sensor']==sensor]
-    f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
-          satinfo.status_nan.to_numpy().astype('float'),
-          kind='previous')
-    dftmp['active']=f(dftmp.datetime.to_numpy().astype('float')).tolist()
-    dftmp['obs_count_nan']=dftmp.obs_count*dftmp.active
+    # f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
+    #       satinfo.status_nan.to_numpy().astype('float'),
+    #       kind='previous')
+    # dftmp['active']=f(dftmp.datetime.to_numpy().astype('float')).tolist()
+    # dftmp['obs_count_nan']=dftmp.obs_count*dftmp.active
     return dftmp
 
 def get_sensor(row):
@@ -125,10 +126,19 @@ def get_sensor(row):
 print('connecting to mysql db')
 mysql_conn = itf.engine.connect()
 #sql = f"""select * from obs_meta_nceplibs_bufr where filename like '%{obs_stream}%' """
+#BUFR FILE INFO
 sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
 data = pandas.read_sql(sql, mysql_conn)
-db_frame = data.sort_values('inserted_at'
+db_frame1 = data.sort_values('inserted_at'
         ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
+
+#PREPBUFR FILE INFO 
+sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
+data2 = pandas.read_sql(sql, mysql_conn)
+db_frame2 = data.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day','variable', 'file_size'], keep='last')
+
+db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
+
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
@@ -160,15 +170,15 @@ fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
 #plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
-plt.title("Inventory of Clean Bucket Atmosphere Sensors in 'bufr' format")
+plt.title("Inventory of Clean Bucket Atmosphere Sensors")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor')
 
 counter=0
 # for index, row in unique_sat_id.iterrows():
 for index, row in unique_sensor.iterrows():
-    satinfo_string_ = row['sensor']+"_"+sat_dictionary[row['sat_id_name']]
-    satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
+    #satinfo_string_ = row['sensor']+"_"+sat_dictionary[row['sat_id_name']]
+    #satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
     # dftmp = select_sensor_satelite_combo(row['sat_id'], db_frame, satinfo)
@@ -180,7 +190,7 @@ for index, row in unique_sensor.iterrows():
     # print(f"{satinfo_string_} sat_id = {sid} dftmp len={l}")
     #display(satinfo)
 
-    plot_one_line(satinfo, dftmp, step/2+step*counter)
+    plot_one_line(dftmp, step/2+step*counter)
     counter = counter + 1
 
 ax.set_yticks(step/2+step*np.arange(counter))
