@@ -93,7 +93,7 @@ def plot_one_line(dftmp, yloc):
     
     # plt.plot(satinfo_tmp.datetime, yloc*satinfo_tmp.status_nan,'b')
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'s',color='gray',markersize=5)
-    plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
+    # plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
 
 def select_sensor_satelite_combo(sensor, sat_id, db_frame, satinfo):
     dftmp = db_frame.loc[db_frame['sat_id']==sat_id]
