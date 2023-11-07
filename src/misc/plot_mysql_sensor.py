@@ -205,7 +205,8 @@ ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 #ax.yaxis.grid(False)
 
-fnout=os.path.join(args.out_dir,f"all_line_observations_inventory_sensor_grey.png")
+file_name = "all_line_observations_inventory_sensor_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
 mysql_conn.close()
