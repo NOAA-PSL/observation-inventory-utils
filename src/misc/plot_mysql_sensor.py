@@ -106,11 +106,6 @@ def select_sensor_satelite_combo(sensor, sat_id, db_frame, satinfo):
 
 def select_sensor(sensor, db_frame):
     dftmp = db_frame.loc[db_frame['sensor']==sensor]
-    # f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
-    #       satinfo.status_nan.to_numpy().astype('float'),
-    #       kind='previous')
-    # dftmp['active']=f(dftmp.datetime.to_numpy().astype('float')).tolist()
-    # dftmp['obs_count_nan']=dftmp.obs_count*dftmp.active
     return dftmp
 
 def get_sensor(row):
@@ -120,12 +115,8 @@ def get_sensor(row):
 
 
 #read data from sql database of obs counts
-#fnin=os.path.join(args.root_dir,"observations_inventory.db")
-#print(f"opeinign db file {fnin}")
-#conn = sqlite3.connect(fnin)
 print('connecting to mysql db')
 mysql_conn = itf.engine.connect()
-#sql = f"""select * from obs_meta_nceplibs_bufr where filename like '%{obs_stream}%' """
 #BUFR FILE INFO
 sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
 data = pandas.read_sql(sql, mysql_conn)
@@ -152,6 +143,8 @@ db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 unique_sensor = db_frame.sort_values('sensor').drop_duplicates('sensor')
 step=0.05
 height=step*len(unique_sensor)
+
+#calculate number of sats per sensor so total height is sensors and sats 
 
 #make list of sat labels
 # sat_labels=[]
