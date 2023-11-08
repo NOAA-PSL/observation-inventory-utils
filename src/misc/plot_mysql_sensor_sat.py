@@ -45,21 +45,23 @@ sat_dictionary={"NOAA 5": "n5", "NOAA 6": "n6", "NOAA 7": "n7", "NOAA 8": "n8", 
                "GRACE A":"GRACE A","GRACE B":"GRACE B","SAC-C":"SAC C","TerraSAR-X":"TerraSAR-X","TERRA":"TERRA",
                "ERS 2":"ERS 2", "GMS 3" : "GMS 3 ","GMS 4":"GMS 4","GMS 5":"GMS 5",
                "INSAT 3A":"INSAT 3A","INSAT 3D":"INSAT 3D","INSAT 3DR":"INSAT 3DR",
-               "TIROS-N": "TIROS-N",  "Megha-Tropiques": "Megha-Tropiques",
+               "TIROS-N": "TIROS-N",  "Megha-Tropiques": "meghat",
                 "TanDEM-X": "TanDEM-X", "PAZ":"PAZ", "KOMPSAT-5": "KOMPSAT-5",
                "LANDSAT 5":"LANDSAT 5", "GPM-core":"GPM-core", "TRMM":"TRMM",
                "Himawari-8":"himawari8", "Himawari-9":"himawari9"}
 
-hirs_dictionary={
+satinfo_translate_dictionary={
     "hirs_n11":"hirs2_n11", "hirs_n12":"hirs2_n12", "hirs_n14":"hirs2_n14", "hirs_n15":"hirs3_n15",
     "hirs_n16":"hirs3_n16", "hirs_n17":"hirs3_n17", "hirs_metop-a":"hirs4_metop-a", 
-    "hirs_metop-b":"hirs4_metop-b", "hirs_n19":"hirs4_n19"
+    "hirs_metop-b":"hirs4_metop-b", "hirs_n19":"hirs4_n19", "avhrr_n14":"avhrr2_n14",
+    "avhrr_metop-a":"avhrr3_metop-a", "avhrr_metop-b":"avhrr3_metop-b", "avhrr_n15":"avhrr3_n15",
+    "avhrr_n16":"avhrr3_n16", "avhrr_n17":"avhrr3_n17", "avhrr_n18":"avhrr3_n18", "avhrr_n19":"avhrr3_n19"
 }
 
 #read raw satinfo files
 def read_satinfo_files(satinfo_db_root,satinfo_string):
-    if satinfo_string in hirs_dictionary:
-            satinfo_string = hirs_dictionary[satinfo_string]
+    if satinfo_string in satinfo_translate_dictionary:
+            satinfo_string = satinfo_translate_dictionary[satinfo_string]
     satinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
 #    for fn in os.listdir(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
     for fn in glob.glob(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
