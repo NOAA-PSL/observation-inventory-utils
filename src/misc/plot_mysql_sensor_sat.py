@@ -3,7 +3,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import sqlite3, pandas , matplotlib.pyplot as plt
+import pandas , matplotlib.pyplot as plt
 from datetime import datetime, date
 import matplotlib.dates as mdates
 from IPython.display import display
@@ -16,18 +16,10 @@ import obs_inv_utils.inventory_table_factory as itf
 #argparse section
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
-#parser.add_argument("-d", dest='root_dir', help="directory with observations_inventory.db",type=str)
-parser.add_argument("-n", dest='obs_stream', help="obs stream name",default='amsua_disc_final',type=str)
-parser.add_argument("-s", dest='sensor_name', help="sensor name",default='amsua',type=str)
 parser.add_argument("--sidb", dest='satinfo_db_root', help="root for sat info db files",default='satellites/satinfo/',type=str)
 args = parser.parse_args()
 
 #parameters
-#obs_stream='1bamua'
-#sensor_name='amsua'
-#satinfo_db_root='satellites/'
-obs_stream=args.obs_stream
-sensor_name=args.sensor_name
 satinfo_db_root=args.satinfo_db_root
 daterange=[date(1975,1,1), date(2024,1,1)]
 
@@ -83,20 +75,21 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
 
 
 # def plot_one_line(satinfo, dftmp, yloc):
-def plot_one_line(dftmp, yloc):
-    # f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
-    #       satinfo.status_nan.to_numpy().astype('float'),
-    #       kind='previous')
-    # satinfo_tmp = pandas.DataFrame()
-    # satinfo_tmp['datetime']=pandas.date_range(start='1/1/1900', end='1/1/2050')
-    # satinfo_tmp['status_nan']=f(satinfo_tmp.datetime.to_numpy().astype('float')).tolist()
+def plot_one_line(satinfo, dftmp, yloc):
+    f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
+          satinfo.status_nan.to_numpy().astype('float'),
+          kind='previous')
+    satinfo_tmp = pandas.DataFrame()
+    satinfo_tmp['datetime']=pandas.date_range(start='1/1/1900', end='1/1/2050')
+    satinfo_tmp['status_nan']=f(satinfo_tmp.datetime.to_numpy().astype('float')).tolist()
     
-    # plt.plot(satinfo_tmp.datetime, yloc*satinfo_tmp.status_nan,'b')
+    plt.plot(satinfo_tmp.datetime, yloc*satinfo_tmp.status_nan,'b')
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'s',color='gray',markersize=5)
-    # plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
+    plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
 
 def select_sensor_satelite_combo(sensor, sat_id, db_frame, satinfo):
-    dftmp = db_frame.loc[db_frame['sat_id']==sat_id]
+    dftmp1 = db_frame.loc[db_frame['sat_id']==sat_id]
+    dftmp = dftmp1.loc[dftmp1['sensor'==sensor]]
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
           satinfo.status_nan.to_numpy().astype('float'),
           kind='previous')
@@ -139,43 +132,49 @@ db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 # step=0.05
 # height=step*len(unique_sat_id)
 
-#loop and plot sensors
-unique_sensor = db_frame.sort_values('sensor').drop_duplicates('sensor')
+#loop and plot sensors/sat_ids
+unique_sensor_sats = db_frame[['sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id_name'])
+#unique_sensor = db_frame.sort_values('sensor').drop_duplicates('sensor')
 step=0.05
-height=step*len(unique_sensor)
+height=step*len(unique_sensor_sats)
 
-#calculate number of sats per sensor so total height is sensors and sats 
-
-#make list of sat labels
+# #make list of sat labels
 # sat_labels=[]
-# for index, row in unique_sat_id.iterrows():
+# for index, row in unique_sensor_sats.iterrows():
 #   if row.sat_id_name.strip():
 #     sat_labels.append(row.parent_dir + str(row.sat_id_name))
 #   else:
 #     sat_labels.append(row.parent_dir + str(row.sat_id))
 
-#make list of sensor labels
-sensor_labels = []
-for index, row in unique_sensor.iterrows():
-    sensor_labels.append(row.sensor)
+# #make list of sensor labels
+# sensor_labels = []
+# for index, row in unique_sensor.iterrows():
+#     sensor_labels.append(row.sensor)
+
+#make list of sensor&sat labels 
+sensor_sat_labels = []
+for index, row in unique_sensor_sats.iterrows():
+    if row.sat_id_name.strip():
+        sensor_sat_labels.append(row.sensor + " " + str(row.sat_id_name))
+    else:
+        sensor_sat_labels.append(row.sensor + " " + str(row.sat_id))
 
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
 #plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
-plt.title("Inventory of Clean Bucket Atmosphere Sensors")
+plt.title("Inventory of Clean Bucket Atmosphere Sensors by Satellite")
 plt.xlabel('Observation Date')
-plt.ylabel('Sensor')
+plt.ylabel('Sensor & Satellite')
 
 counter=0
 # for index, row in unique_sat_id.iterrows():
-for index, row in unique_sensor.iterrows():
-    #satinfo_string_ = row['sensor']+"_"+sat_dictionary[row['sat_id_name']]
-    #satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
+for index, row in unique_sensor_sats.iterrows():
+    satinfo_string_ = row['sensor']+"_"+sat_dictionary[row['sat_id_name']]
+    satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
-    # dftmp = select_sensor_satelite_combo(row['sat_id'], db_frame, satinfo)
-    dftmp = select_sensor(row['sensor'], db_frame)
+    dftmp = select_sensor_satelite_combo(row['sat_id'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
     
     # l=len(dftmp)
@@ -187,18 +186,15 @@ for index, row in unique_sensor.iterrows():
     counter = counter + 1
 
 ax.set_yticks(step/2+step*np.arange(counter))
-#ax.set_yticklabels(unique_sat_id.sat_id_name)
-# ax.set_yticklabels(sat_labels)
-ax.set_yticklabels(sensor_labels)
+ax.set_yticklabels(sensor_sat_labels)
 ax.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
 ax.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax.set_xlim(daterange)
 ax.set_ylim([0, height])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
-#ax.yaxis.grid(False)
 
-file_name = "all_line_observations_inventory_sensor_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+file_name = "all_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
