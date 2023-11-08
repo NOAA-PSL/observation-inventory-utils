@@ -87,7 +87,7 @@ def plot_one_line(satinfo, dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'s',color='gray',markersize=5)
     plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
 
-def select_sensor_satelite_combo(sensor, sat_id, db_frame, satinfo):
+def select_sensor_satellite_combo(sensor, sat_id, db_frame, satinfo):
     dftmp1 = db_frame.loc[db_frame['sat_id']==sat_id]
     dftmp = dftmp1.loc[dftmp1['sensor'==sensor]]
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
@@ -174,7 +174,7 @@ for index, row in unique_sensor_sats.iterrows():
     satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
-    dftmp = select_sensor_satelite_combo(row['sat_id'], db_frame, satinfo)
+    dftmp = select_sensor_satellite_combo(row['sensor'], row['sat_id'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
     
     # l=len(dftmp)
