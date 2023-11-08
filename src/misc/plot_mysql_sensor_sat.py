@@ -23,30 +23,32 @@ args = parser.parse_args()
 satinfo_db_root=args.satinfo_db_root
 daterange=[date(1975,1,1), date(2024,1,1)]
 
-sat_dictionary={"NOAA 10":"n10","NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13","NOAA 14":"n14",
+sat_dictionary={"NOAA 5": "n5", "NOAA 6": "n6", "NOAA 7": "n7", "NOAA 8": "n8", "NOAA 9": "n9", 
+                "NOAA 10":"n10", "NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13","NOAA 14":"n14",
                "NOAA 15":"n15","NOAA 16":"n16","NOAA 17":"n17","NOAA 18":"n18","NOAA 19":"n19","NOAA 20":"n20",
                "METOP-1":"metop-b","METOP-2":"metop-a","METOP-3":"metop-c",
                "METOP-1 (Metop-A":"metop-b","METOP-2 (Metop-B":"metop-a","METOP-3 (Metop-C":"metop-c",
                "METOP-1 (Metop-B":"metop-b","METOP-2 (Metop-A":"metop-a",
                "AQUA":"aqua", "NPP":"npp",
-               "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
-               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16",
-               "MTSAT-2":"MTSAT-2",
-               "METEOSAT 5": "m05", "METEOSAT 6": "m06", "METEOSAT 7": "m7","MTSAT-1R":"MTSAT-1R",
+               "GOES 7" : "g7", "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
+               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16", "GOES 17":"g17",
+               "MTSAT-2":"MTSAT-2", "MTSAT-1R":"MTSAT-1R",
+               "METEOSAT 2" : "m02", "METEOSAT 3": "m03", "METEOSAT 4": "m04","METEOSAT 5": "m05", "METEOSAT 6": "m06", "METEOSAT 7": "m7",
                "METEOSAT 8": "m08", "METEOSAT 9": "m09", "METEOSAT 10": "m10", "METEOSAT 11": "m11",
                "":"",
                "DMSP 8":"f8", "DMSP 9":"f9", "DMSP 10": "f10", "DMSP 11": "f11", "DMSP 12": "f12", "DMSP 13": "f13", 
                "DMSP 14": "f14", "DMSP 15": "f15","DMSP 16": "f16", "DMSP17": "f17", "DMSP18": "f18",
                "CHAMP":"CHAMP","COSMIC-1":"COSMIC-1","COSMIC-2":"COSMIC-2","COSMIC-3":"COSMIC-3","COSMIC-4":"COSMIC-4",
                "COSMIC-5":"COSMIC-5","COSMIC-6":"COSMIC-6","COSMIC-7":"COSMIC-7",
+               "COSMIC-2 E1":"COSMIC-2 E1", "COSMIC-2 E2":"COSMIC-2 E2", "COSMIC-2 E3":"COSMIC-2 E3",
+                "COSMIC-2 E4":"COSMIC-2 E4", "COSMIC-2 E5":"COSMIC-2 E5", "COSMIC-2 E6":"COSMIC-2 E6",
                "GRACE A":"GRACE A","GRACE B":"GRACE B","SAC-C":"SAC C","TerraSAR-X":"TerraSAR-X","TERRA":"TERRA",
-               "ERS 2":"ERS 2", "GMS 3" : "GMS 3 ","GMS 4":"GMS 4","GMS 5":"GMS 5","INSAT 3A":"INSAT 3A","INSAT 3D":"INSAT 3D",
-               "TIROS-N": "TIROS-N", "NOAA 6": "n6", "NOAA 5": "n5", "Megha-Tropiques": "Megha-Tropiques", "NOAA 7": "n7",
-               "NOAA 8": "n8", "NOAA 9": "n9", "TanDEM-X": "TanDEM-X", "PAZ":"PAZ", "COSMIC-2 E1":"COSMIC-2 E1", 
-               "COSMIC-2 E2":"COSMIC-2 E2", "COSMIC-2 E3":"COSMIC-2 E3", "COSMIC-2 E4":"COSMIC-2 E4", "COSMIC-2 E5":"COSMIC-2 E5",
-               "COSMIC-2 E6":"COSMIC-2 E6", "KOMPSAT-5": "KOMPSAT-5", "GOES 7" : "g7", "METEOSAT 4": "m04", "METEOSAT 2" : "m02",
-               "METEOSAT 3": "m03", "LANDSAT 5":"LANDSAT 5", "MTSAT-1R":"MTSAT-1R", "GPM-core":"GPM-core", "TRMM":"TRMM",
-               "Himawari-8":"himawari8", "Himawari-9":"himawari9", "GOES 17":"g17", "INSAT 3DR":"INSAT 3DR"}
+               "ERS 2":"ERS 2", "GMS 3" : "GMS 3 ","GMS 4":"GMS 4","GMS 5":"GMS 5",
+               "INSAT 3A":"INSAT 3A","INSAT 3D":"INSAT 3D","INSAT 3DR":"INSAT 3DR",
+               "TIROS-N": "TIROS-N",  "Megha-Tropiques": "Megha-Tropiques",
+                "TanDEM-X": "TanDEM-X", "PAZ":"PAZ", "KOMPSAT-5": "KOMPSAT-5",
+               "LANDSAT 5":"LANDSAT 5", "GPM-core":"GPM-core", "TRMM":"TRMM",
+               "Himawari-8":"himawari8", "Himawari-9":"himawari9"}
 
 
 #read raw satinfo files
