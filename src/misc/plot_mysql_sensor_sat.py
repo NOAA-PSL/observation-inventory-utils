@@ -74,7 +74,6 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
     return satinfo
 
 
-# def plot_one_line(satinfo, dftmp, yloc):
 def plot_one_line(satinfo, dftmp, yloc):
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
           satinfo.status_nan.to_numpy().astype('float'),
@@ -181,7 +180,7 @@ for index, row in unique_sensor_sats.iterrows():
     # print(f"{satinfo_string_} sat_id = {sid} dftmp len={l}")
     #display(satinfo)
 
-    plot_one_line(dftmp, step/2+step*counter)
+    plot_one_line(satinfo, dftmp, step/2+step*counter)
     counter = counter + 1
 
 ax.set_yticks(step/2+step*np.arange(counter))
