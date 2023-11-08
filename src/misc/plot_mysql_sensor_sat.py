@@ -50,9 +50,16 @@ sat_dictionary={"NOAA 5": "n5", "NOAA 6": "n6", "NOAA 7": "n7", "NOAA 8": "n8", 
                "LANDSAT 5":"LANDSAT 5", "GPM-core":"GPM-core", "TRMM":"TRMM",
                "Himawari-8":"himawari8", "Himawari-9":"himawari9"}
 
+hirs_dictionary={
+    "hirs_n11":"hirs2_n11", "hirs_n12":"hirs2_n12", "hirs_n14":"hirs2_n14", "hirs_n15":"hirs3_n15",
+    "hirs_n16":"hirs3_n16", "hirs_n17":"hirs3_n17", "hirs_metop-a":"hirs4_metop-a", 
+    "hirs_metop-b":"hirs4_metop-b", "hirs_n19":"hirs4_n19"
+}
 
 #read raw satinfo files
 def read_satinfo_files(satinfo_db_root,satinfo_string):
+    if satinfo_string in hirs_dictionary:
+            satinfo_string = hirs_dictionary[satinfo_string]
     satinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
 #    for fn in os.listdir(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
     for fn in glob.glob(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
