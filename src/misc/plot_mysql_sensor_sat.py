@@ -88,7 +88,7 @@ def plot_one_line(satinfo, dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
 
 def select_sensor_satellite_combo(sensor, sat_id, db_frame, satinfo):
-    dftmp = db_frame.loc[db_frame['sat_id']==sat_id, db_frame['sensor']==sensor]
+    dftmp = db_frame.query(db_frame['sat_id']==sat_id and db_frame['sensor']==sensor)
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
           satinfo.status_nan.to_numpy().astype('float'),
           kind='previous')
