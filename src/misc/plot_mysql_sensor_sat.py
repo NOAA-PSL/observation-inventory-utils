@@ -130,7 +130,7 @@ sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner j
 data2 = pandas.read_sql(sql2, mysql_conn)
 db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size'], keep='last')
 
-db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
+db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True).drop(index='gps', columns='sensor')
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
