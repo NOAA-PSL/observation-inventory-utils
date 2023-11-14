@@ -130,10 +130,13 @@ sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner j
 data2 = pandas.read_sql(sql2, mysql_conn)
 db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size'], keep='last')
 
-db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True).drop('gps')
+db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
+
+index_gps_amv = db_frame[(db_frame['sensor']=='gps' | db_frame['sensor']=='amv')].index
+db_frame.drop(index_gps_amv, inplace=True)
 
 #THIS AREA NEEDS TO CHANGE TO ADDRESS THE VARIOUS SENSORS ON SINGLE SATS
 #loop and plot satelites
