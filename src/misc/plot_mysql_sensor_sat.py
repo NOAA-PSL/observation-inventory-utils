@@ -135,8 +135,11 @@ db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
-index_gps_amv = db_frame[(db_frame['sensor']=='gps' | db_frame['sensor']=='amv')].index
-db_frame.drop(index_gps_amv, inplace=True)
+index_gps = db_frame[(db_frame['sensor']=='gps')].index
+db_frame.drop(index_gps, inplace=True)
+
+index_amv = db_frame[(db_frame['sensor']=='amv')].index
+db_frame.drop(index_amv, inplace=True)
 
 #THIS AREA NEEDS TO CHANGE TO ADDRESS THE VARIOUS SENSORS ON SINGLE SATS
 #loop and plot satelites
