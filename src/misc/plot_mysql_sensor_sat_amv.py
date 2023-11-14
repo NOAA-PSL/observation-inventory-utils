@@ -135,7 +135,7 @@ db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
-db_frame = db_frame[(db_frame['sensor']=='gps')]
+db_frame = db_frame[(db_frame['sensor']=='amv')]
 
 
 #THIS AREA NEEDS TO CHANGE TO ADDRESS THE VARIOUS SENSORS ON SINGLE SATS
@@ -206,7 +206,7 @@ ax.set_ylim([0, height])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 
-file_name = "gps_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+file_name = "amv_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
