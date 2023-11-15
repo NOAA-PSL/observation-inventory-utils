@@ -51,7 +51,7 @@ db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
 #loop and plot sensors
-unique_sensor = db_frame.sort_values('sensor').drop_duplicates('sensor')
+unique_sensor = db_frame.sort_values('sensor').drop_duplicates('sensor').ascending([False])
 step=0.05
 height=step*len(unique_sensor)
 
