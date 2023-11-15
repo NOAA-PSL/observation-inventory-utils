@@ -135,33 +135,13 @@ db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
+#select only the gps rows 
 db_frame = db_frame[(db_frame['sensor']=='gps')]
-
-
-#THIS AREA NEEDS TO CHANGE TO ADDRESS THE VARIOUS SENSORS ON SINGLE SATS
-#loop and plot satelites
-# unique_sat_id = db_frame.sort_values('sat_id_name').drop_duplicates('sat_id')
-# step=0.05
-# height=step*len(unique_sat_id)
 
 #loop and plot sensors/sat_ids
 unique_sensor_sats = db_frame[['sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id_name'], ascending=[False, False])
-#unique_sensor = db_frame.sort_values('sensor').drop_duplicates('sensor')
 step=0.05
 height=step*len(unique_sensor_sats)
-
-# #make list of sat labels
-# sat_labels=[]
-# for index, row in unique_sensor_sats.iterrows():
-#   if row.sat_id_name.strip():
-#     sat_labels.append(row.parent_dir + str(row.sat_id_name))
-#   else:
-#     sat_labels.append(row.parent_dir + str(row.sat_id))
-
-# #make list of sensor labels
-# sensor_labels = []
-# for index, row in unique_sensor.iterrows():
-#     sensor_labels.append(row.sensor)
 
 #make list of sensor&sat labels 
 sensor_sat_labels = []
@@ -175,7 +155,7 @@ fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
 #plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
-plt.title("Inventory of Clean Bucket Atmosphere Sensors by Satellite")
+plt.title("Inventory of Clean Bucket GPS Sensors by Satellite")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Satellite')
 

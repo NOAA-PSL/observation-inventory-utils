@@ -135,36 +135,17 @@ db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
+#remove gps and amv rows to be plotted separately
 index_gps = db_frame[(db_frame['sensor']=='gps')].index
 db_frame.drop(index_gps, inplace=True)
 
 index_amv = db_frame[(db_frame['sensor']=='amv')].index
 db_frame.drop(index_amv, inplace=True)
 
-#THIS AREA NEEDS TO CHANGE TO ADDRESS THE VARIOUS SENSORS ON SINGLE SATS
-#loop and plot satelites
-# unique_sat_id = db_frame.sort_values('sat_id_name').drop_duplicates('sat_id')
-# step=0.05
-# height=step*len(unique_sat_id)
-
 #loop and plot sensors/sat_ids
 unique_sensor_sats = db_frame[['sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id_name'], ascending=[False, False])
-#unique_sensor = db_frame.sort_values('sensor').drop_duplicates('sensor')
 step=0.05
 height=step*len(unique_sensor_sats)
-
-# #make list of sat labels
-# sat_labels=[]
-# for index, row in unique_sensor_sats.iterrows():
-#   if row.sat_id_name.strip():
-#     sat_labels.append(row.parent_dir + str(row.sat_id_name))
-#   else:
-#     sat_labels.append(row.parent_dir + str(row.sat_id))
-
-# #make list of sensor labels
-# sensor_labels = []
-# for index, row in unique_sensor.iterrows():
-#     sensor_labels.append(row.sensor)
 
 #make list of sensor&sat labels 
 sensor_sat_labels = []
@@ -177,7 +158,6 @@ for index, row in unique_sensor_sats.iterrows():
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-#plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
 plt.title("Inventory of Clean Bucket Atmosphere Sensors by Satellite")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Satellite')
@@ -191,11 +171,6 @@ for index, row in unique_sensor_sats.iterrows():
     pandas.options.mode.chained_assignment = None
     dftmp = select_sensor_satellite_combo(row['sensor'], row['sat_id'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
-    
-    # l=len(dftmp)
-    # sid=row['sat_id']
-    # print(f"{satinfo_string_} sat_id = {sid} dftmp len={l}")
-    #display(satinfo)
 
     plot_one_line(satinfo, dftmp, step/2+step*counter)
     counter = counter + 1

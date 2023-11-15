@@ -63,7 +63,6 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
     if satinfo_string in satinfo_translate_dictionary:
             satinfo_string = satinfo_translate_dictionary[satinfo_string]
     satinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
-#    for fn in os.listdir(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
     for fn in glob.glob(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
         pd_tmp = pandas.read_csv(os.path.join(satinfo_db_root,satinfo_string,os.path.basename(fn))
             ,header=None,sep='\s+'
@@ -135,33 +134,13 @@ db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
+#select only amv rows
 db_frame = db_frame[(db_frame['sensor']=='amv')]
-
-
-#THIS AREA NEEDS TO CHANGE TO ADDRESS THE VARIOUS SENSORS ON SINGLE SATS
-#loop and plot satelites
-# unique_sat_id = db_frame.sort_values('sat_id_name').drop_duplicates('sat_id')
-# step=0.05
-# height=step*len(unique_sat_id)
 
 #loop and plot sensors/sat_ids
 unique_sensor_sats = db_frame[['sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id_name'], ascending=[False, False])
-#unique_sensor = db_frame.sort_values('sensor').drop_duplicates('sensor')
 step=0.05
 height=step*len(unique_sensor_sats)
-
-# #make list of sat labels
-# sat_labels=[]
-# for index, row in unique_sensor_sats.iterrows():
-#   if row.sat_id_name.strip():
-#     sat_labels.append(row.parent_dir + str(row.sat_id_name))
-#   else:
-#     sat_labels.append(row.parent_dir + str(row.sat_id))
-
-# #make list of sensor labels
-# sensor_labels = []
-# for index, row in unique_sensor.iterrows():
-#     sensor_labels.append(row.sensor)
 
 #make list of sensor&sat labels 
 sensor_sat_labels = []
@@ -174,13 +153,11 @@ for index, row in unique_sensor_sats.iterrows():
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-#plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
-plt.title("Inventory of Clean Bucket Atmosphere Sensors by Satellite")
+plt.title("Inventory of Clean Bucket AMV Sensors by Satellite")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Satellite')
 
 counter=0
-# for index, row in unique_sat_id.iterrows():
 for index, row in unique_sensor_sats.iterrows():
     satinfo_string_ = row['sensor']+"_"+sat_dictionary[row['sat_id_name']]
     satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
@@ -188,11 +165,6 @@ for index, row in unique_sensor_sats.iterrows():
     pandas.options.mode.chained_assignment = None
     dftmp = select_sensor_satellite_combo(row['sensor'], row['sat_id'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
-    
-    # l=len(dftmp)
-    # sid=row['sat_id']
-    # print(f"{satinfo_string_} sat_id = {sid} dftmp len={l}")
-    #display(satinfo)
 
     plot_one_line(satinfo, dftmp, step/2+step*counter)
     counter = counter + 1
