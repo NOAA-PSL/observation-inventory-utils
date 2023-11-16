@@ -156,13 +156,11 @@ height=step*len(unique_sensor_sats)
 
 #make list of sensor&sat labels 
 sensor_sat_labels = []
-directory_labels = []
 for index, row in unique_sensor_sats.iterrows():
     if row.sat_id_name.strip():
         sensor_sat_labels.append(row.sensor + " " + str(row.sat_id_name))
     else:
         sensor_sat_labels.append(row.sensor + " " + str(row.sat_id))
-    directory_labels.append(row.source_dir)
 
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
@@ -171,6 +169,8 @@ plt.title("Inventory of Clean Bucket Atmosphere Sensors by Satellite")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Satellite')
 
+
+directory_labels = []
 counter=0
 # for index, row in unique_sat_id.iterrows():
 for index, row in unique_sensor_sats.iterrows():
@@ -181,6 +181,7 @@ for index, row in unique_sensor_sats.iterrows():
     dftmp = select_sensor_satellite_combo(row['sensor'], row['sat_id'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
 
+    directory_labels.append(dftmp['source_dir'][0])
     plot_one_line(satinfo, dftmp, step/2+step*counter)
     counter = counter + 1
 
