@@ -182,7 +182,7 @@ for index, row in unique_sensor_sats.iterrows():
     pandas.options.mode.chained_assignment = 'warn'
 
     #this should grab all disticnt options of dir to list 
-    directory_labels.append(dftmp['source_dir'][0])
+    directory_labels.append(dftmp[0]['source_dir'])
     plot_one_line(satinfo, dftmp, step/2+step*counter)
     counter = counter + 1
 
