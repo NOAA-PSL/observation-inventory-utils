@@ -12,6 +12,7 @@ from scipy import interpolate
 import argparse
 import glob
 import obs_inv_utils.inventory_table_factory as itf
+import re
 
 #argparse section
 parser = argparse.ArgumentParser()
@@ -115,6 +116,11 @@ def get_sensor(row):
     sensor = directory.split("/")[2]
     return sensor
 
+def get_source_dir(row):
+    directory = row['parent_dir']
+    source_dir = re.split("/[12][90][0-9][0-9]/[01][0-9]/", directory)[0]
+    return source_dir
+
 
 #read data from sql database of obs counts
 print('connecting to mysql db')
@@ -134,6 +140,7 @@ db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
+db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 
 #remove gps and amv rows to be plotted separately
 index_gps = db_frame[(db_frame['sensor']=='gps')].index
@@ -149,11 +156,13 @@ height=step*len(unique_sensor_sats)
 
 #make list of sensor&sat labels 
 sensor_sat_labels = []
+directory_labels = []
 for index, row in unique_sensor_sats.iterrows():
     if row.sat_id_name.strip():
         sensor_sat_labels.append(row.sensor + " " + str(row.sat_id_name))
     else:
         sensor_sat_labels.append(row.sensor + " " + str(row.sat_id))
+    directory_labels.append(row.source_dir)
 
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
@@ -183,6 +192,8 @@ ax.set_xlim(daterange)
 ax.set_ylim([0, height])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
+ax2 = ax.twinx()
+ax2.set_yticklabels(directory_labels)
 
 file_name = "all_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
