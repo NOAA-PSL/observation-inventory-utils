@@ -181,6 +181,7 @@ for index, row in unique_sensor_sats.iterrows():
     dftmp = select_sensor_satellite_combo(row['sensor'], row['sat_id'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
 
+    #this should grab all disticnt options of dir to list 
     directory_labels.append(dftmp['source_dir'][0])
     plot_one_line(satinfo, dftmp, step/2+step*counter)
     counter = counter + 1
