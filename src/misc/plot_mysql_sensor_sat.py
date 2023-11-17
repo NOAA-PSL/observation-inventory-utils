@@ -195,7 +195,7 @@ ax.set_ylim([0, height])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 ax2 = ax.twinx()
-ax.set_yticks(step/2+step*np.arange(counter))
+ax2.set_yticks(step/2+step*np.arange(counter))
 ax2.set_yticklabels(directory_labels)
 
 file_name = "all_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
