@@ -118,6 +118,7 @@ def get_sensor(row):
 
 def get_source_dir(row):
     directory = row['parent_dir']
+    directory = directory.replace("observations/reanalysis", "")
     source_dir = re.split("/[12][90][0-9][0-9]/[01][0-9]/", directory)[0]
     return source_dir
 
