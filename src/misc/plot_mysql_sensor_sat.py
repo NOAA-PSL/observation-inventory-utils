@@ -202,6 +202,6 @@ ax2.set_ylim([0, height])
 
 file_name = "all_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
-print(f"saving {fnout}", bbox_inches='tight')
-plt.savefig(fnout)
+print(f"saving {fnout}")
+plt.savefig(fnout, bbox_inches='tight')
 mysql_conn.close()
