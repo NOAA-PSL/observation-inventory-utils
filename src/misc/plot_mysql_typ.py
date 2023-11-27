@@ -18,6 +18,15 @@ args = parser.parse_args()
 #parameters
 daterange=[date(1975,1,1), date(2024,1,1)]
 
+typ_dictionary = {
+    "111":"SYNDAT", "112":"n/a", "120":"ADPUPA", "122":"ADPUPA", "126":"RASSDA", "130":"AIRCFT", 
+    "131":"AIRCFT", "132":"ADPUPA", "133":"AIRCAR", "134":"AIRCFT", "135":"AIRCFT", "150": "SPSSMI",
+    "151":"GOESND", "152":"SPSSMI", "153":"GPSIPW", "156":"GOESND", "157":"GOESND", "158":"GOESND", 
+    "159":"GOESND", "164":"GOESND", "165":"GOESND", "174":"GOESND", "175":"GOESND", "180":"SFCSHP", 
+    "181":"ADPSFC", "182":"SFCSHP", "183":"ADPSFC,SFCSHP", "187":"ADPSFC", "188":"MSONET", "191":"SFCBOG",
+    "192":"ADPSFC", "193":"ADPSFC", "194":"SFCSHP", "195":"MSONET"
+}
+
 def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.tot.astype('bool'),'s',color='gray',markersize=5)
 
@@ -55,10 +64,13 @@ unique_typ = db_frame.sort_values('typ', ascending=False).drop_duplicates('typ')
 step=0.05
 height=step*len(unique_typ)
 
-#make list of sensor labels
+#make list of typ labels
 typ_labels = []
 for index, row in unique_typ.iterrows():
-    typ_labels.append(row.typ)
+    if row.typ in typ_dictionary.keys():
+        typ_labels.append(typ_dictionary[row.typ])
+    else:
+        typ_labels.append(row.typ)
 
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
