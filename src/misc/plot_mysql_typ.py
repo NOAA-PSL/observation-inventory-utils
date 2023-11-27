@@ -21,8 +21,8 @@ daterange=[date(1975,1,1), date(2024,1,1)]
 def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'s',color='gray',markersize=5)
 
-def select_sensor(sensor, db_frame):
-    dftmp = db_frame.loc[db_frame['sensor']==sensor]
+def select_typ(typ, db_frame):
+    dftmp = db_frame.loc[db_frame['typ']==typ]
     return dftmp
 
 def get_sensor(row):
@@ -35,22 +35,22 @@ def get_sensor(row):
 print('connecting to mysql db')
 mysql_conn = itf.engine.connect()
 #BUFR FILE INFO
-sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
-data = pandas.read_sql(sql, mysql_conn)
-db_frame1 = data.sort_values('inserted_at'
-        ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
+# sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
+# data = pandas.read_sql(sql, mysql_conn)
+# db_frame1 = data.sort_values('inserted_at'
+#         ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
 
 #PREPBUFR FILE INFO 
 sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
 data2 = pandas.read_sql(sql2, mysql_conn)
-db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size'], keep='last')
+db_frame = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size'], keep='last')
 
-db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
+# db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
-#loop and plot sensors
+#loop and plot typ
 unique_typ = db_frame.sort_values('typ', ascending=False).drop_duplicates('typ')
 step=0.05
 height=step*len(unique_typ)
@@ -71,7 +71,7 @@ counter=0
 # for index, row in unique_sat_id.iterrows():
 for index, row in unique_typ.iterrows():
     pandas.options.mode.chained_assignment = None
-    dftmp = select_sensor(row['typ'], db_frame)
+    dftmp = select_typ(row['typ'], db_frame)
     pandas.options.mode.chained_assignment = 'warn'
 
     plot_one_line(dftmp, step/2+step*counter)
