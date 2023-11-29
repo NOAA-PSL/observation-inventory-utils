@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 20000316T120000Z
+  end: 20101005T000000Z
+search_info:
+  -
+    platform: aws_s3_clean
+    key: observations/reanalysis/ssmi/ssmit/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.ssmit.tm00.bufr_d
+

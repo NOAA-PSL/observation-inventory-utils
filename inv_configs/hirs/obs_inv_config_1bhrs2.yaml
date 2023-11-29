@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19790101T000000Z
+  end: 20070301T180000Z
+search_info:
+  -
+    platform: aws_s3_clean
+    key: observations/reanalysis/hirs/1bhrs2/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.1bhrs2.tm00.bufr_d
+

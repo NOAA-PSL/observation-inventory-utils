@@ -1,0 +1,13 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/atms/atms/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+#  start: 20120101T000000Z
+  start: 20140408T000000Z
+  end: 20210101T180000Z
+bufr_files:
+  - gdas.%z.atms.tm00.bufr_d
+work_dir: './'
+scrub_files: True
+
+

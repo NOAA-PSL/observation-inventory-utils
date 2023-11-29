@@ -1,0 +1,12 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/trmm/nasa/tmi/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19980101T000000Z
+  end: 20141001T000000Z
+bufr_files:
+  - tmi.V05A.%z.bufr #sql wildcards here
+work_dir: './'
+scrub_files: True
+
+

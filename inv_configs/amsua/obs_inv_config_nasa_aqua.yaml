@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 20020901T000000Z
+  end: 20230202T000000Z
+search_info:
+  -
+    platform: aws_s3_clean
+    key: observations/reanalysis/amsua/nasa/aqua/%Y/%m/bufr/amsua_disc_final.%Y%m%d.t%Hz.bufr
+

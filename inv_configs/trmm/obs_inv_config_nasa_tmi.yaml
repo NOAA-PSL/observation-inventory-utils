@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19980101T000000Z
+  end: 20141001T000000Z
+search_info:
+  -
+    platform: aws_s3_clean
+    key: observations/reanalysis/trmm/nasa/tmi/%Y/%m/bufr/tmi.V05A.%Y%m%d.t%Hz.bufr
+

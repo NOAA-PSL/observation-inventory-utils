@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19981026T000000Z
+  end: 20120311T000000Z
+search_info:
+  -
+    platform: aws_s3_clean
+    key: observations/reanalysis/avhrr/nasa/21cr_repro/avcsam/%Y/%m/bufr/gmao.%Y%m%d.t%Hz.avcsam.tm00.bufr_d
+

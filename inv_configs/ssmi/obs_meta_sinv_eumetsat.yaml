@@ -1,0 +1,12 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/ssmi/eumetsat/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19870709T120000Z
+  end: 20090101T000000Z
+bufr_files:
+  - gdas.%z.ssmit.tm00.bufr_d #sql wildcards here
+work_dir: './'
+scrub_files: True
+
+

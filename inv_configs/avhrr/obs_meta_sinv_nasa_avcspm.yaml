@@ -1,0 +1,12 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/avhrr/nasa/21cr_repro/avcspm/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 20010301T000000Z
+  end: 20120301T000000Z
+bufr_files:
+  - gmao.%z.avcspm.tm00.bufr_d #sql wildcards here
+work_dir: './'
+scrub_files: True
+
+

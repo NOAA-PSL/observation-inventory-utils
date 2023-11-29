@@ -1,0 +1,12 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/gps/eumetsat/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 20010901T000000Z
+  end: 20170101T180000Z
+bufr_files:
+  - gdas.%z.gpsro.tm00.bufr_d
+work_dir: './'
+scrub_files: True
+
+

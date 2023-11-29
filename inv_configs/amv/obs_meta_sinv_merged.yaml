@@ -1,0 +1,12 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/amsua/1bamua/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19790101T000000Z
+  end: 20191101T000000Z
+bufr_files:
+  - gdas.%z.satwnd.tm00.bufr_d #sql wildcards here
+work_dir: './'
+scrub_files: True
+
+

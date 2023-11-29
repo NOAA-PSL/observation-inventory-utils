@@ -1,0 +1,12 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/conv/prepbufr.acft_profiles/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19790101T000000Z
+  end: 20230401T060000Z
+prepbufr_files:
+  - gdas.%z.prepbufr.acft_profiles.nr
+work_dir: './'
+scrub_files: True
+
+

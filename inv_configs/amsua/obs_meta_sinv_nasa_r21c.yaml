@@ -1,0 +1,12 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/amsua/nasa/r21c_repro/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19981026T000000Z
+  end: 20090501T060000Z
+bufr_files:
+  - gmao_r21c_repro.%z.1bamu.tm00.bufr #sql wildcards here
+work_dir: './'
+scrub_files: True
+
+

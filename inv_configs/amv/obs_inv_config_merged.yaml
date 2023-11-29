@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19790101T000000Z
+  end: 20191101T000000Z
+search_info:
+  -
+    platform: aws_s3_clean
+    key: observations/reanalysis/amv/merged/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.satwnd.tm00.bufr_d
+

@@ -1,0 +1,12 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/msu/1bmsu/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19790101T000000Z
+  end: 20070301T000000Z
+bufr_files:
+  - gdas.%z.1bmsu.tm00.bufr_d
+work_dir: './'
+scrub_files: True
+
+

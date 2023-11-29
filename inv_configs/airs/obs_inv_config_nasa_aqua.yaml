@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 20020831T000000Z
+  end: 20230118T120000Z
+search_info:
+  -
+    platform: aws_s3_clean
+    key: observations/reanalysis/airs/nasa/aqua/%Y/%m/bufr/airs_disc_final.%Y%m%d.t%Hz.bufr
+

@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 20140305T000000Z
+  end: 20220912T060000Z
+search_info:
+  -
+    platform: aws_s3_clean
+    key: observations/reanalysis/gmi/nasa/gmi_v7/%Y/%m/bufr/gmi_v7_L1CR.%Y%m%d.t%Hz.bufr
+

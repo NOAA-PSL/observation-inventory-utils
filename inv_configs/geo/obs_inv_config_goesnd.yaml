@@ -1,0 +1,10 @@
+cycling_interval: 21600
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  start: 19970901T000000Z
+  end: 20080101T180000Z
+search_info:
+  -
+    platform: aws_s3_clean
+    key: observations/reanalysis/geo/goesnd/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.goesnd.tm00.bufr_d
+
