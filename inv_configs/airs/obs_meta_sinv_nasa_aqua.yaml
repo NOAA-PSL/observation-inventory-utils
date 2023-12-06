@@ -2,7 +2,7 @@ s3_bucket: noaa-reanalyses-pds
 s3_prefix: observations/reanalysis/airs/nasa/aqua/%Y/%m/bufr/
 date_range:
   datestr: '%Y%m%dT%H%M%SZ'
-  start: 20070201T000000Z
+  start: 20020831T000000Z
   end: 20230118T120000Z
 bufr_files:
   - airs_disc_final.%z.bufr
