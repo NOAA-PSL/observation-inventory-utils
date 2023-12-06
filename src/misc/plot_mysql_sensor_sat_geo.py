@@ -145,7 +145,7 @@ db_frame = db_frame[(db_frame['sensor']=='geo')]
 db_frame['subsensor'] = db_frame.apply(get_subsensor, axis=1)
 
 #loop and plot sensors/sat_ids
-unique_sensor_sats = db_frame[['subsensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['subsensor', 'sat_id_name'], ascending=[False, False])
+unique_sensor_sats = db_frame[['sensor', 'subsensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['subsensor', 'sat_id', 'sat_id_name'], ascending=[False, False, False])
 step=0.05
 height=step*len(unique_sensor_sats)
 
