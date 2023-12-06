@@ -12,7 +12,6 @@ from scipy import interpolate
 import argparse
 import glob
 import obs_inv_utils.inventory_table_factory as itf
-import re
 
 #argparse section
 parser = argparse.ArgumentParser()
@@ -98,8 +97,8 @@ def plot_one_line(satinfo, dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'s',color='gray',markersize=5)
     plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
 
-def select_sensor_satellite_combo(sensor, sat_id, db_frame, satinfo):
-    dftmp = db_frame.loc[(db_frame['sat_id']==sat_id) & (db_frame['sensor']==sensor)]
+def select_subsensor_satellite_combo(subsensor, sat_id, db_frame, satinfo):
+    dftmp = db_frame.loc[(db_frame['sat_id']==sat_id) & (db_frame['subsensor']==subsensor)]
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
           satinfo.status_nan.to_numpy().astype('float'),
           kind='previous')
@@ -116,12 +115,10 @@ def get_sensor(row):
     sensor = directory.split("/")[2]
     return sensor
 
-def get_source_dir(row):
+def get_subsensor(row):
     directory = row['parent_dir']
-    directory = directory.replace("observations/reanalysis", "")
-    source_dir = re.split("/[12][90][0-9][0-9]/[01][0-9]/", directory)[0]
-    return source_dir
-
+    subsensor = directory.split("/")[3]
+    return subsensor
 
 #read data from sql database of obs counts
 print('connecting to mysql db')
@@ -141,20 +138,14 @@ db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
-db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 
-#remove gps, amv, and geo rows to be plotted separately
-index_gps = db_frame[(db_frame['sensor']=='gps')].index
-db_frame.drop(index_gps, inplace=True)
+#select only the gps rows 
+db_frame = db_frame[(db_frame['sensor']=='geo')]
 
-index_amv = db_frame[(db_frame['sensor']=='amv')].index
-db_frame.drop(index_amv, inplace=True)
-
-index_geo = db_frame[(db_frame['sensor']=='geo')].index
-db_frame.drop(index_geo, inplace=True)
+db_frame['subsensor'] = db_frame.apply(get_subsensor, axis=1)
 
 #loop and plot sensors/sat_ids
-unique_sensor_sats = db_frame[['sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id_name'], ascending=[False, False])
+unique_sensor_sats = db_frame[['subsensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['subsensor', 'sat_id_name'], ascending=[False, False])
 step=0.05
 height=step*len(unique_sensor_sats)
 
@@ -162,19 +153,18 @@ height=step*len(unique_sensor_sats)
 sensor_sat_labels = []
 for index, row in unique_sensor_sats.iterrows():
     if row.sat_id_name.strip():
-        sensor_sat_labels.append(row.sensor + " " + str(row.sat_id_name))
+        sensor_sat_labels.append(row.subsensor + " " + str(row.sat_id_name))
     else:
-        sensor_sat_labels.append(row.sensor + " " + str(row.sat_id))
+        sensor_sat_labels.append(row.subsensor + " " + str(row.sat_id))
 
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title("Inventory of Clean Bucket Atmosphere Sensors by Satellite")
+#plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
+plt.title("Inventory of Clean Bucket GEO Sensors by Satellite")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Satellite')
 
-
-directory_labels = []
 counter=0
 # for index, row in unique_sat_id.iterrows():
 for index, row in unique_sensor_sats.iterrows():
@@ -182,11 +172,9 @@ for index, row in unique_sensor_sats.iterrows():
     satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
-    dftmp = select_sensor_satellite_combo(row['sensor'], row['sat_id'], db_frame, satinfo)
+    dftmp = select_subsensor_satellite_combo(row['subsensor'], row['sat_id'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
 
-    dirs = dftmp['source_dir'].unique()
-    directory_labels.append(np.array2string(dirs))
     plot_one_line(satinfo, dftmp, step/2+step*counter)
     counter = counter + 1
 
@@ -198,12 +186,8 @@ ax.set_xlim(daterange)
 ax.set_ylim([0, height])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
-ax2 = ax.twinx()
-ax2.set_yticks(step/2+step*np.arange(counter))
-ax2.set_yticklabels(directory_labels)
-ax2.set_ylim([0, height])
 
-file_name = "all_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+file_name = "geo_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
