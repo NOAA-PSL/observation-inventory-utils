@@ -69,7 +69,7 @@ db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
 #loop and plot typ
-unique_typ = db_frame.sort_values('typ', ascending=False).drop_duplicates('typ')
+unique_typ = db_frame.drop_duplicates('typ').sort_values('typ', ascending=False)
 step=0.05
 height=step*len(unique_typ)
 
