@@ -61,8 +61,8 @@ mysql_conn = itf.engine.connect()
 #PREPBUFR FILE INFO 
 sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
 data2 = pandas.read_sql(sql2, mysql_conn)
-db_frame = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size'], keep='last')
-
+#db_frame = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size'], keep='last')
+db_frame = data2.sort_values('inserted_at')
 # db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
