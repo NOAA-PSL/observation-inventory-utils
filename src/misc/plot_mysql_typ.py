@@ -37,7 +37,7 @@ typ_dictionary = {
 }
 
 def plot_one_line(dftmp, yloc):
-    plt.plot(dftmp.datetime, yloc*dftmp.tot.astype('bool'),'s',color='gray',markersize=5)
+    plt.plot(dftmp.datetime, yloc,'s',color='gray',markersize=5)
 
 def select_typ(typ, db_frame):
     dftmp = db_frame.loc[db_frame['typ']==typ]
