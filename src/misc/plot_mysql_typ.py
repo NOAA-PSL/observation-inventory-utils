@@ -40,7 +40,7 @@ def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.tot.astype('bool'),'s',color='gray',markersize=5)
 
 def select_typ(typ, db_frame):
-    dftmp = db_frame.loc[db_frame['typ']==typ]
+    dftmp = db_frame.sel(db_frame['typ']==typ)
     return dftmp
 
 def get_sensor(row):
