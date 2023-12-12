@@ -40,7 +40,7 @@ def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.tot.astype('bool'),'s',color='gray',markersize=5)
 
 def select_typ(typ, db_frame):
-    dftmp = db_frame.sel(db_frame['typ']==typ)
+    dftmp = db_frame.loc[db_frame['typ']==typ]
     return dftmp
 
 def get_sensor(row):
@@ -69,7 +69,7 @@ db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
 #loop and plot typ
-unique_typ = db_frame.drop_duplicates('typ').sort_values('typ', ascending=False)
+unique_typ = db_frame['typ'].drop_duplicates('typ').sort_values('typ', ascending=False)
 step=0.05
 height=step*len(unique_typ)
 
