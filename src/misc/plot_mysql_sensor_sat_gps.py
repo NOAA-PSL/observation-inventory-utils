@@ -36,7 +36,7 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                "METEOSAT 2" : "m02", "METEOSAT 3": "m03", "METEOSAT 4": "m04","METEOSAT 5": "m05", "METEOSAT 6": "m06", "METEOSAT 7": "m07",
                "METEOSAT 8": "m08", "METEOSAT 9": "m09", "METEOSAT 10": "m10", "METEOSAT 11": "m11",
                "":"",
-               "DMSP 8":"f8", "DMSP 9":"f9", "DMSP 10": "f10", "DMSP 11": "f11", "DMSP 12": "f12", "DMSP 13": "f13", 
+               "DMSP 8":"f08", "DMSP 9":"f09", "DMSP 10": "f10", "DMSP 11": "f11", "DMSP 12": "f12", "DMSP 13": "f13", 
                "DMSP 14": "f14", "DMSP 15": "f15","DMSP 16": "f16", "DMSP17": "f17", "DMSP18": "f18",
                "CHAMP":"CHAMP","COSMIC-1":"COSMIC-1","COSMIC-2":"COSMIC-2","COSMIC-3":"COSMIC-3","COSMIC-4":"COSMIC-4",
                "COSMIC-5":"COSMIC-5","COSMIC-6":"COSMIC-6","COSMIC-7":"COSMIC-7",
@@ -51,9 +51,10 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                "Himawari-8":"himawari8", "Himawari-9":"himawari9"}
 
 satinfo_translate_dictionary={
+    "hirs_n06":"hirs2_n06", "hirs_n07":"hirs2_n07", "hirs_n08":"hirs2_n08", "hirs_n09":"hirs2_n09", "hirs_n10":"hirs2_n10",
     "hirs_n11":"hirs2_n11", "hirs_n12":"hirs2_n12", "hirs_n14":"hirs2_n14", "hirs_n15":"hirs3_n15",
     "hirs_n16":"hirs3_n16", "hirs_n17":"hirs3_n17", "hirs_metop-a":"hirs4_metop-a", 
-    "hirs_metop-b":"hirs4_metop-b", "hirs_n19":"hirs4_n19", "avhrr_n14":"avhrr2_n14",
+    "hirs_metop-b":"hirs4_metop-b", "hirs_n19":"hirs4_n19", "hirs_tirosn":"hirs2_tirosn", "avhrr_n14":"avhrr2_n14",
     "avhrr_metop-a":"avhrr3_metop-a", "avhrr_metop-b":"avhrr3_metop-b", "avhrr_n15":"avhrr3_n15",
     "avhrr_n16":"avhrr3_n16", "avhrr_n17":"avhrr3_n17", "avhrr_n18":"avhrr3_n18", "avhrr_n19":"avhrr3_n19"
 }
