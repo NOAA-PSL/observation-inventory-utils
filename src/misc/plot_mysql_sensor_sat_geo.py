@@ -56,7 +56,10 @@ satinfo_translate_dictionary={
     "hirs_n16":"hirs3_n16", "hirs_n17":"hirs3_n17", "hirs_metop-a":"hirs4_metop-a", 
     "hirs_metop-b":"hirs4_metop-b", "hirs_n19":"hirs4_n19", "hirs_tirosn":"hirs2_tirosn", "avhrr_n14":"avhrr2_n14",
     "avhrr_metop-a":"avhrr3_metop-a", "avhrr_metop-b":"avhrr3_metop-b", "avhrr_n15":"avhrr3_n15",
-    "avhrr_n16":"avhrr3_n16", "avhrr_n17":"avhrr3_n17", "avhrr_n18":"avhrr3_n18", "avhrr_n19":"avhrr3_n19"
+    "avhrr_n16":"avhrr3_n16", "avhrr_n17":"avhrr3_n17", "avhrr_n18":"avhrr3_n18", "avhrr_n19":"avhrr3_n19",
+    "goesnd_g11":"sndrD_g11", "goesnd_g12":"sndrD_g12", "goesnd_g13":"sndrD_g13", "goesnd_g14":"sndrD_g14",
+    "goesnd_g15":"sndrD_g15", "goesnd_g08":"sndr_g08", "goesnd_g10":"sndr_g10", "goesnd_g11":"sndr_g11",
+    "goesnd_g12":"sndr_g12"
 }
 
 #read raw satinfo files
@@ -169,7 +172,7 @@ plt.ylabel('Sensor & Satellite')
 counter=0
 # for index, row in unique_sat_id.iterrows():
 for index, row in unique_sensor_sats.iterrows():
-    satinfo_string_ = row['sensor']+"_"+sat_dictionary[row['sat_id_name']]
+    satinfo_string_ = row['subsensor']+"_"+sat_dictionary[row['sat_id_name']]
     satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
