@@ -60,3 +60,4 @@ Parallel(n_jobs=10)(delayed(run_full_inventory)(info) for info in to_inventory)
 
 print('Auto inventory script completed for ' + str(to_inventory))
 
+#next step would be to trigger the plotting scripts again 
