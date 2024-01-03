@@ -4,8 +4,8 @@ import yaml_generation as yg
 import obs_inv_utils.obs_inv_cli as cli
 
 import argparse
-
 import subprocess
+from joblib import Parallel, delayed
 
 #argparse section
 parser = argparse.ArgumentParser()
@@ -47,11 +47,16 @@ def run_nceplibs(inventory_info):
     else:
         print(f'No valid commmand found for nceplibs_cmd in {inventory_info.obs_name} inventory info with value: ' + inventory_info.nceplibs_cmd)
 
+def run_full_inventory(inventory_info):
+    print('Beginning inventory for ' + inventory_info.obs_name)
+    run_obs_inventory(inventory_info)
+    print('Obs inventory complete, now running nceplibs for ' + inventory_info.obs_name)
+    run_nceplibs(inventory_info)
+    print('NCEPlibs call complete for ' + inventory_info.obs_name)
 
-#for each 
-# generate yaml for obs inventory
-# run obs inventory
-# determine nceplibs command (sinv or cmpbqm)
-# generate yaml for nceplibs
-# run correct command 
+#for each item in the category list run parallel
+#call the run obs inventory and run nceplibs from above
+Parallel(n_jobs=10)(delayed(run_full_inventory)(info) for info in to_inventory)
+
+print('Auto inventory script completed for ' + str(to_inventory))
 
