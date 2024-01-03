@@ -1,6 +1,8 @@
 import automation_utils as au
 from automation_utils import InventoryInfo
 
+
+
 airs_airsev = InventoryInfo(
     obs_name='airs_airsev',
     key='observations/reanalysis/airs/airsev/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.airsev.tm00.bufr_d',
@@ -37,3 +39,6 @@ amsua_1bamua = InventoryInfo(
     nceplibs_cmd=au.NCEPLIBS_SINV
 )
 
+
+
+atm_infos = [airs_airsev, airs_aqua, amsua_1bamua]
