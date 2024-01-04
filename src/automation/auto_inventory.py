@@ -13,7 +13,8 @@ from datetime import timedelta
 #argparse section
 parser = argparse.ArgumentParser()
 parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere'], default="atmosphere", type=str)
-parser.add_argument("-p", dest="platform", help="Platform the script is being run on. Valid options: pw, hera", choices=['pw', 'hera'], default="pw", type=str)
+#parser.add_argument("-p", dest="platform", help="Platform the script is being run on. Valid options: pw, hera", choices=['pw', 'hera'], default="pw", type=str)
+parser.add_argument("-ago", dest="days_ago", help="Number of days ago to run the inventory for. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
 args = parser.parse_args()
 
 #get category list
@@ -35,11 +36,15 @@ if args.category is 'atmosphere':
 #define functions to run in parallel 
 def run_obs_inventory(inventory_info):
     #EXPAND THIS LATER TO HANDLE TWO DAY RUNS; probably specify end time as part fo the argument options above
-    start = dt.strptime(inventory_info.start, au.DATESTR_FORMAT)
-    end = start + timedelta(days=2)
-    end_time = end.strftime(au.DATESTR_FORMAT)
+    if args.days_ago > 0:
+        end = dt.now() # need to get in 0/6/12/18z most recent value 
+        end_time = end.strftime(au.DATESTR_FORMAT)
+    else:
+        start_time = inventory_info.start
+        end = dt.now() # need to get this in the 0 / 6 / 12 / 18z most recent value 
+        end_time = end.strftime(au.DATESTR_FORMAT)
 
-    yaml_file = yg.generate_obs_inv_config(inventory_info, inventory_info.start, end_time)
+    yaml_file = yg.generate_obs_inv_config(inventory_info, start_time, end_time)
     cli.get_obs_inventory_base(yaml_file)
 
 def run_nceplibs(inventory_info):
