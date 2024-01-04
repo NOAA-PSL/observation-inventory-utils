@@ -6,9 +6,13 @@ import automation_utils as au
 
 PY_CURRENT_DIR = pathlib.Path(__file__).parent.resolve()
 
-def generate_obs_inv_config(inventory_info, end_time):
+def generate_obs_inv_config(inventory_info, start_time, end_time):
     filename = inventory_info.obs_name + '_obs_inv_config.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
+    if start_time is dt:
+        start = start_time.strftime(au.DATESTR_FORMAT)
+    else:
+        start = start_time
     if end_time is dt:
         end = end_time.strftime(au.DATESTR_FORMAT)
     else:
@@ -17,7 +21,7 @@ def generate_obs_inv_config(inventory_info, end_time):
         'cycling_interval': inventory_info.cycling_interval,
         'date_range': {
             'datestr':au.DATESTR_FORMAT,
-            'start':inventory_info.start,
+            'start': start,
             'end': end
         },
         'search_info':[{
@@ -31,9 +35,13 @@ def generate_obs_inv_config(inventory_info, end_time):
     outfile.close()
     return yaml_file_path
 
-def generate_nceplibs_sinv_inventory_config(inventory_info, end_time):
+def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time):
     filename = inventory_info.obs_name + '_obs_meta_sinv.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
+    if start_time is dt:
+        start = start_time.strftime(au.DATESTR_FORMAT)
+    else:
+        start = start_time
     if end_time is dt:
         end = end_time.strftime(au.DATESTR_FORMAT)
     else:
@@ -43,7 +51,7 @@ def generate_nceplibs_sinv_inventory_config(inventory_info, end_time):
         's3_prefix': inventory_info.s3_prefix,
         'date_range': {
             'datestr':au.DATESTR_FORMAT,
-            'start':inventory_info.start,
+            'start': start,
             'end': end
         },
         'bufr_files':[inventory_info.bufr_files],
@@ -55,9 +63,13 @@ def generate_nceplibs_sinv_inventory_config(inventory_info, end_time):
     outfile.close()
     return yaml_file_path
 
-def generate_nceplibs_cmpbqm_inventory_config(inventory_info, end_time):
+def generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_time):
     filename = inventory_info.obs_name + '_obs_meta_cmpbqm.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
+    if start_time is dt:
+        start = start_time.strftime(au.DATESTR_FORMAT)
+    else:
+        start = start_time
     if end_time is dt:
         end = end_time.strftime(au.DATESTR_FORMAT)
     else:
@@ -67,7 +79,7 @@ def generate_nceplibs_cmpbqm_inventory_config(inventory_info, end_time):
         's3_prefix': inventory_info.s3_prefix,
         'date_range': {
             'datestr':au.DATESTR_FORMAT,
-            'start':inventory_info.start,
+            'start': start,
             'end': end
         },
         'prepbufr_files':[inventory_info.bufr_files],
