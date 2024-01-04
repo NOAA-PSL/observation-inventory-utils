@@ -25,8 +25,9 @@ def generate_obs_inv_config(inventory_info, end_time):
             'key':inventory_info.key
         }
     }
-    with(yaml_file_path, 'w') as outfile:
-        yaml.dump(body, outfile)
+    outfile = open(yaml_file_path, 'w')
+    yaml.dump(body, outfile)
+    outfile.close()
     return yaml_file_path
 
 def generate_nceplibs_inventory_config(inventory_info, end_time):
@@ -48,6 +49,7 @@ def generate_nceplibs_inventory_config(inventory_info, end_time):
         'work_dir': './',
         'scrub_files': 'True'
     }
-    with(yaml_file_path, 'w') as outfile:
-        yaml.dump(body, outfile)
+    outfile = open(yaml_file_path, 'w')
+    yaml.dump(body, outfile)
+    outfile.close()
     return yaml_file_path
