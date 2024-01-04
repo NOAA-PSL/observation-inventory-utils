@@ -24,10 +24,12 @@ if args.category is 'atmosphere':
     to_inventory = atm_dicts.atm_infos 
 
 #need to run correct sh for platform 
-if args.platform is 'pw':
-    subprocess.run(['./../../obs_inv_utils_pw_cloud.sh'])
-elif args.platform is 'hera':
-    subprocess.run(['./../../obs_inv_utils_hera.sh'])
+# assume this is gonna be done before running the script because I had to do it to run initally
+# and don't want to give permission to run these files from this script 
+# if args.platform is 'pw':
+#     subprocess.run(['./../../obs_inv_utils_pw_cloud.sh'])
+# elif args.platform is 'hera':
+#     subprocess.run(['./../../obs_inv_utils_hera.sh'])
 
 
 #define functions to run in parallel 
