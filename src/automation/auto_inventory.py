@@ -7,6 +7,9 @@ import argparse
 import subprocess
 from joblib import Parallel, delayed
 
+from datetime import datetime as dt
+from datetime import timedelta
+
 #argparse section
 parser = argparse.ArgumentParser()
 parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere'], default="atmosphere", type=str)
@@ -30,13 +33,19 @@ elif args.platform is 'hera':
 #define functions to run in parallel 
 def run_obs_inventory(inventory_info):
     #EXPAND THIS LATER TO HANDLE TWO DAY RUNS; probably specify end time as part fo the argument options above
-    end_time = inventory_info.end_time
+    start = dt.strptime(inventory_info.start, au.DATESTR_FORMAT)
+    end = start + timedelta(days=2)
+    end_time = end.strftime(au.DATESTR_FORMAT)
+
     yaml_file = yg.generate_obs_inv_config(inventory_info, end_time)
     cli.get_obs_inventory(yaml_file)
 
 def run_nceplibs(inventory_info):
     #ADD TWO DAY EXPANSION HERE AS WELL
-    end_time = inventory_info.end_time 
+    start = dt.strptime(inventory_info.start, au.DATESTR_FORMAT)
+    end = start + timedelta(days=2)
+    end_time = end.strftime(au.DATESTR_FORMAT)
+
     yaml_file = yg.generate_nceplibs_inventory_config(inventory_info, end_time)
     
     #run correct command
