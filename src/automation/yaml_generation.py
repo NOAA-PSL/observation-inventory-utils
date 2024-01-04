@@ -20,10 +20,11 @@ def generate_obs_inv_config(inventory_info, end_time):
             'start':inventory_info.start,
             'end': end
         },
-        'search_info':{
+        'search_info':[{
             'platform':inventory_info.platform,
-            'key':inventory_info.key
-        }
+            'key':inventory_info.key 
+            }
+        ],
     }
     outfile = open(yaml_file_path, 'w')
     yaml.dump(body, outfile)
