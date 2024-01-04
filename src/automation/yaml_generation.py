@@ -48,7 +48,7 @@ def generate_nceplibs_inventory_config(inventory_info, end_time):
         },
         'bufr_files':[inventory_info.bufr_files],
         'work_dir': './',
-        'scrub_files': 'True'
+        'scrub_files': True
     }
     outfile = open(yaml_file_path, 'w')
     yaml.dump(body, outfile)
