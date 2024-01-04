@@ -12,6 +12,8 @@ REANALYSIS_BUCKET = 'noaa-reanlyses-pds'
 
 DATESTR_FORMAT = '%Y%m%dT%H%M%SZ'
 
+CYCLING_6H = '21600'
+
 InventoryInfo = namedtuple(
     'InventoryInfo',
     [
