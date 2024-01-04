@@ -25,9 +25,9 @@ if args.category is 'atmosphere':
 
 #need to run correct sh for platform 
 if args.platform is 'pw':
-    subprocess.run(['source', '../../obs_inv_utils_pw_cloud.sh'])
+    subprocess.run(['../../obs_inv_utils_pw_cloud.sh'])
 elif args.platform is 'hera':
-    subprocess.run(['source', '../../obs_inv_utils_hera.sh'])
+    subprocess.run(['../../obs_inv_utils_hera.sh'])
 
 
 #define functions to run in parallel 
