@@ -32,15 +32,17 @@ def cli():
     """Cli for observations Inventory."""
 
 
-@cli.command()
-@click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
-def get_obs_inventory(config_yaml):
-
+def get_obs_inventory_base(config_yaml):
     print(f'Inventory config to use: {config_yaml}')
     cf = ObservationsConfig(config_yaml)
     cf.load()
     inv_search = se.ObsInventorySearchEngine(cf)
     inv_search.get_obs_file_info()
+
+@cli.command()
+@click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
+def get_obs_inventory(config_yaml):
+    return get_obs_inventory_base(config_yaml)
 
 @cli.command()
 @click.option('-m', '--min-instances', 'min_instances', required=True, type=int)
@@ -58,9 +60,7 @@ def plot_groups_filesize_timeseries(config_yaml):
     obgr = pg.ObsGroupFilesizeTimeline(config)
     obgr.plot_obsgroups_fs_timeline()
 
-@cli.command()
-@click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
-def get_obs_count_meta_sinv(config_yaml):
+def get_obs_count_meta_sinv_base(config_yaml):
     config = ObsMetaSinvConfig(config_yaml)
     config.load()
     print(repr(config))
@@ -69,12 +69,20 @@ def get_obs_count_meta_sinv(config_yaml):
 
 @cli.command()
 @click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
-def get_obs_count_meta_cmpbqm(config_yaml):
+def get_obs_count_meta_sinv(config_yaml):
+    return get_obs_count_meta_sinv_base(config_yaml)
+
+def get_obs_count_meta_cmpbqm_base(config_yaml):
     config = ObsMetaCMPBQMConfig(config_yaml)
     config.load()
     print(repr(config))
     mh = ObsPrepBufrFileMetaHandler(config)
     mh.get_prepbufr_file_meta(obs_meta_cmpbqm.NCEPLIBS_PREPBUFR_CMPBQM)
+
+@cli.command()
+@click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
+def get_obs_count_meta_cmpbqm(config_yaml):
+    return get_obs_count_meta_cmpbqm_base(config_yaml)
     
 
 if __name__ == '__main__':
