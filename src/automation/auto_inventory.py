@@ -40,7 +40,7 @@ def run_obs_inventory(inventory_info):
     end_time = end.strftime(au.DATESTR_FORMAT)
 
     yaml_file = yg.generate_obs_inv_config(inventory_info, end_time)
-    cli.get_obs_inventory(yaml_file)
+    cli.get_obs_inventory_base(yaml_file)
 
 def run_nceplibs(inventory_info):
     #ADD TWO DAY EXPANSION HERE AS WELL
@@ -52,9 +52,9 @@ def run_nceplibs(inventory_info):
     
     #run correct command
     if inventory_info.nceplibs_cmd == au.NCEPLIBS_SINV:
-        cli.get_obs_count_meta_sinv(yaml_file)
+        cli.get_obs_count_meta_sinv_base(yaml_file)
     elif inventory_info.nceplibs_cmd == au.NCEPLIBS_CMPBQM:
-        cli.get_obs_count_meta_cmpbqm(yaml_file)
+        cli.get_obs_count_meta_cmpbqm_base(yaml_file)
     else:
         print(f'No valid commmand found for nceplibs_cmd in {inventory_info.obs_name} inventory info with value: ' + inventory_info.nceplibs_cmd)
 
