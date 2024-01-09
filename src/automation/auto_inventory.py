@@ -1,7 +1,6 @@
 import automation_utils as au
 import atm_dicts
 import yaml_generation as yg
-import obs_inv_utils.obs_inv_cli as cli
 
 import argparse
 from joblib import Parallel, delayed
@@ -18,18 +17,27 @@ parser.add_argument("-end", dest="end_date", help=f"End date to use for run. For
 parser.add_argument("-ago", dest="days_ago", help="Number of days ago to run the inventory for. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
 args = parser.parse_args()
 
+#check that input variables are valid 
+if args.end_date != None and len(args.end_date) > 0:
+    try:
+        end_date = dt.strptime(args.end_date, au.DATESTR_FORMAT)
+    except ValueError:
+        print(f'Argument -end value {args.end_date} is not a string in the valid format of {au.DATESTR_FORMAT}. Please give a valid end date.')
+        quit()
+
+if args.days_ago < 0:
+    print(f'Argument -ago value {args.days_ago} is not a positive value, please give a  valid positive integer to use the -ago argument.')
+    quit()
+
 #get category list
 # more categories to be added as they are written as dictionaries 
 # remember to add new categories to the argparser options and here
 to_inventory = []
 if args.category == 'atmosphere':
     to_inventory = atm_dicts.atm_infos 
-    
-if args.end_date != None and len(args.end_date) > 0:
-    try:
-        end_date = dt.strptime(args.end_date, au.DATESTR_FORMAT)
-    except ValueError:
-        print(f'Argument end_date is not in the valid format of {au.DATESTR_FORMAT}')
+
+#Import CLI here so that we only connect to the database if the arguments were valid 
+import obs_inv_utils.obs_inv_cli as cli
 
 def get_start_end_time(inventory_info):
     if inventory_info.cycling_interval == au.CYCLING_6H:
