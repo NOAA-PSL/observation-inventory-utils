@@ -38,7 +38,7 @@ def get_start_end_time(inventory_info):
     else: #default to round to closest hour as I think that's the lowest current unit 
         frequency = 'H'
 
-    if len(args.end_date) > 0:
+    if args.end_date != None and len(args.end_date) > 0:
         end_date = dt.strptime(args.end_date, au.DATESTR_FORMAT)
         end = Timestamp(end_date).round(freq=frequency)
     else:
