@@ -34,13 +34,17 @@ if args.category == 'atmosphere':
 #     subprocess.run(['./../../obs_inv_utils_pw_cloud.sh'])
 # elif args.platform is 'hera':
 #     subprocess.run(['./../../obs_inv_utils_hera.sh'])
+
+#set end date time
+if len(args.end_date) > 0:
+    end_date = dt.strptime(args.end_date, au.DATESTR_FORMAT)
+    end = Timestamp(end_date).round(freq='6H')
+else:
+    end = Timestamp.now().round(freq='6H')
+
+print(f'End date: {end}')
     
 def get_start_end_time(inventory_info):
-    if len(args.end_date) > 0:
-        end = Timestamp.strptime(args.end_date, au.DATESTR_FORMAT).round(freq='6H')
-    else:
-        end = Timestamp.now().round(freq='6H')
-
     if args.days_ago > 0:
         #end = Timestamp.now().round(freq='6H')
         #end = dt.now() # need to get in 0/6/12/18z most recent value 
@@ -59,11 +63,6 @@ def get_start_end_time(inventory_info):
 #define functions to run in parallel 
 def run_obs_inventory(inventory_info):
     #EXPAND THIS LATER TO HANDLE TWO DAY RUNS; probably specify end time as part fo the argument options above
-    if len(args.end_date) > 0:
-        end = Timestamp.strptime(args.end_date, au.DATESTR_FORMAT).round(freq='6H')
-    else:
-        end = Timestamp.now().round(freq='6H')
-
     if args.days_ago > 0:
         #end = Timestamp.now().round(freq='6H')
         #end = dt.now() # need to get in 0/6/12/18z most recent value 
@@ -82,11 +81,6 @@ def run_obs_inventory(inventory_info):
 
 def run_nceplibs(inventory_info):
     #ADD TWO DAY EXPANSION HERE AS WELL
-    if len(args.end_date) > 0:
-        end = Timestamp.strptime(args.end_date, au.DATESTR_FORMAT).round(freq='6H')
-    else:
-        end = Timestamp.now().round(freq='6H')
-
     if args.days_ago > 0:
         #end = Timestamp.now().round(freq='6H')
         #end = dt.now() # need to get in 0/6/12/18z most recent value 
