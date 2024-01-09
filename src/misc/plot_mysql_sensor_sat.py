@@ -26,7 +26,7 @@ daterange=[date(1975,1,1), date(2025,1,1)]
 
 sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n08", "NOAA 9": "n09", 
                 "NOAA 10":"n10", "NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13","NOAA 14":"n14",
-               "NOAA 15":"n15","NOAA 16":"n16","NOAA 17":"n17","NOAA 18":"n18","NOAA 19":"n19","NOAA 20":"n20",
+               "NOAA 15":"n15","NOAA 16":"n16","NOAA 17":"n17","NOAA 18":"n18","NOAA 19":"n19","NOAA 20":"n20", "NOAA 21":"n21",
                "METOP-1":"metop-b","METOP-2":"metop-a","METOP-3":"metop-c",
                "METOP-1 (Metop-A":"metop-b","METOP-2 (Metop-B":"metop-a","METOP-3 (Metop-C":"metop-c",
                "METOP-1 (Metop-B":"metop-b","METOP-2 (Metop-A":"metop-a",
