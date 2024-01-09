@@ -16,7 +16,7 @@ parser.add_argument("-o", dest='out_dir', help="output directory for figures",de
 args = parser.parse_args()
 
 #parameters
-daterange=[date(1975,1,1), date(2024,1,1)]
+daterange=[date(1975,1,1), date(2025,1,1)]
 
 typ_dictionary = {
     111:"SYNDAT (110)", 112:"n/a (112)", 120:"ADPUPA (120)", 122:"ADPUPA (122)", 126:"RASSDA (126)", 130:"AIRCFT (130)", 

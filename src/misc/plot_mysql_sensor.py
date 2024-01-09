@@ -16,7 +16,7 @@ parser.add_argument("-o", dest='out_dir', help="output directory for figures",de
 args = parser.parse_args()
 
 #parameters
-daterange=[date(1975,1,1), date(2024,1,1)]
+daterange=[date(1975,1,1), date(2025,1,1)]
 
 def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'s',color='gray',markersize=5)

@@ -22,7 +22,7 @@ args = parser.parse_args()
 
 #parameters
 satinfo_db_root=args.satinfo_db_root
-daterange=[date(1975,1,1), date(2024,1,1)]
+daterange=[date(1975,1,1), date(2025,1,1)]
 
 sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n08", "NOAA 9": "n09", 
                 "NOAA 10":"n10", "NOAA 11":"n11","NOAA 12":"n12","NOAA 13":"n13","NOAA 14":"n14",
