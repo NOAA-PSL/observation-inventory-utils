@@ -9,6 +9,7 @@ from joblib import Parallel, delayed
 
 from datetime import datetime as dt
 from datetime import timedelta
+from pandas import Timestamp
 
 #argparse section
 parser = argparse.ArgumentParser()
@@ -37,11 +38,16 @@ if args.category is 'atmosphere':
 def run_obs_inventory(inventory_info):
     #EXPAND THIS LATER TO HANDLE TWO DAY RUNS; probably specify end time as part fo the argument options above
     if args.days_ago > 0:
-        end = dt.now() # need to get in 0/6/12/18z most recent value 
+        end = Timestamp.now().round(freq='6H')
+        #end = dt.now() # need to get in 0/6/12/18z most recent value 
         end_time = end.strftime(au.DATESTR_FORMAT)
-    else:
+        start = end - timedelta(days=args.days_ago)
+        start_time = start.strftime(au.DATESTR_FORMAT)
+        print(f'Start time: {start_time}, End time: {end_time}')
+    else: #run the full period from start to now
         start_time = inventory_info.start
-        end = dt.now() # need to get this in the 0 / 6 / 12 / 18z most recent value 
+        #end = dt.now() # need to get this in the 0 / 6 / 12 / 18z most recent value 
+        end = Timestamp.now().round(freq='6H')
         end_time = end.strftime(au.DATESTR_FORMAT)
 
     yaml_file = yg.generate_obs_inv_config(inventory_info, start_time, end_time)
@@ -49,16 +55,25 @@ def run_obs_inventory(inventory_info):
 
 def run_nceplibs(inventory_info):
     #ADD TWO DAY EXPANSION HERE AS WELL
-    start = dt.strptime(inventory_info.start, au.DATESTR_FORMAT)
-    end = start + timedelta(days=2)
-    end_time = end.strftime(au.DATESTR_FORMAT)
+    if args.days_ago > 0:
+        end = Timestamp.now().round(freq='6H')
+        #end = dt.now() # need to get in 0/6/12/18z most recent value 
+        end_time = end.strftime(au.DATESTR_FORMAT)
+        start = end - timedelta(days=args.days_ago)
+        start_time = start.strftime(au.DATESTR_FORMAT)
+        print(f'Start time: {start_time}, End time: {end_time}')
+    else: #run the full period from start to now
+        start_time = inventory_info.start
+        #end = dt.now() # need to get this in the 0 / 6 / 12 / 18z most recent value 
+        end = Timestamp.now().round(freq='6H')
+        end_time = end.strftime(au.DATESTR_FORMAT)
     
     #run correct command
     if inventory_info.nceplibs_cmd == au.NCEPLIBS_SINV:
-        yaml_file = yg.generate_nceplibs_sinv_inventory_config(inventory_info, inventory_info.start, end_time)
+        yaml_file = yg.generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time)
         cli.get_obs_count_meta_sinv_base(yaml_file)
     elif inventory_info.nceplibs_cmd == au.NCEPLIBS_CMPBQM:
-        yaml_file = yg.generate_nceplibs_cmpbqm_inventory_config(inventory_info, inventory_info.start, end_time)
+        yaml_file = yg.generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_time)
         cli.get_obs_count_meta_cmpbqm_base(yaml_file)
     else:
         print(f'No valid commmand found for nceplibs_cmd in {inventory_info.obs_name} inventory info with value: ' + inventory_info.nceplibs_cmd)
@@ -74,7 +89,8 @@ def run_full_inventory(inventory_info):
 #call the run obs inventory and run nceplibs from above
 Parallel(n_jobs=10)(delayed(run_full_inventory)(info) for info in to_inventory)
 
-print('Auto inventory script completed for ' + str(to_inventory))
+print('Auto inventory script completed for ')
+for i in to_inventory: print(i.obs_name)
 
 #NEED TO ADD A CLEAN UP OF THE YAML FILES SOMEWHERE IN HERE 
 
