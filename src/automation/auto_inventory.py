@@ -17,12 +17,13 @@ parser.add_argument("-cat", dest="category", help="Category of variables to inve
 #parser.add_argument("-p", dest="platform", help="Platform the script is being run on. Valid options: pw, hera", choices=['pw', 'hera'], default="pw", type=str)
 parser.add_argument("-ago", dest="days_ago", help="Number of days ago to run the inventory for. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
 args = parser.parse_args()
+#ADD AN ARGUMENT OPTION FOR END DATE IN CASE WANT TO NOT RUN TO NOW / DAYS AGO WILL BE BASED OFF THIS END DATE 
 
 #get category list
 # more categories to be added as they are written as dictionaries 
 # remember to add new categories to the argparser options and here
 to_inventory = []
-if args.category is 'atmosphere':
+if args.category == 'atmosphere':
     to_inventory = atm_dicts.atm_infos 
 
 #need to run correct sh for platform 
