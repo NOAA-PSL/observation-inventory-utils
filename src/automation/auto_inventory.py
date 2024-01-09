@@ -92,7 +92,7 @@ def run_full_inventory(inventory_info):
 
 #for each item in the category list run parallel
 #call the run obs inventory and run nceplibs from above
-Parallel(n_jobs=10)(delayed(run_full_inventory)(info) for info in to_inventory)
+Parallel(n_jobs=18)(delayed(run_full_inventory)(info) for info in to_inventory)
 
 print('Auto inventory script completed for ')
 for i in to_inventory: print(i.obs_name)
