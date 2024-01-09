@@ -15,6 +15,7 @@ from pandas import Timestamp
 parser = argparse.ArgumentParser()
 parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere'], default="atmosphere", type=str)
 #parser.add_argument("-p", dest="platform", help="Platform the script is being run on. Valid options: pw, hera", choices=['pw', 'hera'], default="pw", type=str)
+parser.add_argument("-end", dest="end_date", help="End date to use for run. Format expected %Y%m%dT%H%M%SZ. If not provided, uses the current time.", type=str)
 parser.add_argument("-ago", dest="days_ago", help="Number of days ago to run the inventory for. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
 args = parser.parse_args()
 #ADD AN ARGUMENT OPTION FOR END DATE IN CASE WANT TO NOT RUN TO NOW / DAYS AGO WILL BE BASED OFF THIS END DATE 
@@ -33,13 +34,15 @@ if args.category == 'atmosphere':
 #     subprocess.run(['./../../obs_inv_utils_pw_cloud.sh'])
 # elif args.platform is 'hera':
 #     subprocess.run(['./../../obs_inv_utils_hera.sh'])
-
-
-#define functions to run in parallel 
-def run_obs_inventory(inventory_info):
-    #EXPAND THIS LATER TO HANDLE TWO DAY RUNS; probably specify end time as part fo the argument options above
-    if args.days_ago > 0:
+    
+def get_start_end_time(inventory_info):
+    if len(args.end_date) > 0:
+        end = Timestamp.strptime(args.end_date, au.DATESTR_FORMAT).round(freq='6H')
+    else:
         end = Timestamp.now().round(freq='6H')
+
+    if args.days_ago > 0:
+        #end = Timestamp.now().round(freq='6H')
         #end = dt.now() # need to get in 0/6/12/18z most recent value 
         end_time = end.strftime(au.DATESTR_FORMAT)
         start = end - timedelta(days=args.days_ago)
@@ -48,7 +51,30 @@ def run_obs_inventory(inventory_info):
     else: #run the full period from start to now
         start_time = inventory_info.start
         #end = dt.now() # need to get this in the 0 / 6 / 12 / 18z most recent value 
+        #end = Timestamp.now().round(freq='6H')
+        end_time = end.strftime(au.DATESTR_FORMAT)
+
+    return start_time, end_time
+
+#define functions to run in parallel 
+def run_obs_inventory(inventory_info):
+    #EXPAND THIS LATER TO HANDLE TWO DAY RUNS; probably specify end time as part fo the argument options above
+    if len(args.end_date) > 0:
+        end = Timestamp.strptime(args.end_date, au.DATESTR_FORMAT).round(freq='6H')
+    else:
         end = Timestamp.now().round(freq='6H')
+
+    if args.days_ago > 0:
+        #end = Timestamp.now().round(freq='6H')
+        #end = dt.now() # need to get in 0/6/12/18z most recent value 
+        end_time = end.strftime(au.DATESTR_FORMAT)
+        start = end - timedelta(days=args.days_ago)
+        start_time = start.strftime(au.DATESTR_FORMAT)
+        print(f'Start time: {start_time}, End time: {end_time}')
+    else: #run the full period from start to now
+        start_time = inventory_info.start
+        #end = dt.now() # need to get this in the 0 / 6 / 12 / 18z most recent value 
+        #end = Timestamp.now().round(freq='6H')
         end_time = end.strftime(au.DATESTR_FORMAT)
 
     yaml_file = yg.generate_obs_inv_config(inventory_info, start_time, end_time)
@@ -56,8 +82,13 @@ def run_obs_inventory(inventory_info):
 
 def run_nceplibs(inventory_info):
     #ADD TWO DAY EXPANSION HERE AS WELL
-    if args.days_ago > 0:
+    if len(args.end_date) > 0:
+        end = Timestamp.strptime(args.end_date, au.DATESTR_FORMAT).round(freq='6H')
+    else:
         end = Timestamp.now().round(freq='6H')
+
+    if args.days_ago > 0:
+        #end = Timestamp.now().round(freq='6H')
         #end = dt.now() # need to get in 0/6/12/18z most recent value 
         end_time = end.strftime(au.DATESTR_FORMAT)
         start = end - timedelta(days=args.days_ago)
@@ -66,7 +97,7 @@ def run_nceplibs(inventory_info):
     else: #run the full period from start to now
         start_time = inventory_info.start
         #end = dt.now() # need to get this in the 0 / 6 / 12 / 18z most recent value 
-        end = Timestamp.now().round(freq='6H')
+        #end = Timestamp.now().round(freq='6H')
         end_time = end.strftime(au.DATESTR_FORMAT)
     
     #run correct command
