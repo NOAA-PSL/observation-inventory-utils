@@ -24,6 +24,8 @@ if args.end_date != None and len(args.end_date) > 0:
     except ValueError:
         print(f'Argument -end value {args.end_date} is not a string in the valid format of {au.DATESTR_FORMAT}. Please give a valid end date.')
         quit()
+else:
+    end_date = None
 
 if args.days_ago < 0:
     print(f'Argument -ago value {args.days_ago} is not a positive value, please give a  valid positive integer to use the -ago argument.')
