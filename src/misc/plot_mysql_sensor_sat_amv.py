@@ -12,6 +12,7 @@ from scipy import interpolate
 import argparse
 import glob
 import obs_inv_utils.inventory_table_factory as itf
+import re
 
 #argparse section
 parser = argparse.ArgumentParser()
@@ -115,6 +116,11 @@ def get_sensor(row):
     sensor = directory.split("/")[2]
     return sensor
 
+def get_source_dir(row):
+    directory = row['parent_dir']
+    directory = directory.replace("observations/reanalysis", "")
+    source_dir = re.split("/[12][90][0-9][0-9]/[01][0-9]/", directory)[0]
+    return source_dir
 
 #read data from sql database of obs counts
 print('connecting to mysql db')
@@ -134,6 +140,7 @@ db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
+db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 
 #select only amv rows
 db_frame = db_frame[(db_frame['sensor']=='amv')]
@@ -158,6 +165,7 @@ plt.title("Inventory of Clean Bucket AMV Sensors by Satellite")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Satellite')
 
+directory_labels = []
 counter=0
 for index, row in unique_sensor_sats.iterrows():
     satinfo_string_ = row['sensor']+"_"+sat_dictionary[row['sat_id_name']]
@@ -167,6 +175,8 @@ for index, row in unique_sensor_sats.iterrows():
     dftmp = select_sensor_satellite_combo(row['sensor'], row['sat_id'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
 
+    dirs = dftmp['source_dir'].unique()
+    directory_labels.append(np.array2string(dirs))
     plot_one_line(satinfo, dftmp, step/2+step*counter)
     counter = counter + 1
 
@@ -178,6 +188,10 @@ ax.set_xlim(daterange)
 ax.set_ylim([0, height])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
+ax2 = ax.twinx()
+ax2.set_yticks(step/2+step*np.arange(counter))
+ax2.set_yticklabels(directory_labels)
+ax2.set_ylim([0, height])
 
 file_name = "amv_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
