@@ -28,7 +28,7 @@ else:
     end_date = None
 
 if args.days_ago < 0:
-    print(f'Argument -ago value {args.days_ago} is not a positive value, please give a  valid positive integer to use the -ago argument.')
+    print(f'Argument -ago value {args.days_ago} is not a positive value, please give a valid positive integer to use the -ago argument.')
     quit()
 
 #get category list
@@ -42,9 +42,10 @@ if args.category == 'atmosphere':
 import obs_inv_utils.obs_inv_cli as cli
 
 def get_start_end_time(inventory_info):
+    #additional cycling options will need to be added as functionality expands 
     if inventory_info.cycling_interval == au.CYCLING_6H:
         frequency = '6H'
-    else: #default to round to closest hour as I think that's the lowest current unit 
+    else: #default to round to closest hour
         frequency = 'H'
 
     if end_date != None:
@@ -98,5 +99,3 @@ Parallel(n_jobs=18)(delayed(run_full_inventory)(info) for info in to_inventory)
 
 print('Auto inventory script completed for ')
 for i in to_inventory: print(i.obs_name)
-
-#next step would be to trigger the plotting scripts again 
