@@ -191,8 +191,8 @@ for index, row in unique_dir_sensor_sats.iterrows():
     dftmp = select_sensor_satellite_dir_combo(row['sensor'], row['sat_id'], row['source_dir'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
 
-    dirs = dftmp['source_dir'].unique()
-    directory_labels.append(np.array2string(dirs))
+    #dirs = dftmp['source_dir'].unique()
+    #directory_labels.append(np.array2string(dirs))
     plot_one_line(satinfo, dftmp, step/2+step*counter)
     counter = counter + 1
 
@@ -204,10 +204,10 @@ ax.set_xlim(daterange)
 ax.set_ylim([0, height])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
-ax2 = ax.twinx()
-ax2.set_yticks(step/2+step*np.arange(counter))
-ax2.set_yticklabels(directory_labels)
-ax2.set_ylim([0, height])
+# ax2 = ax.twinx()
+# ax2.set_yticks(step/2+step*np.arange(counter))
+# ax2.set_yticklabels(directory_labels)
+# ax2.set_ylim([0, height])
 
 file_name = "all_line_observations_inventory_dir_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
