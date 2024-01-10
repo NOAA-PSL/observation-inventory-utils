@@ -99,8 +99,8 @@ def plot_one_line(satinfo, dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'s',color='gray',markersize=5)
     plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
 
-def select_sensor_satellite_combo(sensor, sat_id, db_frame, satinfo):
-    dftmp = db_frame.loc[(db_frame['sat_id']==sat_id) & (db_frame['sensor']==sensor)]
+def select_sensor_satellite_dir_combo(sensor, sat_id, source_dir, db_frame, satinfo):
+    dftmp = db_frame.loc[(db_frame['sat_id']==sat_id) & (db_frame['sensor']==sensor) & (db_frame['source_dir']==source_dir)]
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
           satinfo.status_nan.to_numpy().astype('float'),
           kind='previous')
@@ -138,6 +138,8 @@ sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner j
 data2 = pandas.read_sql(sql2, mysql_conn)
 db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size', 'typ'], keep='last')
 
+print("Data pulled from mysql database")
+
 db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
@@ -167,6 +169,8 @@ for index, row in unique_dir_sensor_sats.iterrows():
     else:
         sensor_sat_labels.append(row.sensor + " " + row.source_dir + " " + str(row.sat_id))
 
+print(f"Identified {sensor_sat_labels.count()} unique dir, sensor, sat combos. Generating plot now.")
+
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
@@ -183,7 +187,7 @@ for index, row in unique_dir_sensor_sats.iterrows():
     satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
-    dftmp = select_sensor_satellite_combo(row['sensor'], row['sat_id'], db_frame, satinfo)
+    dftmp = select_sensor_satellite_dir_combo(row['sensor'], row['sat_id'], row['source_dir'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
 
     dirs = dftmp['source_dir'].unique()
