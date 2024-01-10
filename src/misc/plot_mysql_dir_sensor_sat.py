@@ -96,7 +96,7 @@ def plot_one_line(satinfo, dftmp, yloc):
     satinfo_tmp['status_nan']=f(satinfo_tmp.datetime.to_numpy().astype('float')).tolist()
     
     plt.plot(satinfo_tmp.datetime, yloc*satinfo_tmp.status_nan,'b')
-    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='gray',markersize=5)
+    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
     plt.plot(dftmp.datetime, yloc*dftmp.active,'|',color='blue',markersize=5)
 
 def select_sensor_satellite_dir_combo(sensor, sat_id, source_dir, db_frame, satinfo):
@@ -164,10 +164,11 @@ height=step*len(unique_dir_sensor_sats)
 #make list of sensor&sat labels 
 sensor_sat_labels = []
 for index, row in unique_dir_sensor_sats.iterrows():
+    source_string = row.source_dir.replace('/', ' ')
     if row.sat_id_name.strip():
-        sensor_sat_labels.append(row.sensor + " " + row.source_dir +  " " + str(row.sat_id_name))
+        sensor_sat_labels.append(source_string +  " " + str(row.sat_id_name))
     else:
-        sensor_sat_labels.append(row.sensor + " " + row.source_dir + " " + str(row.sat_id))
+        sensor_sat_labels.append(source_string + " " + str(row.sat_id))
 
 print(f"Identified {len(sensor_sat_labels)} unique dir, sensor, sat combos. Generating plot now.")
 
