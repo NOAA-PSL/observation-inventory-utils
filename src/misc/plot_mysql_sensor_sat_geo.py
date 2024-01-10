@@ -98,8 +98,8 @@ def plot_one_line(satinfo, dftmp, yloc):
     satinfo_tmp['status_nan']=f(satinfo_tmp.datetime.to_numpy().astype('float')).tolist()
     
     plt.plot(satinfo_tmp.datetime, yloc*satinfo_tmp.status_nan,'b')
-    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'s',color='gray',markersize=5)
-    plt.plot(dftmp.datetime, yloc*dftmp.active,'s',color='blue',markersize=5)
+    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
+    plt.plot(dftmp.datetime, yloc*dftmp.active,'|',color='blue',markersize=5)
 
 def select_subsensor_satellite_combo(subsensor, sat_id, db_frame, satinfo):
     dftmp = db_frame.loc[(db_frame['sat_id']==sat_id) & (db_frame['subsensor']==subsensor)]
