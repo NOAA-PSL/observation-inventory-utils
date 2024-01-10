@@ -169,7 +169,7 @@ for index, row in unique_dir_sensor_sats.iterrows():
     else:
         sensor_sat_labels.append(row.sensor + " " + row.source_dir + " " + str(row.sat_id))
 
-print(f"Identified {sensor_sat_labels.count()} unique dir, sensor, sat combos. Generating plot now.")
+print(f"Identified {len(sensor_sat_labels)} unique dir, sensor, sat combos. Generating plot now.")
 
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
