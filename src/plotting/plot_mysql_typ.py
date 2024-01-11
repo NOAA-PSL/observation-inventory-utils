@@ -9,6 +9,7 @@ import matplotlib.dates as mdates
 import os
 import argparse
 import obs_inv_utils.inventory_table_factory as itf
+import plot_utils as utils
 
 #argparse section
 parser = argparse.ArgumentParser()
@@ -17,24 +18,6 @@ args = parser.parse_args()
 
 #parameters
 daterange=[date(1975,1,1), date(2025,1,1)]
-
-typ_dictionary = {
-    111:"SYNDAT (110)", 112:"n/a (112)", 120:"ADPUPA (120)", 122:"ADPUPA (122)", 126:"RASSDA (126)", 130:"AIRCFT (130)", 
-    131:"AIRCFT (131)", 132:"ADPUPA (132)", 133:"AIRCAR (133)", 134:"AIRCFT (134)", 135:"AIRCFT (135)", 150: "SPSSMI (150)",
-    151:"GOESND (151)", 152:"SPSSMI (152)", 153:"GPSIPW (153)", 156:"GOESND (156)", 157:"GOESND (157)", 158:"GOESND (158)", 
-    159:"GOESND (159)", 164:"GOESND (164)", 165:"GOESND (165)", 174:"GOESND (174)", 175:"GOESND (175)", 180:"SFCSHP (180)", 
-    181:"ADPSFC (181)", 182:"SFCSHP (182)", 183:"ADPSFC,SFCSHP (183)", 187:"ADPSFC (187)", 188:"MSONET (188)", 191:"SFCBOG (191)",
-    192:"ADPSFC (192)", 193:"ADPSFC (193)", 194:"SFCSHP (194)", 195:"MSONET (195)", 210:"SYNDAT (210)", 220:"ADPUPA (220)", 
-    221:"ADPUPA (221)", 222:"ADPUPA (222)", 223:"PROFLR (223)", 224:"VADWND (224)", 227:"PROFLR (227)", 228:"PROFLR (228)",
-    229:"PROFLR (229)", 230:"AIRCFT (230)", 231:"AIRCFT (231)", 232:"ADPUPA (232)", 233:"AIRCAR (233)", 234:"AIRCFT (234)",
-    235:"AIRCFT (235)", 240:"SATWND (240)", 241:"SATWND (241)", 242:"SATWND (242)", 243:"SATWND (243)", 244:"SATWND (244)",
-    245:"SATWND (245)", 246:"SATWND (246)", 247:"SATWND (247)", 248:"SATWND (248)", 249:"SATWND (249)", 250:"SATWND (250)",
-    251:"SATWND (251)", 252:"SATWND (252)", 253:"SATWND (253)", 254:"SATWND (254)", 255:"SATWND (255)", 256:"SATWND (256)",
-    257:"SATWND (257)", 258:"SATWND (258)", 259:"SATWND (259)", 260:"SATWND (260)", 270:"(270)", 271:"(271)",
-    280:"SFCSHP (280)", 281:"ADPSFC (281)", 282:"SFCSHP (282)", 283:"SPSSMI (283)", 284:"ADPSFC,SFCSHP (284)", 
-    285:"QKSWND (285)", 286:"ERS1DA (286)", 287:"ADPSFC (287)", 288:"MSONET (288)", 289:"WDSATR (289)", 
-    290:"ASCATW (290)", 291:"(291)", 292:"ADPSFC (292)", 293:"ADPSFC (293)", 294:"SFCSHP (294)", 295:"MSONET (295)"
-}
 
 def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.tot.astype('bool'),'|',color='black',markersize=5)
@@ -76,8 +59,8 @@ height=step*len(unique_typ)
 #make list of typ labels
 typ_labels = []
 for index, row in unique_typ.iterrows():
-    if row.typ in typ_dictionary.keys():
-        typ_labels.append(typ_dictionary[row.typ])
+    if row.typ in utils.typ_dictionary.keys():
+        typ_labels.append(utils.typ_dictionary[row.typ])
     else:
         typ_labels.append(row.typ)
 
