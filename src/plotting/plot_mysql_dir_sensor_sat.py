@@ -175,7 +175,7 @@ print(f"Identified {len(sensor_sat_labels)} unique dir, sensor, sat combos. Gene
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title("Inventory of Clean Bucket Atmosphere Sensors by Satellite")
+plt.suptitle("Inventory of Clean Bucket Atmosphere Sensors by Satellite")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Satellite')
 
