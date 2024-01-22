@@ -87,6 +87,7 @@ ax.set_ylim([0, height])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 
+plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")}', y=-0.01)
 file_name = "all_line_observations_inventory_variable_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
