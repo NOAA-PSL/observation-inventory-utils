@@ -210,7 +210,7 @@ ax.set_title("Inventory of Clean Bucket Atmosphere Sensors by Satellite")
 # ax2.set_yticklabels(directory_labels)
 # ax2.set_ylim([0, height])
 
-plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")}', y=-0.05)
+plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")}', y=-0.03)
 file_name = "all_line_observations_inventory_dir_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
