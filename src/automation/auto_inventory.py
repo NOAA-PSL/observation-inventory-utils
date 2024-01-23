@@ -1,3 +1,9 @@
+'''
+Script for automated running of inventory in the AWS S3 bucket
+Allows for configuration of categories of data to run (currently referencing atm_dicts), an end date, and number of days ago
+If nothing is specified in the configuration, it runs the full period of time for all atmosphere variables. 
+Runs in parallel on up to 18 CPUs. 
+'''
 import automation_utils as au
 import atm_dicts
 import yaml_generation as yg

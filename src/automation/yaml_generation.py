@@ -1,3 +1,6 @@
+'''
+Generation of yaml configurations needed to pass to the CLI
+'''
 import yaml
 import os
 import pathlib
