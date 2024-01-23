@@ -14,6 +14,7 @@ import plot_utils as utils
 #argparse section
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
+parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 args = parser.parse_args()
 
 #parameters
@@ -91,7 +92,9 @@ ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")}', y=-0.01)
-file_name = "all_line_observations_inventory_typ_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+file_name = "all_line_observations_inventory_typ.png"
+if args.dev:
+    file_name = "all_line_observations_inventory_typ_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')

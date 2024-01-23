@@ -19,6 +19,7 @@ import plot_utils as utils
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("--sidb", dest='satinfo_db_root', help="root for sat info db files",default='satellites/satinfo/',type=str)
+parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 args = parser.parse_args()
 
 #parameters
@@ -168,7 +169,10 @@ ax2.set_yticks(step/2+step*np.arange(counter))
 ax2.set_yticklabels(directory_labels)
 ax2.set_ylim([0, height])
 
-file_name = "geo_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")}', y=-0.01)
+file_name = "geo_line_observations_inventory_sensor_sat.png"
+if args.dev:
+    file_name = "geo_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
