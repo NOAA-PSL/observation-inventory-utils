@@ -12,7 +12,7 @@ from pandas import Timestamp
 
 #argparse section
 parser = argparse.ArgumentParser()
-parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere'], default="atmosphere", type=str)
+parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere', 'rerun'], default="atmosphere", type=str)
 parser.add_argument("-end", dest="end_date", help=f"End date to use for run. Format expected {au.DATESTR_FORMAT}. If not provided, uses the current time.", type=str)
 parser.add_argument("-ago", dest="days_ago", help="Number of days ago to run the inventory for. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
 args = parser.parse_args()
@@ -37,6 +37,8 @@ if args.days_ago < 0:
 to_inventory = []
 if args.category == 'atmosphere':
     to_inventory = atm_dicts.atm_infos 
+if args.category == 'rerun':
+    to_inventory = atm_dicts.rerun
 
 #Import CLI here so that we only connect to the database if the arguments were valid 
 import obs_inv_utils.obs_inv_cli as cli
