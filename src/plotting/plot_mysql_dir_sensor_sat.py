@@ -212,7 +212,7 @@ ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 ax_dup = ax.twiny()
 ax_dup.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
 ax_dup.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
-ax.set_xlim(daterange)
+ax_dup.set_xlim(daterange)
 # sec_ax = ax.secondary_xaxis('top')
 
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")}', y=-0.01)
