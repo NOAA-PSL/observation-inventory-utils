@@ -168,6 +168,10 @@ ax2 = ax.twinx()
 ax2.set_yticks(step/2+step*np.arange(counter))
 ax2.set_yticklabels(directory_labels)
 ax2.set_ylim([0, height])
+ax_dup = ax.twiny()
+ax_dup.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
+ax_dup.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
+ax_dup.set_xlim(daterange)
 
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")}', y=-0.01)
 file_name = "geo_line_observations_inventory_sensor_sat.png"
