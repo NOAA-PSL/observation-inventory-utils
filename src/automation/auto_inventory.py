@@ -2,7 +2,7 @@
 Script for automated running of inventory in the AWS S3 bucket
 Allows for configuration of categories of data to run (currently referencing atm_dicts), an end date, and number of days ago
 If nothing is specified in the configuration, it runs the full period of time for all atmosphere variables. 
-Runs in parallel on up to 18 CPUs. 
+Runs in parallel on given number of CPUs. 
 '''
 import automation_utils as au
 import atm_dicts
@@ -18,9 +18,10 @@ from pandas import Timestamp
 
 #argparse section
 parser = argparse.ArgumentParser()
-parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere', 'rerun'], default="atmosphere", type=str)
+parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere'], default="atmosphere", type=str)
 parser.add_argument("-end", dest="end_date", help=f"End date to use for run. Format expected {au.DATESTR_FORMAT}. If not provided, uses the current time.", type=str)
 parser.add_argument("-ago", dest="days_ago", help="Number of days ago to run the inventory for. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
+parser.add_argument("-n_jobs", dest="n_jobs", help="Number of parallel jobs to run.", default=18, type=int)
 args = parser.parse_args()
 
 #check that input variables are valid 
@@ -42,9 +43,7 @@ if args.days_ago < 0:
 # remember to add new categories to the argparser options and here
 to_inventory = []
 if args.category == 'atmosphere':
-    to_inventory = atm_dicts.atm_infos 
-if args.category == 'rerun':
-    to_inventory = atm_dicts.rerun
+    to_inventory = atm_dicts.atm_infos
 
 #Import CLI here so that we only connect to the database if the arguments were valid 
 import obs_inv_utils.obs_inv_cli as cli
@@ -103,7 +102,7 @@ def run_full_inventory(inventory_info):
 
 #for each item in the category list run parallel
 #call the run obs inventory and run nceplibs from above
-Parallel(n_jobs=18)(delayed(run_full_inventory)(info) for info in to_inventory)
+Parallel(n_jobs=args.n_jobs)(delayed(run_full_inventory)(info) for info in to_inventory)
 
 print('Auto inventory script completed for ')
 for i in to_inventory: print(i.obs_name)

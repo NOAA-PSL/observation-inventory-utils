@@ -440,5 +440,3 @@ atm_infos = [airs_airsev, airs_aqua, amsua_1bamua, amsua_nasa_aqua, amsua_nasa_r
              geo_goesfv, geo_goesnd, gmi_nasa_gmiv7, gps_eumetsat, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4,
              iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_sbuv_v87, saphir_saphir, seviri_sevcsr, ssmi_eumetsat,
              ssmi_ssmit, ssmis_eumetsat, ssmis_ssmisu, ssu_1bssu, trmm_nasa_tmi]
-
-rerun = [atms_atms, cris_crisf4]
