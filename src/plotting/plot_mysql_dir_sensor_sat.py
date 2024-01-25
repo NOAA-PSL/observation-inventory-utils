@@ -121,7 +121,7 @@ counter=0
 # for index, row in unique_sat_id.iterrows():
 for index, row in unique_dir_sensor_sats.iterrows():
     satinfo_string_ = row['sensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
-    if row['source_dir'].contains('crisf4'):
+    if "crisf4" in row['source_dir']:
         satinfo_string_ = "crisf4_" + utils.sat_dictionary[row['sat_id_name']]
     satinfo = utils.read_satinfo_files(satinfo_db_root,satinfo_string_)
 
