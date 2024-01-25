@@ -9,14 +9,20 @@ atm_dicts.py contains the definition of each atmospheric variable necessary to c
 
 ## Example Usage 
 
-python3 auto_inventory.py 
+```sh
+$ python3 auto_inventory.py 
+```
 - this will run the base version of all atmopshere variables as 18 separate jobs for the full time period
 
-python3 auto_inventory.py -ago 3 -n_jobs 25
+```sh
+$ python3 auto_inventory.py -ago 3 -n_jobs 25
+```
 - this will run the inventory for the atmosphere variables for the past 3 days as 25 separate jobs 
 
+```sh
 python3 auto_inventory.py -end 20231231T180000Z -ago 31 
-- this will run the inventory for 31 days ending on December 31, 2023 (i.e. the month of December 2023)
+```
+- this will run the inventory for 31 days ending on December 31, 2023 18Z (i.e. the month of December 2023)
 
 
 Future versions will have additional supported inputs for the '-cat' flag but currently all atmosphere variables will be run each time. 
