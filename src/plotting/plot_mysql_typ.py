@@ -68,7 +68,7 @@ for index, row in unique_typ.iterrows():
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title("Inventory of Clean Bucket Conventional Sensors")
+plt.title("Inventory of NNJA Conventional Sensors")
 plt.xlabel('Observation Date')
 plt.ylabel('typ')
 

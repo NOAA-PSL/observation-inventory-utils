@@ -6,11 +6,9 @@ import numpy as np
 import pandas , matplotlib.pyplot as plt
 from datetime import datetime, date
 import matplotlib.dates as mdates
-from IPython.display import display
 import os
 from scipy import interpolate
 import argparse
-import glob
 import obs_inv_utils.inventory_table_factory as itf
 import re
 import plot_utils as utils
@@ -25,33 +23,6 @@ args = parser.parse_args()
 #parameters
 satinfo_db_root=args.satinfo_db_root
 daterange=[date(1975,1,1), date(2025,1,1)]
-
-#read raw satinfo files
-def read_satinfo_files(satinfo_db_root,satinfo_string):
-    if satinfo_string in utils.satinfo_translate_dictionary:
-            satinfo_string = utils.satinfo_translate_dictionary[satinfo_string]
-    satinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
-#    for fn in os.listdir(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
-    for fn in glob.glob(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
-        pd_tmp = pandas.read_csv(os.path.join(satinfo_db_root,satinfo_string,os.path.basename(fn))
-            ,header=None,sep='\s+'
-            ,names=['sensor','ch_num','status','error','o1','o2','o3','o4','o5','o6','o7'])
-        tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
-            ,columns=['datetime','status'])
-        satinfo=pandas.concat([satinfo,tmp_frame])
-    #if empty make 
-    if (satinfo.empty):
-      satinfo.loc[len(satinfo.index)] = [date(1900,1,1), False, np.nan]
-      satinfo.loc[len(satinfo.index)] = [date(2100,1,1), False, np.nan]
-    #convert logical to floats with nans for plotting
-    satinfo['status_nan'] = satinfo.status.astype('int')
-    satinfo['status_nan'].replace(0, np.nan, inplace=True)
-    #make sure the end of the series is in the future
-    satinfo.loc[len(satinfo.index)]=[date(2100,1,1), satinfo.status.iat[-1], satinfo.status_nan.iat[-1]]    
-    satinfo.datetime = pandas.to_datetime(satinfo.datetime)
-    display(satinfo)
-    return satinfo
-
 
 def plot_one_line(satinfo, dftmp, yloc):
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
@@ -135,8 +106,7 @@ for index, row in unique_sensor_sats.iterrows():
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-#plt.title(f"{sensor_name} sensor from obs stream {obs_stream}")
-plt.title("Inventory of Clean Bucket GEO Sensors by Satellite")
+plt.title("Inventory of NNJA GEO Sensors by Satellite")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Satellite')
 
@@ -145,7 +115,7 @@ counter=0
 # for index, row in unique_sat_id.iterrows():
 for index, row in unique_sensor_sats.iterrows():
     satinfo_string_ = row['subsensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
-    satinfo = read_satinfo_files(satinfo_db_root,satinfo_string_)
+    satinfo = utils.read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
     dftmp = select_subsensor_satellite_combo(row['subsensor'], row['sat_id'], db_frame, satinfo)

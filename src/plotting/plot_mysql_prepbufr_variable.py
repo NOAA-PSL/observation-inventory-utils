@@ -9,7 +9,6 @@ import matplotlib.dates as mdates
 import os
 import argparse
 import obs_inv_utils.inventory_table_factory as itf
-import plot_utils as utils
 
 #argparse section
 parser = argparse.ArgumentParser()
@@ -65,7 +64,7 @@ for index, row in unique_var.iterrows():
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title("Inventory of Clean Bucket Conventional Variables by Time")
+plt.title("Inventory of NNJA Conventional Variables by Time")
 plt.xlabel('Observation Date')
 plt.ylabel('Variable')
 

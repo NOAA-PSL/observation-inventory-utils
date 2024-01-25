@@ -3,6 +3,12 @@ Utility file for containing information which needs to be referenced by multiple
 
 Mainly contains dictionaries used for handling the translation between the nceplibs output and readable formats or satinfo files.
 '''
+import pandas
+import os
+from datetime import datetime, date
+import glob
+from IPython.display import display
+import numpy as np
 
 #Dictionary of satellite names used for getting sat info files
 #For scripts to run successfully, they expect every sat we have data for to have a dictionary entry
@@ -65,5 +71,30 @@ satinfo_translate_dictionary={
     "avhrr_n16":"avhrr3_n16", "avhrr_n17":"avhrr3_n17", "avhrr_n18":"avhrr3_n18", "avhrr_n19":"avhrr3_n19",
     "goesnd_g11":"sndrD_g11", "goesnd_g12":"sndrD_g12", "goesnd_g13":"sndrD_g13", "goesnd_g14":"sndrD_g14",
     "goesnd_g15":"sndrD_g15", "goesnd_g08":"sndr_g08", "goesnd_g10":"sndr_g10", "goesnd_g11":"sndr_g11",
-    "goesnd_g12":"sndr_g12"
+    "goesnd_g12":"sndr_g12", "crisf4_n20":"cris-fsr_n20", "crisf4_n21":"cris-fsr_n21", "crisf4_npp":"cris-fsr_npp"
 }
+
+#function for reading from raw satinfo files which is standard across the various plot scripts 
+def read_satinfo_files(satinfo_db_root,satinfo_string):
+    if satinfo_string in satinfo_translate_dictionary:
+            satinfo_string = satinfo_translate_dictionary[satinfo_string]
+    satinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
+    for fn in glob.glob(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
+        pd_tmp = pandas.read_csv(os.path.join(satinfo_db_root,satinfo_string,os.path.basename(fn))
+            ,header=None,sep='\s+'
+            ,names=['sensor','ch_num','status','error','o1','o2','o3','o4','o5','o6','o7'])
+        tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
+            ,columns=['datetime','status'])
+        satinfo=pandas.concat([satinfo,tmp_frame])
+    #if empty make 
+    if (satinfo.empty):
+      satinfo.loc[len(satinfo.index)] = [date(1900,1,1), False, np.nan]
+      satinfo.loc[len(satinfo.index)] = [date(2100,1,1), False, np.nan]
+    #convert logical to floats with nans for plotting
+    satinfo['status_nan'] = satinfo.status.astype('int')
+    satinfo['status_nan'].replace(0, np.nan, inplace=True)
+    #make sure the end of the series is in the future
+    satinfo.loc[len(satinfo.index)]=[date(2100,1,1), satinfo.status.iat[-1], satinfo.status_nan.iat[-1]]    
+    satinfo.datetime = pandas.to_datetime(satinfo.datetime)
+    display(satinfo)
+    return satinfo
