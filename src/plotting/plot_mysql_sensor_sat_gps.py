@@ -136,7 +136,7 @@ ax_dup.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
 ax_dup.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax_dup.set_xlim(daterange)
 
-plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")}', y=-0.01)
+plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
 file_name = "gps_line_observations_inventory_sensor_sat.png"
 if args.dev:
     file_name = "gps_line_observations_inventory_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
