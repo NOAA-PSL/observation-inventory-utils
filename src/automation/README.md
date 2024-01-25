@@ -4,7 +4,8 @@ Automation tools for running observation inventory utils. Runs as a separate scr
 
 The main script for running the inventory is auto_inventory.py. All the other files support running the inventory. 
 
-atm_dicts.py contains the definition of each atmospheric variable necessary to complete an inventory as well as the dictionary group collecting them all together (i.e. atm_infos)
+atm_dicts.py contains the definition of each atmospheric variable necessary to complete an inventory as well as the dictionary group collecting them all together (i.e. atm_infos). This is where additional groupings can be defined that 
+will be used on a recurrent basis. 
 
 
 ## Example Usage 
