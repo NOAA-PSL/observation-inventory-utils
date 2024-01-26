@@ -25,5 +25,5 @@ if not included, it will save to a folder called figures in the location of the 
 
 plot_mysql_dir_sensor_sat.py with --sidb provided
 
-![NNJA Directory, Sensor, Satellite](src/plotting/examples/all_line_observations_inventory_dir_sensor_sat.png "NNJA Directory, Sensor, Satellite")
+![NNJA Directory, Sensor, Satellite](/examples/all_line_observations_inventory_dir_sensor_sat.png "NNJA Directory, Sensor, Satellite")
 
