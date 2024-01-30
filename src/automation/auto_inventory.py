@@ -20,7 +20,7 @@ from pandas import Timestamp
 parser = argparse.ArgumentParser()
 parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere'], default="atmosphere", type=str)
 parser.add_argument("-end", dest="end_date", help=f"End date to use for run. Format expected {au.DATESTR_FORMAT}. If not provided, uses the current time.", type=str)
-parser.add_argument("-ago", dest="days_ago", help="Number of days before today or a given "end_date" (defined by the -end argument) over which to run the inventory. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
+parser.add_argument("-ago", dest="days_ago", help="Number of days before today or a given end_date (defined by the -end argument) over which to run the inventory. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
 parser.add_argument("-n_jobs", dest="n_jobs", help="Number of parallel jobs to run.", default=18, type=int)
 args = parser.parse_args()
 
@@ -48,6 +48,7 @@ if args.category == 'atmosphere':
 #Import CLI here so that we only connect to the database if the arguments were valid 
 import obs_inv_utils.obs_inv_cli as cli
 
+#function to determine the start and end time for inventory calls based on given info  
 def get_start_end_time(inventory_info):
     #additional cycling options will need to be added as functionality expands 
     if inventory_info.cycling_interval == au.CYCLING_6H:
@@ -71,6 +72,7 @@ def get_start_end_time(inventory_info):
     return start_time, end_time
 
 #define functions to run in parallel 
+#call get obs inventory cli 
 def run_obs_inventory(inventory_info):
     start_time, end_time = get_start_end_time(inventory_info)
 
@@ -78,6 +80,7 @@ def run_obs_inventory(inventory_info):
     cli.get_obs_inventory_base(yaml_file)
     os.remove(yaml_file)
 
+#call appropriate nceplibs cli command 
 def run_nceplibs(inventory_info):
     start_time, end_time = get_start_end_time(inventory_info)
     
@@ -93,6 +96,7 @@ def run_nceplibs(inventory_info):
     else:
         print(f'No valid commmand found for nceplibs_cmd in {inventory_info.obs_name} inventory info with value: ' + inventory_info.nceplibs_cmd)
 
+#function to use for parallel call for each variable 
 def run_full_inventory(inventory_info):
     print('Beginning inventory for ' + inventory_info.obs_name)
     run_obs_inventory(inventory_info)
