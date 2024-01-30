@@ -9,6 +9,7 @@ import automation_utils as au
 
 PY_CURRENT_DIR = pathlib.Path(__file__).parent.resolve()
 
+# produces the yaml in required format to pass to get_obs_inventory cli command
 def generate_obs_inv_config(inventory_info, start_time, end_time):
     filename = inventory_info.obs_name + '_obs_inv_config.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
@@ -38,6 +39,7 @@ def generate_obs_inv_config(inventory_info, start_time, end_time):
     outfile.close()
     return yaml_file_path
 
+# produces the yaml in required format to pass to get_obs_count_meta_sinv cli command
 def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time):
     filename = inventory_info.obs_name + '_obs_meta_sinv.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
@@ -66,6 +68,7 @@ def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time
     outfile.close()
     return yaml_file_path
 
+# produces the yaml in required format to pass to get_obs_count_meta_cmpbqm cli command
 def generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_time):
     filename = inventory_info.obs_name + '_obs_meta_cmpbqm.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
