@@ -49,7 +49,7 @@ python3 plot_mysql_dir_sensor_sat.py --sidb ../satinfo
 ![NNJA AMV Sat](/src/plotting/examples/amv_line_observations_inventory_sensor_sat.png "NNJA AMV Sat Plot")
 
 ## Geosynchronous (GEO) sensors by Satellite 
-`plot_mysql_sesnor_sat_geo.py` --sidb provided
+`plot_mysql_sensor_sat_geo.py` --sidb provided
 
 ![NNJA GEO Sat](/src/plotting/examples/geo_line_observations_inventory_sensor_sat.png "NNJA GEO Sat Plot")
 
