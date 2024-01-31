@@ -17,12 +17,10 @@ python3 plot_mysql_dir_sensor_sat.py --sidb ../satinfo
 ## Flag options 
 
 * --sidb provides the location of the satinfo folder for plots which go down to the satellite level to include the black/white list 
-
-if not included, then the plot will be all black and not show any blue lines 
+     if not included, then the plot will be all black and not show any blue lines 
 
 * -o the location where the plot should be saved to.
-
-if not included, it will save to a folder called figures in the location of the script 
+    if not included, it will save to a folder called figures in the location of the script 
 
 * -dev this will append a timestamp to the name of the plot to prevent overwriting the same file during development stages 
 
