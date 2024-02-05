@@ -83,7 +83,19 @@ amv_merged = InventoryInfo(
     obs_name='amv_merged',
     key='observations/reanalysis/amv/merged/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.satwnd.tm00.bufr_d',
     start='19790101T000000Z',
-    s3_prefix='observations/reanalysis/amsua/1bamua/%Y/%m/bufr/',
+    s3_prefix='observations/reanalysis/amv/merged/%Y/%m/bufr/',
+    bufr_files='gdas.%z.satwnd.tm00.bufr_d',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+amv_satwnd = InventoryInfo(
+    obs_name='amv_satwnd',
+    key='observations/reanalysis/amv/satwnd/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.satwnd.tm00.bufr_d',
+    start='19900101T000000Z',
+    s3_prefix='observations/reanalysis/amv/satwnd/%Y/%m/bufr/',
     bufr_files='gdas.%z.satwnd.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
     platform=au.CLEAN_PLATFORM,
@@ -452,8 +464,8 @@ trmm_nasa_tmi = InventoryInfo(
 )
 
 
-#37 items
-atm_infos = [airs_airsev, airs_aqua, amsua_1bamua, amsua_nasa_aqua, amsua_nasa_r21c, amsub_1bamub, amv_merged, atms_atms,
+#38 items
+atm_infos = [airs_airsev, airs_aqua, amsua_1bamua, amsua_nasa_aqua, amsua_nasa_r21c, amsub_1bamub, amv_merged, amv_satwnd, atms_atms,
              avhrr_avcsam, avhrr_avcspm, conv_prepbufr_acft_profiles, conv_prepbufr, cris_cris, cris_crisf4, geo_geoimr,
              geo_goesfv, geo_goesnd, geo_gsrasr, geo_gsrcsr, gmi_nasa_gmiv7, gps_eumetsat, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4,
              iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_sbuv_v87, saphir_saphir, seviri_sevcsr, ssmi_eumetsat,
