@@ -127,8 +127,6 @@ avhrr_avcspm = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
-# 10
-
 conv_prepbufr_acft_profiles = InventoryInfo(
     obs_name='conv_prepbufr_acft_profiles',
     key='observations/reanalysis/conv/prepbufr.acft_profiles/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.prepbufr.acft_profiles.nr',
@@ -213,6 +211,30 @@ geo_goesnd = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
+geo_gsrasr = InventoryInfo(
+    obs_name='geo_gsrasr',
+    key='observations/reanalysis/geo/gsrasr/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.gsrasr.tm00.bufr_d',
+    start='20210322T120000Z',
+    s3_prefix='observations/reanalysis/geo/gsrasr/%Y/%m/bufr/',
+    bufr_files='gdas.%z.gsrasr.tm00.bufr_d',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+geo_gsrcsr = InventoryInfo(
+    obs_name='geo_gsrcsr',
+    key='observations/reanalysis/geo/gsrcsr/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.gsrcsr.tm00.bufr_d',
+    start='20210322T120000Z',
+    s3_prefix='observations/reanalysis/geo/gsrcsr/%Y/%m/bufr/',
+    bufr_files='gdas.%z.gsrcsr.tm00.bufr_d',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 gmi_nasa_gmiv7 = InventoryInfo(
     obs_name='gmi_nasa_gmiv7',
     key='observations/reanalysis/gmi/nasa/gmi_v7/%Y/%m/bufr/gmi_v7_L1CR.%Y%m%d.t%Hz.bufr',
@@ -248,8 +270,6 @@ gps_gpsro = InventoryInfo(
     cycling_interval=au.CYCLING_6H,
     s3_bucket=au.REANALYSIS_BUCKET,
 )
-
-#20
 
 hirs_1bhrs2 = InventoryInfo(
     obs_name='hirs_1bhrs2',
@@ -371,8 +391,6 @@ ssmi_eumetsat = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
-#30
-
 ssmi_ssmit = InventoryInfo(
     obs_name='ssmi_ssmit',
     key='observations/reanalysis/ssmi/ssmit/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.ssmit.tm00.bufr_d',
@@ -433,10 +451,10 @@ trmm_nasa_tmi = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
-#35
 
+#37 items
 atm_infos = [airs_airsev, airs_aqua, amsua_1bamua, amsua_nasa_aqua, amsua_nasa_r21c, amsub_1bamub, amv_merged, atms_atms,
              avhrr_avcsam, avhrr_avcspm, conv_prepbufr_acft_profiles, conv_prepbufr, cris_cris, cris_crisf4, geo_geoimr,
-             geo_goesfv, geo_goesnd, gmi_nasa_gmiv7, gps_eumetsat, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4,
+             geo_goesfv, geo_goesnd, geo_gsrasr, geo_gsrcsr, gmi_nasa_gmiv7, gps_eumetsat, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4,
              iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_sbuv_v87, saphir_saphir, seviri_sevcsr, ssmi_eumetsat,
              ssmi_ssmit, ssmis_eumetsat, ssmis_ssmisu, ssu_1bssu, trmm_nasa_tmi]
