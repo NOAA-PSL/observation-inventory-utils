@@ -120,9 +120,14 @@ directory_labels = []
 counter=0
 # for index, row in unique_sat_id.iterrows():
 for index, row in unique_dir_sensor_sats.iterrows():
-    satinfo_string_ = row['sensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
-    if "crisf4" in row['source_dir']:
-        satinfo_string_ = "crisf4_" + utils.sat_dictionary[row['sat_id_name']]
+    try:
+        satinfo_string_ = row['sensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
+        if "crisf4" in row['source_dir']:
+            satinfo_string_ = "crisf4_" + utils.sat_dictionary[row['sat_id_name']]
+    except KeyError as err:
+        print(f'unable to get satinfo string for row: {row}')
+        print(f'Error: {err}')
+        satinfo_string_ = row['sensor']
     satinfo = utils.read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
