@@ -48,7 +48,8 @@ if args.category == 'atmosphere':
 if args.category == 'list':
     try:
         print(f"got list: {args.var_list}")
-        to_inventory = [i for i in args.var_list if any(i == x.obs_name for x in atm_dicts.atm_infos)]
+        #to_inventory = [i for i in args.var_list if any(i == x.obs_name for x in atm_dicts.atm_infos)]
+        to_inventory = [x for x in atm_dicts.atm_infos if any(x.obs_name == i for i in args.var_list)]
         print(f"to inventory: ")
         for i in to_inventory: print(i.obs_name)
     except Exception as ex:
