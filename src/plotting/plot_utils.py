@@ -20,7 +20,7 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                "METOP-1 (Metop-B":"metop-b","METOP-2 (Metop-A":"metop-a",
                "AQUA":"aqua", "NPP":"npp",
                "GOES 7" : "g07", "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
-               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16", "GOES 17":"g17",
+               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16", "GOES 17":"g17", "GOES 18":"g18",
                "MTSAT-2":"MTSAT-2", "MTSAT-1R":"MTSAT-1R",
                "METEOSAT 2" : "m02", "METEOSAT 3": "m03", "METEOSAT 4": "m04","METEOSAT 5": "m05", "METEOSAT 6": "m06", "METEOSAT 7": "m07",
                "METEOSAT 8": "m08", "METEOSAT 9": "m09", "METEOSAT 10": "m10", "METEOSAT 11": "m11",
