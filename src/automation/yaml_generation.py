@@ -60,7 +60,7 @@ def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time
             'end': end
         },
         'bufr_files':[inventory_info.bufr_files],
-        'work_dir': './',
+        'work_dir': '/lustre/home/work/inventory-work/',
         'scrub_files': True
     }
     outfile = open(yaml_file_path, 'w')
@@ -89,7 +89,7 @@ def generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_ti
             'end': end
         },
         'prepbufr_files':[inventory_info.bufr_files],
-        'work_dir': './',
+        'work_dir': '/lustre/home/work/inventory-work/',
         'scrub_files': True
     }
     outfile = open(yaml_file_path, 'w')
