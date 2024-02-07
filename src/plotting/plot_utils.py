@@ -39,7 +39,7 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                 "TanDEM-X": "TanDEM-X", "PAZ":"PAZ", "KOMPSAT-5": "KOMPSAT-5",
                "LANDSAT 5":"LANDSAT 5", "GPM-core":"GPM-core", "TRMM":"TRMM",
                "Himawari-8":"himawari8", "Himawari-9":"himawari9", "Spire Lemur 3U C":"Spire L3UC", "Sentinel 6A":"Sentinel 6A",
-               "PlanetiQ GNOMES-":"PlanetiQ GNOMES"}
+               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"AURA"}
 
 #Dictionary for translating typ numbers from cmpbqm output into their full names
 typ_dictionary = {
@@ -96,5 +96,4 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
     #make sure the end of the series is in the future
     satinfo.loc[len(satinfo.index)]=[date(2100,1,1), satinfo.status.iat[-1], satinfo.status_nan.iat[-1]]    
     satinfo.datetime = pandas.to_datetime(satinfo.datetime)
-    display(satinfo)
     return satinfo
