@@ -536,9 +536,9 @@ trmm_nasa_tmi = InventoryInfo(
 )
 
 
-#38 items
 atm_infos = [airs_airsev, airs_aqua, amsua_1bamua, amsua_nasa_aqua, amsua_nasa_r21c, amsub_1bamub, amv_merged, amv_satwnd, atms_atms,
              avhrr_avcsam, avhrr_avcspm, conv_prepbufr_acft_profiles, conv_prepbufr, cris_cris, cris_crisf4, geo_geoimr,
              geo_goesfv, geo_goesnd, geo_gsrasr, geo_gsrcsr, gmi_nasa_gmiv7, gps_eumetsat, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4,
-             iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_nasa_sbuv_v87, saphir_saphir, seviri_sevcsr, ssmi_eumetsat,
+             iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_cfsr, ozone_nasa_sbuv_v87, ozone_ncep_gome, ozone_ncep_omi, ozone_ncep_ompslp,
+             ozone_ncep_ompsn8, ozone_ncep_ompst8, saphir_saphir, seviri_sevcsr, ssmi_eumetsat,
              ssmi_ssmit, ssmis_eumetsat, ssmis_ssmisu, ssu_1bssu, trmm_nasa_tmi]
