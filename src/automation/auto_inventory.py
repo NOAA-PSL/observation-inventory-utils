@@ -52,7 +52,7 @@ if args.category == 'list':
         print("An error occurred getting list values to inventory")
         print(ex)
         quit()
-    if to_inventory is None:
+    if len(to_inventory) == 0:
         print("The provided list did not match available variables.")
         quit()
     if len(to_inventory) != len(args.var_list):
