@@ -22,6 +22,7 @@ parser.add_argument("-cat", dest="category", help="Category of variables to inve
 parser.add_argument("-end", dest="end_date", help=f"End date to use for run. Format expected {au.ESCAPED_DATESTR_FORMAT}. If not provided, uses the current time.", type=str)
 parser.add_argument("-ago", dest="days_ago", help="Number of days before today or a given end_date (defined by the -end argument) over which to run the inventory. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
 parser.add_argument("-n_jobs", dest="n_jobs", help="Number of parallel jobs to run.", default=18, type=int)
+parser.add_argument("-work_dir", dest="work_dir", help="Location of work directory for nceplibs calls. Defaults to the current directory.", default="./", type=str)
 parser.add_argument("--list", dest="var_list", help="List of the variables to inventory with spaces between each, will only be used if -cat is list", type=str, nargs='+')
 args = parser.parse_args()
 
@@ -103,11 +104,11 @@ def run_nceplibs(inventory_info):
     
     #run correct command as given in dict 
     if inventory_info.nceplibs_cmd == au.NCEPLIBS_SINV:
-        yaml_file = yg.generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time)
+        yaml_file = yg.generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time, args.work_dir)
         cli.get_obs_count_meta_sinv_base(yaml_file)
         os.remove(yaml_file)
     elif inventory_info.nceplibs_cmd == au.NCEPLIBS_CMPBQM:
-        yaml_file = yg.generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_time)
+        yaml_file = yg.generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_time, args.work_dir)
         cli.get_obs_count_meta_cmpbqm_base(yaml_file)
         os.remove(yaml_file)
     else:
