@@ -52,6 +52,14 @@ if args.category == 'list':
         print("An error occurred getting list values to inventory")
         print(ex)
         quit()
+    if to_inventory is None:
+        print("The provided list did not match available variables.")
+        quit()
+    if to_inventory.count() != args.var_list.count():
+        print("Some of the items in the list were not available variables.")
+        print("The following items were valid: ")
+        for i in to_inventory: print(i.obs_name)
+        quit()
 
 
 #Import CLI here so that we only connect to the database if the arguments were valid 
