@@ -53,7 +53,7 @@ if args.category == 'list':
         print(ex)
         quit()
     if len(to_inventory) == 0:
-        print("The provided list did not match available variables.")
+        print("The provided list did not match any available variables.")
         quit()
     if len(to_inventory) != len(args.var_list):
         print("Some of the items in the list were not available variables.")
