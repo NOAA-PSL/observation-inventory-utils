@@ -83,6 +83,7 @@ db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
+db_frame['subsensor'] = db_frame.apply(get_subsensor, axis=1)
 db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 
 #select only amv rows
