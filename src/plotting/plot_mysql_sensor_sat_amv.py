@@ -36,8 +36,8 @@ def plot_one_line(satinfo, dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
     plt.plot(dftmp.datetime, yloc*dftmp.active,'|',color='blue',markersize=5)
 
-def select_sensor_satellite_combo(sensor, sat_id, db_frame, satinfo):
-    dftmp = db_frame.loc[(db_frame['sat_id']==sat_id) & (db_frame['sensor']==sensor)]
+def select_subsensor_satellite_combo(subsensor, sat_id, db_frame, satinfo):
+    dftmp = db_frame.loc[(db_frame['sat_id']==sat_id) & (db_frame['subsensor']==subsensor)]
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
           satinfo.status_nan.to_numpy().astype('float'),
           kind='previous')
@@ -53,6 +53,11 @@ def get_sensor(row):
     directory = row['parent_dir']
     sensor = directory.split("/")[2]
     return sensor
+
+def get_subsensor(row):
+    directory = row['parent_dir']
+    subsensor = directory.split("/")[3]
+    return subsensor
 
 def get_source_dir(row):
     directory = row['parent_dir']
@@ -84,7 +89,7 @@ db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 db_frame = db_frame[(db_frame['sensor']=='amv')]
 
 #loop and plot sensors/sat_ids
-unique_sensor_sats = db_frame[['sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id_name'], ascending=[False, False])
+unique_sensor_sats = db_frame[['sensor', 'subsensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id', 'sat_id_name'], ascending=[False, False, False])
 step=0.05
 height=step*len(unique_sensor_sats)
 
@@ -115,7 +120,7 @@ for index, row in unique_sensor_sats.iterrows():
     satinfo = utils.read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
-    dftmp = select_sensor_satellite_combo(row['sensor'], row['sat_id'], db_frame, satinfo)
+    dftmp = select_subsensor_satellite_combo(row['subsensor'], row['sat_id'], db_frame, satinfo)
     pandas.options.mode.chained_assignment = 'warn'
 
     dirs = dftmp['source_dir'].unique()
