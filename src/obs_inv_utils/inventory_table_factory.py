@@ -51,7 +51,7 @@ else:
     OBS_DATABASE = f"sqlite:///{sqlite_database}"
     print('sqlite database: ' + OBS_DATABASE)   
 
-engine = db.create_engine(OBS_DATABASE, echo=True)
+engine = db.create_engine(OBS_DATABASE)
 Base = declarative_base()
 metadata = MetaData(engine)
 Session = sessionmaker(bind=engine)

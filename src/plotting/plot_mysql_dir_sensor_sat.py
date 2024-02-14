@@ -101,11 +101,10 @@ height=step*len(unique_dir_sensor_sats)
 #make list of sensor&sat labels 
 sensor_sat_labels = []
 for index, row in unique_dir_sensor_sats.iterrows():
-    source_string = row.source_dir.replace('/', ' ')
     if row.sat_id_name.strip():
-        sensor_sat_labels.append(source_string +  " " + str(row.sat_id_name))
+        sensor_sat_labels.append(str(row.sensor) +  " " + str(row.sat_id_name))
     else:
-        sensor_sat_labels.append(source_string + " " + str(row.sat_id))
+        sensor_sat_labels.append(str(row.sensor) + " " + str(row.sat_id))
 
 print(f"Identified {len(sensor_sat_labels)} unique dir, sensor, sat combos. Generating plot now.")
 
@@ -120,9 +119,14 @@ directory_labels = []
 counter=0
 # for index, row in unique_sat_id.iterrows():
 for index, row in unique_dir_sensor_sats.iterrows():
-    satinfo_string_ = row['sensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
-    if "crisf4" in row['source_dir']:
-        satinfo_string_ = "crisf4_" + utils.sat_dictionary[row['sat_id_name']]
+    try:
+        satinfo_string_ = row['sensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
+        if "crisf4" in row['source_dir']:
+            satinfo_string_ = "crisf4_" + utils.sat_dictionary[row['sat_id_name']]
+    except KeyError as err:
+        print(f'unable to get satinfo string for row: {row}')
+        print(f'Error: {err}')
+        satinfo_string_ = row['sensor']
     satinfo = utils.read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None

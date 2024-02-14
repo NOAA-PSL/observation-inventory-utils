@@ -11,6 +11,7 @@ CLEAN_PLATFORM = 'aws_s3_clean'
 REANALYSIS_BUCKET = 'noaa-reanlyses-pds'
 
 DATESTR_FORMAT = '%Y%m%dT%H%M%SZ'
+ESCAPED_DATESTR_FORMAT = '%%Y%%m%%dT%%H%%M%%SZ'
 
 CYCLING_6H = '21600'
 

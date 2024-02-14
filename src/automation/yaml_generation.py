@@ -40,7 +40,7 @@ def generate_obs_inv_config(inventory_info, start_time, end_time):
     return yaml_file_path
 
 # produces the yaml in required format to pass to get_obs_count_meta_sinv cli command
-def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time):
+def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time, work_dir):
     filename = inventory_info.obs_name + '_obs_meta_sinv.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
     if start_time is dt:
@@ -60,7 +60,7 @@ def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time
             'end': end
         },
         'bufr_files':[inventory_info.bufr_files],
-        'work_dir': './',
+        'work_dir': work_dir,
         'scrub_files': True
     }
     outfile = open(yaml_file_path, 'w')
@@ -69,7 +69,7 @@ def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time
     return yaml_file_path
 
 # produces the yaml in required format to pass to get_obs_count_meta_cmpbqm cli command
-def generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_time):
+def generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_time, work_dir):
     filename = inventory_info.obs_name + '_obs_meta_cmpbqm.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
     if start_time is dt:
@@ -89,7 +89,7 @@ def generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_ti
             'end': end
         },
         'prepbufr_files':[inventory_info.bufr_files],
-        'work_dir': './',
+        'work_dir': work_dir,
         'scrub_files': True
     }
     outfile = open(yaml_file_path, 'w')

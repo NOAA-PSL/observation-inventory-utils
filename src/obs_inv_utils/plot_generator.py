@@ -32,9 +32,6 @@ OBS_INV_DATERANGE_6H_CYCLE = pd.date_range(
 EXT_OBS_ERA5 = 'era5'
 EXT_OBS_MERA20CR = 'mera20cr'
 
-print(f'OBS_INV_DATERANGE: {OBS_INV_DATERANGE}')
-
-
 @dataclass
 class ObsGroupFilesizeTimeline(object):
     config: ObsGroupFileSizePlotConfig

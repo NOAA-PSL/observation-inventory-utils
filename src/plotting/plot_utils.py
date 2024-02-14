@@ -20,7 +20,7 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                "METOP-1 (Metop-B":"metop-b","METOP-2 (Metop-A":"metop-a",
                "AQUA":"aqua", "NPP":"npp",
                "GOES 7" : "g07", "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
-               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16", "GOES 17":"g17",
+               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16", "GOES 17":"g17", "GOES 18":"g18",
                "MTSAT-2":"MTSAT-2", "MTSAT-1R":"MTSAT-1R",
                "METEOSAT 2" : "m02", "METEOSAT 3": "m03", "METEOSAT 4": "m04","METEOSAT 5": "m05", "METEOSAT 6": "m06", "METEOSAT 7": "m07",
                "METEOSAT 8": "m08", "METEOSAT 9": "m09", "METEOSAT 10": "m10", "METEOSAT 11": "m11",
@@ -39,7 +39,7 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                 "TanDEM-X": "TanDEM-X", "PAZ":"PAZ", "KOMPSAT-5": "KOMPSAT-5",
                "LANDSAT 5":"LANDSAT 5", "GPM-core":"GPM-core", "TRMM":"TRMM",
                "Himawari-8":"himawari8", "Himawari-9":"himawari9", "Spire Lemur 3U C":"Spire L3UC", "Sentinel 6A":"Sentinel 6A",
-               "PlanetiQ GNOMES-":"PlanetiQ GNOMES"}
+               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"AURA"}
 
 #Dictionary for translating typ numbers from cmpbqm output into their full names
 typ_dictionary = {
@@ -96,5 +96,4 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
     #make sure the end of the series is in the future
     satinfo.loc[len(satinfo.index)]=[date(2100,1,1), satinfo.status.iat[-1], satinfo.status_nan.iat[-1]]    
     satinfo.datetime = pandas.to_datetime(satinfo.datetime)
-    display(satinfo)
     return satinfo
