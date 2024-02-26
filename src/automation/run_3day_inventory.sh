@@ -14,8 +14,8 @@ python3 auto_inventory.py -cat atmosphere -ago 3 -n_jobs 50 -work_dir $WORK_DIR
 
 #run all plots in parallel
 python3 ../plotting/plot_mysql_dir_sensor_sat.py --sidb $SATINFO_DIR -o $OUTPUT_LOC &
-python3 ../plotting/plot_mysql_sensor.py -o $OUTPUT_LOC &
+python3 ../plotting/plot_mysql_sensor.py -o $OUTPUT_LOC 
 python3 ../plotting/plot_mysql_sensor_sat_amv.py --sidb $SATINFO_DIR -o $OUTPUT_LOC &
-python3 ../plotting/plot_mysql_sensor_sat_geo.py --sidb $SATINFO_DIR -o $OUTPUT_LOC &
+python3 ../plotting/plot_mysql_sensor_sat_geo.py --sidb $SATINFO_DIR -o $OUTPUT_LOC 
 python3 ../plotting/plot_mysql_sensor_sat_gps.py --sidb $SATINFO_DIR -o $OUTPUT_LOC &
 python3 ../plotting/plot_mysql_typ.py -o $OUTPUT_LOC 
