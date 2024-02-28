@@ -9,7 +9,6 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import NullPool
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -52,7 +51,7 @@ else:
     OBS_DATABASE = f"sqlite:///{sqlite_database}"
     print('sqlite database: ' + OBS_DATABASE)   
 
-engine = db.create_engine(OBS_DATABASE, poolclass=NullPool)
+engine = db.create_engine(OBS_DATABASE, pool_size=58, max_overflow=0)
 Base = declarative_base()
 metadata = MetaData(engine)
 Session = sessionmaker(bind=engine)
