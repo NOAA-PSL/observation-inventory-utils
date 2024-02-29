@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 # This script is for running the automated inventory for 
 # the past 3 days to get updates for lagged data and plotting
 # the new data.
@@ -6,6 +6,8 @@
 SATINFO_DIR=/home/Jessica.Knezha/obs-inventory/build_gsinfo/satinfo
 OUTPUT_LOC=/home/Jessica.Knezha/inventory-figures
 WORK_DIR=/lustre/home/work/inventory-work
+
+cd $(dirname $0)
 
 source ../../obs_inv_utils_pw_cloud.sh
 
