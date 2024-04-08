@@ -65,13 +65,13 @@ def get_source_dir(row):
 print('connecting to mysql db')
 mysql_conn = itf.engine.connect()
 #BUFR FILE INFO
-sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
+sql = f"""select m.*, o.parent_dir, o.s3_bucket from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
 data = pandas.read_sql(sql, mysql_conn)
 db_frame1 = data.sort_values('inserted_at'
         ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
 
 #PREPBUFR FILE INFO 
-sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id"""
+sql2 = f"""select m.*, o.parent_dir, o.s3_bucket from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
 data2 = pandas.read_sql(sql2, mysql_conn)
 db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size', 'typ'], keep='last')
 

@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 
 from obs_inv_utils import inventory_table_factory as itf
 
-engine = db.create_engine(itf.OBS_DATABASE, echo=True)
+engine = itf.engine
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
