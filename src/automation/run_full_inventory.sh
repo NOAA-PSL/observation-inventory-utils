@@ -3,8 +3,8 @@
 # the past 3 days to get updates for lagged data and plotting
 # the new data.
 
-SATINFO_DIR=/home/Jessica.Knezha/obs-inventory/build_gsinfo/satinfo
-OUTPUT_LOC=/home/Jessica.Knezha/inventory-figures
+SATINFO_DIR=/home/$USER/obs-inventory/build_gsinfo/satinfo
+OUTPUT_LOC=/home/$USER/inventory-figures
 WORK_DIR=/lustre/home/work/inventory-work
 
 source ../../obs_inv_utils_pw_cloud.sh
