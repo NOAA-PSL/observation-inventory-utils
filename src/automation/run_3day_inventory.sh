@@ -12,7 +12,7 @@ cd $(dirname $0)
 source ../../obs_inv_utils_pw_cloud.sh
 
 #run inventory 
-python3 auto_inventory.py -cat atmosphere -ago 3 -n_jobs 50 -work_dir $WORK_DIR 
+python3 auto_inventory.py -cat atmosphere -ago 3 -n_jobs 150 -work_dir $WORK_DIR 
 
 #run all plots in parallel
 python3 ../plotting/plot_mysql_dir_sensor_sat.py --sidb $SATINFO_DIR -o $OUTPUT_LOC &
