@@ -15,7 +15,7 @@ python3 auto_inventory.py -cat list -n_jobs 80 -work_dir $WORK_DIR --list airs_a
     iasi_mtiasi mhs_1bmhs ozone_nasa_sbuv_v87 ozone_ncep_gome ozone_ncep_omi ozone_ncep_ompslp \
     ozone_ncep_ompsn8 ozone_ncep_ompst8 saphir_saphir seviri_sevcsr ssmi_eumetsat \
     ssmi_ssmit ssmis_ssmisu trmm_nasa_tmi &
-python3 auto_inventory.py -cat list -n_jobs 8 -ago 8400 -end 20020101T000000 -work_dir $WORK_DIR --list ssu_1bssu ozone_cfsr msu_1bmsu hirs_1bhrs2 \
+python3 auto_inventory.py -cat list -n_jobs 8 -ago 8400 -end 20020101T000000Z -work_dir $WORK_DIR --list ssu_1bssu ozone_cfsr msu_1bmsu hirs_1bhrs2 \
     conv_prepbufr_acft_profiles amv_merged conv_prepbufr ssmi_eumetsat & 
 python3 auto_inventory.py -cat list -n_jobs 8 -ago 8400 -work_dir $WORK_DIR --list ssu_1bssu ozone_cfsr msu_1bmsu hirs_1bhrs2 \
     conv_prepbufr_acft_profiles amv_merged conv_prepbufr ssmi_eumetsat    
