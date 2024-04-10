@@ -6,6 +6,8 @@ SATINFO_DIR=/home/$USER/obs-inventory/build_gsinfo/satinfo
 OUTPUT_LOC=/home/$USER/inventory-figures
 WORK_DIR=/lustre/home/work/inventory-work
 
+cd $(dirname $0)
+
 source ../../obs_inv_utils_pw_cloud.sh
 
 #run inventory 
