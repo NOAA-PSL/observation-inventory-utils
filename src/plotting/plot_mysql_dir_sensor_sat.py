@@ -93,6 +93,9 @@ db_frame.drop(index_amv, inplace=True)
 index_geo = db_frame[(db_frame['sensor']=='geo')].index
 db_frame.drop(index_geo, inplace=True)
 
+index_ozone = db_frame[(db_frame['sensor']=='ozone')].index
+db_frame.drop(index_ozone, inplace=True)
+
 #loop and plot sensors/sat_ids
 unique_dir_sensor_sats = db_frame[['source_dir', 'sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'source_dir', 'sat_id_name'], ascending=[False, False, False])
 step=0.05

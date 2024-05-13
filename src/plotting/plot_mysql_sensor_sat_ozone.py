@@ -54,16 +54,16 @@ def get_sensor(row):
     sensor = directory.split("/")[2]
     return sensor
 
-def get_subsensor(row):
-    directory = row['parent_dir']
-    subsensor = directory.split("/")[3]
-    return subsensor
-
 def get_source_dir(row):
     directory = row['parent_dir']
     directory = directory.replace("observations/reanalysis", "")
     source_dir = re.split("/[12][90][0-9][0-9]/[01][0-9]/", directory)[0]
     return source_dir
+
+def get_subsensor(row):
+    source_dir = get_source_dir(row)
+    subsensor = source_dir.split("/")[-1]
+    return subsensor
 
 #read data from sql database of obs counts
 print('connecting to mysql db')
@@ -117,7 +117,7 @@ for index, row in unique_sensor_sats.iterrows():
     except KeyError as err:
         print(f'unable to get satinfo string for row: {row}')
         print(f'Error: {err}')
-        satinfo_string_ = row['sensor']
+        satinfo_string_ = row['subsensor']
     satinfo = utils.read_satinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
