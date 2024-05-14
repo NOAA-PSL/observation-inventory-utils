@@ -113,7 +113,7 @@ directory_labels = []
 counter=0
 for index, row in unique_sensor_sats.iterrows():
     try:
-        satinfo_string_ = row['sensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
+        satinfo_string_ = row['subsensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
     except KeyError as err:
         print(f'unable to get satinfo string for row: {row}')
         print(f'Error: {err}')
