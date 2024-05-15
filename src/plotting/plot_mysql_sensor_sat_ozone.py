@@ -114,6 +114,7 @@ counter=0
 for index, row in unique_sensor_sats.iterrows():
     try:
         satinfo_string_ = row['subsensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
+        print(satinfo_string_)
     except KeyError as err:
         print(f'unable to get satinfo string for row: {row}')
         print(f'Error: {err}')

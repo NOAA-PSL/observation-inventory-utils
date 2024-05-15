@@ -111,6 +111,7 @@ def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
         ozinfo=pandas.concat([ozinfo,tmp_frame])
     #if empty make 
     if (ozinfo.empty):
+      print(f'Empty ozinfo: {ozinfo_string}')
       ozinfo.loc[len(ozinfo.index)] = [date(1900,1,1), False, np.nan]
       ozinfo.loc[len(ozinfo.index)] = [date(2100,1,1), False, np.nan]
     #convert logical to floats with nans for plotting
