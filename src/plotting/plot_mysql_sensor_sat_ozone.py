@@ -118,7 +118,7 @@ for index, row in unique_sensor_sats.iterrows():
         print(f'unable to get satinfo string for row: {row}')
         print(f'Error: {err}')
         satinfo_string_ = row['subsensor']
-    satinfo = utils.read_satinfo_files(satinfo_db_root,satinfo_string_)
+    satinfo = utils.read_ozinfo_files(satinfo_db_root,satinfo_string_)
 
     pandas.options.mode.chained_assignment = None
     dftmp = select_subsensor_satellite_combo(row['subsensor'], row['sat_id'], db_frame, satinfo)

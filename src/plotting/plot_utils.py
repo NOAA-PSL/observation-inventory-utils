@@ -97,3 +97,26 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
     satinfo.loc[len(satinfo.index)]=[date(2100,1,1), satinfo.status.iat[-1], satinfo.status_nan.iat[-1]]    
     satinfo.datetime = pandas.to_datetime(satinfo.datetime)
     return satinfo
+
+def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
+    if ozinfo_string in satinfo_translate_dictionary:
+            ozinfo_string = satinfo_translate_dictionary[ozinfo_string]
+    ozinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
+    for fn in glob.glob(os.path.join(ozinfo_db_root,ozinfo_string,'??????????')):
+        pd_tmp = pandas.read_csv(os.path.join(ozinfo_db_root,ozinfo_string,os.path.basename(fn))
+            ,header=None,sep='\s+'
+            ,names=['sensor','ch_num','status','pressure_level','gross_error','ob_error','b_oz','pg_oz'])
+        tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
+            ,columns=['datetime','status'])
+        ozinfo=pandas.concat([ozinfo,tmp_frame])
+    #if empty make 
+    if (ozinfo.empty):
+      ozinfo.loc[len(ozinfo.index)] = [date(1900,1,1), False, np.nan]
+      ozinfo.loc[len(ozinfo.index)] = [date(2100,1,1), False, np.nan]
+    #convert logical to floats with nans for plotting
+    ozinfo['status_nan'] = ozinfo.status.astype('int')
+    ozinfo['status_nan'].replace(0, np.nan, inplace=True)
+    #make sure the end of the series is in the future
+    ozinfo.loc[len(ozinfo.index)]=[date(2100,1,1), ozinfo.status.iat[-1], ozinfo.status_nan.iat[-1]]    
+    ozinfo.datetime = pandas.to_datetime(ozinfo.datetime)
+    return ozinfo
