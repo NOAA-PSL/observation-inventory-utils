@@ -39,7 +39,7 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                 "TanDEM-X": "TanDEM-X", "PAZ":"PAZ", "KOMPSAT-5": "KOMPSAT-5",
                "LANDSAT 5":"LANDSAT 5", "GPM-core":"GPM-core", "TRMM":"TRMM",
                "Himawari-8":"himawari8", "Himawari-9":"himawari9", "Spire Lemur 3U C":"Spire L3UC", "Sentinel 6A":"Sentinel 6A",
-               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"AURA", "NIMBUS 7":"nim07"}
+               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"aura", "NIMBUS 7":"nim07"}
 
 #Dictionary for translating typ numbers from cmpbqm output into their full names
 typ_dictionary = {
