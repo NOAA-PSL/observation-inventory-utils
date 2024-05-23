@@ -6,12 +6,13 @@ import os
 import pathlib
 from datetime import datetime as dt
 import automation_utils as au
+import random
 
 PY_CURRENT_DIR = pathlib.Path(__file__).parent.resolve()
 
 # produces the yaml in required format to pass to get_obs_inventory cli command
 def generate_obs_inv_config(inventory_info, start_time, end_time):
-    filename = inventory_info.obs_name + '_obs_inv_config.yaml'
+    filename = inventory_info.obs_name + dt.now().strftime("%Y%m%d%H%M%S") + str(random.randint(1, 9999)) + '_obs_inv_config.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
     if start_time is dt:
         start = start_time.strftime(au.DATESTR_FORMAT)
@@ -41,7 +42,7 @@ def generate_obs_inv_config(inventory_info, start_time, end_time):
 
 # produces the yaml in required format to pass to get_obs_count_meta_sinv cli command
 def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time, work_dir):
-    filename = inventory_info.obs_name + '_obs_meta_sinv.yaml'
+    filename = inventory_info.obs_name + dt.now().strftime("%Y%m%d%H%M%S") + str(random.randint(1, 9999)) + '_obs_meta_sinv.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
     if start_time is dt:
         start = start_time.strftime(au.DATESTR_FORMAT)
@@ -70,7 +71,7 @@ def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time
 
 # produces the yaml in required format to pass to get_obs_count_meta_cmpbqm cli command
 def generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_time, work_dir):
-    filename = inventory_info.obs_name + '_obs_meta_cmpbqm.yaml'
+    filename = inventory_info.obs_name + dt.now().strftime("%Y%m%d%H%M%S") + str(random.randint(1, 9999)) + '_obs_meta_cmpbqm.yaml'
     yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
     if start_time is dt:
         start = start_time.strftime(au.DATESTR_FORMAT)
