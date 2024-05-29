@@ -71,7 +71,9 @@ satinfo_translate_dictionary={
     "avhrr_n16":"avhrr3_n16", "avhrr_n17":"avhrr3_n17", "avhrr_n18":"avhrr3_n18", "avhrr_n19":"avhrr3_n19",
     "goesnd_g11":"sndrD_g11", "goesnd_g12":"sndrD_g12", "goesnd_g13":"sndrD_g13", "goesnd_g14":"sndrD_g14",
     "goesnd_g15":"sndrD_g15", "goesnd_g08":"sndr_g08", "goesnd_g10":"sndr_g10", "goesnd_g11":"sndr_g11",
-    "goesnd_g12":"sndr_g12", "crisf4_n20":"cris-fsr_n20", "crisf4_n21":"cris-fsr_n21", "crisf4_npp":"cris-fsr_npp"
+    "goesnd_g12":"sndr_g12", "crisf4_n20":"cris-fsr_n20", "crisf4_n21":"cris-fsr_n21", "crisf4_npp":"cris-fsr_npp",
+    "cfsr_n09":"sbuv2_n09", "cfsr_n11":"sbuv2_n11", "cfsr_n14":"sbuv2_n14", "cfsr_n16":"sbuv2_n16", "cfsr_n17":"sbuv2_n17",
+    "cfsr_n18":"sbuv2_n18", "cfsr_n19":"sbuv2_n19", "cfsr_nim07":"sbuv2_nim07"
 }
 
 #function for reading from raw satinfo files which is standard across the various plot scripts 
