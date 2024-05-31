@@ -64,13 +64,13 @@ def get_source_dir(row):
 print('connecting to mysql db')
 mysql_conn = itf.engine.connect()
 #BUFR FILE INFO
-sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
+sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\' AND o.parent_dir LIKE '%/gps/%' """
 data = pandas.read_sql(sql, mysql_conn)
 db_frame1 = data.sort_values('inserted_at'
         ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
 
 #PREPBUFR FILE INFO 
-sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
+sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\' AND o.parent_dir LIKE '%/gps/%' """
 data2 = pandas.read_sql(sql2, mysql_conn)
 db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size', 'typ'], keep='last')
 
@@ -81,7 +81,7 @@ db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 
 #select only the gps rows 
-db_frame = db_frame[(db_frame['sensor']=='gps')]
+# db_frame = db_frame[(db_frame['sensor']=='gps')]
 
 #loop and plot sensors/sat_ids
 unique_sensor_sats = db_frame[['sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id_name'], ascending=[False, False])
