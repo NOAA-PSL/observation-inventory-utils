@@ -142,6 +142,7 @@ import obs_inv_utils.inventory_table_factory as itf
 
 #returns a data frame subtracting the duplicates of filename, obs_day, sat_id, and sat_inst_id and keeping only the most recent one
 def get_non_duplicate_data_bufr():
+    session = itf.Session()
     # Create a subquery with row numbers
     subquery = select([
         omnb.meta_id,
@@ -172,10 +173,10 @@ def get_non_duplicate_data_bufr():
     query = select([subquery]).where(subquery.c.row_number == 1)
 
     # Execute the query and fetch results into a DataFrame
-    result = itf.session.execute(query)
+    result = session.execute(query)
     df = pandas.DataFrame(result.fetchall(), columns=result.keys())
 
     # Close the session
-    itf.session.close()
+    session.close()
 
     return df
