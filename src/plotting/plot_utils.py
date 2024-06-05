@@ -144,27 +144,27 @@ import obs_inv_utils.inventory_table_factory as itf
 def get_non_duplicate_data_bufr():
     # Create a subquery with row numbers
     subquery = select([
-        omnb.c.meta_id,
-        omnb.c.obs_id,
-        omnb.c.cmd_result_id,
-        omnb.c.cmd_str,
-        omnb.c.sat_id,
-        omnb.c.sat_id_name,
-        omnb.c.obs_count,
-        omnb.c.sat_inst_id,
-        omnb.c.sat_inst_desc,
-        omnb.c.filename,
-        omnb.c.file_size,
-        omnb.c.obs_day,
-        omnb.c.inserted_at,
+        omnb.meta_id,
+        omnb.obs_id,
+        omnb.cmd_result_id,
+        omnb.cmd_str,
+        omnb.sat_id,
+        omnb.sat_id_name,
+        omnb.obs_count,
+        omnb.sat_inst_id,
+        omnb.sat_inst_desc,
+        omnb.filename,
+        omnb.file_size,
+        omnb.obs_day,
+        omnb.inserted_at,
         func.row_number().over(
             partition_by=[
-                omnb.c.filename,
-                omnb.c.obs_day,
-                omnb.c.sat_id,
-                omnb.c.sat_inst_id
+                omnb.filename,
+                omnb.obs_day,
+                omnb.sat_id,
+                omnb.sat_inst_id
             ],
-            order_by=omnb.c.inserted_at.desc()
+            order_by=omnb.inserted_at.desc()
         ).label('row_number')
     ]).alias('subquery')
 
