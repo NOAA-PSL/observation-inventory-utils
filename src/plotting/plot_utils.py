@@ -123,3 +123,59 @@ def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
     ozinfo.loc[len(ozinfo.index)]=[date(2100,1,1), ozinfo.status.iat[-1], ozinfo.status_nan.iat[-1]]    
     ozinfo.datetime = pandas.to_datetime(ozinfo.datetime)
     return ozinfo
+
+from sqlalchemy import MetaData, create_engine
+from sqlalchemy.sql import func, select
+from sqlalchemy.orm import sessionmaker
+from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsBufr as omnb
+import obs_inv_utils.inventory_table_factory as itf
+
+# # Assuming OBS_META_NCEPLIBS_BUFR_TABLE is defined as a string with the table name
+# OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
+
+# # Define your database connection (replace with your actual connection details)
+# DATABASE_URL = "mysql+pymysql://user:password@localhost/dbname"
+# engine = create_engine(DATABASE_URL)
+# metadata = MetaData(bind=engine)
+# Session = sessionmaker(bind=engine)
+# session = Session()
+
+#returns a data frame subtracting the duplicates of filename, obs_day, sat_id, and sat_inst_id and keeping only the most recent one
+def get_non_duplicate_data_bufr():
+    # Create a subquery with row numbers
+    subquery = select([
+        omnb.c.meta_id,
+        omnb.c.obs_id,
+        omnb.c.cmd_result_id,
+        omnb.c.cmd_str,
+        omnb.c.sat_id,
+        omnb.c.sat_id_name,
+        omnb.c.obs_count,
+        omnb.c.sat_inst_id,
+        omnb.c.sat_inst_desc,
+        omnb.c.filename,
+        omnb.c.file_size,
+        omnb.c.obs_day,
+        omnb.c.inserted_at,
+        func.row_number().over(
+            partition_by=[
+                omnb.c.filename,
+                omnb.c.obs_day,
+                omnb.c.sat_id,
+                omnb.c.sat_inst_id
+            ],
+            order_by=omnb.c.inserted_at.desc()
+        ).label('row_number')
+    ]).alias('subquery')
+
+    # Select only the rows where row_number is 1
+    query = select([subquery]).where(subquery.c.row_number == 1)
+
+    # Execute the query and fetch results into a DataFrame
+    result = itf.session.execute(query)
+    df = pandas.DataFrame(result.fetchall(), columns=result.keys())
+
+    # Close the session
+    itf.session.close()
+
+    return df
