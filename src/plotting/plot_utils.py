@@ -170,7 +170,7 @@ def get_non_duplicate_data_bufr():
     ]).alias('subquery')
 
     # Select only the rows where row_number is 1
-    query = select([subquery]).where(subquery.c.row_number == 1)
+    query = select([subquery]).where(subquery.row_number == 1)
 
     # Execute the query and fetch results into a DataFrame
     result = session.execute(query)
