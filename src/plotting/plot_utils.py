@@ -128,6 +128,7 @@ from sqlalchemy import MetaData, create_engine
 from sqlalchemy.sql import func, select
 from sqlalchemy.orm import sessionmaker
 from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsBufr as omnb
+from obs_inv_utils.inventory_table_factory import ObsInventory as oi
 import obs_inv_utils.inventory_table_factory as itf
 
 # # Assuming OBS_META_NCEPLIBS_BUFR_TABLE is defined as a string with the table name
@@ -210,7 +211,7 @@ def get_distinct_bufr():
     ).subquery()
 
     # Join the subquery with the main table to get the full records
-    query = session.query(omnb).join(
+    query = session.query(omnb, oi.parent_dir, oi.s3_bucket).join(
         subquery,
         (omnb.obs_id == subquery.c.obs_id) &
         (omnb.cmd_str == subquery.c.cmd_str) &
@@ -223,13 +224,25 @@ def get_distinct_bufr():
         (omnb.file_size == subquery.c.file_size) &
         (omnb.obs_day == subquery.c.obs_day) &
         (omnb.inserted_at == subquery.c.max_inserted_at)
+    ).join(
+        oi,
+        omnb.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
     )
 
     # Execute the query
     results = query.all()
 
     # Convert results to a list of dictionaries
-    result_dicts = [result.__dict__ for result in results]
+    result_dicts = [
+        {
+            **result[0].__dict__,
+            'parent_dir': result[1],
+            's3_bucket': result[2]
+        }
+        for result in results
+    ]
 
     # Remove the SQLAlchemy metadata from the dictionaries
     for result_dict in result_dicts:
