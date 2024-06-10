@@ -7,8 +7,12 @@ import pandas
 import os
 from datetime import datetime, date
 import glob
-from IPython.display import display
 import numpy as np
+from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsBufr as omnb
+from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsPrepbufr as omnp 
+from obs_inv_utils.inventory_table_factory import ObsInventory as oi
+import obs_inv_utils.inventory_table_factory as itf
+from sqlalchemy.sql import func
 
 #Dictionary of satellite names used for getting sat info files
 #For scripts to run successfully, they expect every sat we have data for to have a dictionary entry
@@ -124,31 +128,11 @@ def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
     ozinfo.datetime = pandas.to_datetime(ozinfo.datetime)
     return ozinfo
 
-from sqlalchemy import MetaData, create_engine
-from sqlalchemy.sql import func, select
-from sqlalchemy.orm import sessionmaker
-from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsBufr as omnb
-from obs_inv_utils.inventory_table_factory import ObsInventory as oi
-import obs_inv_utils.inventory_table_factory as itf
-
-# # Assuming OBS_META_NCEPLIBS_BUFR_TABLE is defined as a string with the table name
-# OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
-
-# # Define your database connection (replace with your actual connection details)
-# DATABASE_URL = "mysql+pymysql://user:password@localhost/dbname"
-# engine = create_engine(DATABASE_URL)
-# metadata = MetaData(bind=engine)
-# Session = sessionmaker(bind=engine)
-# session = Session()
-
-#returns a data frame subtracting the duplicates of filename, obs_day, sat_id, and sat_inst_id and keeping only the most recent one
-def get_non_duplicate_data_bufr():
+def get_distinct_bufr():
     session = itf.Session()
-    # Create a subquery with row numbers
-    subquery = select([
-        omnb.meta_id,
+    # Subquery to get the most recent inserted_at for each combination of other columns
+    subquery = session.query(
         omnb.obs_id,
-        omnb.cmd_result_id,
         omnb.cmd_str,
         omnb.sat_id,
         omnb.sat_id_name,
@@ -158,31 +142,67 @@ def get_non_duplicate_data_bufr():
         omnb.filename,
         omnb.file_size,
         omnb.obs_day,
-        omnb.inserted_at,
-        func.row_number().over(
-            partition_by=[
-                omnb.filename,
-                omnb.obs_day,
-                omnb.sat_id,
-                omnb.sat_inst_id
-            ],
-            order_by=omnb.inserted_at.desc()
-        ).label('row_number')
-    ]).alias('subquery')
+        func.max(omnb.inserted_at).label('max_inserted_at')
+    ).group_by(
+        omnb.obs_id,
+        omnb.cmd_str,
+        omnb.sat_id,
+        omnb.sat_id_name,
+        omnb.obs_count,
+        omnb.sat_inst_id,
+        omnb.sat_inst_desc,
+        omnb.filename,
+        omnb.file_size,
+        omnb.obs_day
+    ).subquery()
 
-    # Select only the rows where row_number is 1
-    query = select([subquery]).where(subquery.column.row_number == 1)
+    # Join the subquery with the main table to get the full records
+    query = session.query(omnb, oi.parent_dir, oi.s3_bucket).join(
+        subquery,
+        (omnb.obs_id == subquery.c.obs_id) &
+        (omnb.cmd_str == subquery.c.cmd_str) &
+        (omnb.sat_id == subquery.c.sat_id) &
+        (omnb.sat_id_name == subquery.c.sat_id_name) &
+        (omnb.obs_count == subquery.c.obs_count) &
+        (omnb.sat_inst_id == subquery.c.sat_inst_id) &
+        (omnb.sat_inst_desc == subquery.c.sat_inst_desc) &
+        (omnb.filename == subquery.c.filename) &
+        (omnb.file_size == subquery.c.file_size) &
+        (omnb.obs_day == subquery.c.obs_day) &
+        (omnb.inserted_at == subquery.c.max_inserted_at)
+    ).join(
+        oi,
+        omnb.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
 
-    # Execute the query and fetch results into a DataFrame
-    result = session.execute(query)
-    df = pandas.DataFrame(result.fetchall(), columns=result.keys())
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [
+        {
+            **result[0].__dict__,
+            'parent_dir': result[1],
+            's3_bucket': result[2]
+        }
+        for result in results
+    ]
+
+    # Remove the SQLAlchemy metadata from the dictionaries
+    for result_dict in result_dicts:
+        result_dict.pop('_sa_instance_state', None)
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
 
     # Close the session
     session.close()
 
     return df
 
-def get_distinct_bufr():
+def get_distinct_prepbufr():
     session = itf.Session()
     # Subquery to get the most recent inserted_at for each combination of other columns
     subquery = session.query(
