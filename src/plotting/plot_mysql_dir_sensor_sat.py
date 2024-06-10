@@ -78,7 +78,7 @@ print('connecting to mysql db')
 print("Data pulled from mysql database")
 
 # db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
-db_frame = utils.get_non_duplicate_data_bufr()
+db_frame = utils.get_distinct_bufr()
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)

@@ -180,3 +180,65 @@ def get_non_duplicate_data_bufr():
     session.close()
 
     return df
+
+def get_distinct_bufr():
+    session = itf.Session()
+    # Subquery to get the most recent inserted_at for each combination of other columns
+    subquery = session.query(
+        omnb.obs_id,
+        omnb.cmd_str,
+        omnb.sat_id,
+        omnb.sat_id_name,
+        omnb.obs_count,
+        omnb.sat_inst_id,
+        omnb.sat_inst_desc,
+        omnb.filename,
+        omnb.file_size,
+        omnb.obs_day,
+        func.max(omnb.inserted_at).label('max_inserted_at')
+    ).group_by(
+        omnb.obs_id,
+        omnb.cmd_str,
+        omnb.sat_id,
+        omnb.sat_id_name,
+        omnb.obs_count,
+        omnb.sat_inst_id,
+        omnb.sat_inst_desc,
+        omnb.filename,
+        omnb.file_size,
+        omnb.obs_day
+    ).subquery()
+
+    # Join the subquery with the main table to get the full records
+    query = session.query(omnb).join(
+        subquery,
+        (omnb.obs_id == subquery.c.obs_id) &
+        (omnb.cmd_str == subquery.c.cmd_str) &
+        (omnb.sat_id == subquery.c.sat_id) &
+        (omnb.sat_id_name == subquery.c.sat_id_name) &
+        (omnb.obs_count == subquery.c.obs_count) &
+        (omnb.sat_inst_id == subquery.c.sat_inst_id) &
+        (omnb.sat_inst_desc == subquery.c.sat_inst_desc) &
+        (omnb.filename == subquery.c.filename) &
+        (omnb.file_size == subquery.c.file_size) &
+        (omnb.obs_day == subquery.c.obs_day) &
+        (omnb.inserted_at == subquery.c.max_inserted_at)
+    )
+
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [result.__dict__ for result in results]
+
+    # Remove the SQLAlchemy metadata from the dictionaries
+    for result_dict in result_dicts:
+        result_dict.pop('_sa_instance_state', None)
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
