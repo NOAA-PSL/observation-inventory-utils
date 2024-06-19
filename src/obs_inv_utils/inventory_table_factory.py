@@ -51,7 +51,9 @@ else:
     OBS_DATABASE = f"sqlite:///{sqlite_database}"
     print('sqlite database: ' + OBS_DATABASE)   
 
-engine = db.create_engine(OBS_DATABASE, pool_size=150, max_overflow=0)
+# EDIT 1: `pool_size` doesnt work when using sqlite
+#engine = db.create_engine(OBS_DATABASE, pool_size=55, max_overflow=0)
+engine = db.create_engine(OBS_DATABASE, echo=True)
 Base = declarative_base()
 metadata = MetaData(engine)
 Session = sessionmaker(bind=engine)
