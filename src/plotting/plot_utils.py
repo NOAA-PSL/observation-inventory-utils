@@ -250,9 +250,6 @@ def get_distinct_prepbufr():
         omnp.obs_day
     ).subquery()
 
-    subquery_results = session.query(subquery).all()
-    print(f"Subquery Results: {subquery_results}")
-
     # Join the subquery with the main table to get the full records
     query = session.query(omnp, oi.parent_dir, oi.s3_bucket).join(
         subquery,
@@ -286,7 +283,6 @@ def get_distinct_prepbufr():
 
     # Execute the query
     results = query.all()
-    print(f"Query Results: {results}")
 
     # Convert results to a list of dictionaries
     result_dicts = [
