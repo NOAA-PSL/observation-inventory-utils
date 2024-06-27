@@ -48,12 +48,12 @@ print('connecting to mysql db')
 # db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size', 'typ'], keep='last')
 
 print('skipping bufr files')
-#db_frame1 = utils.get_distinct_bufr()
+db_frame1 = utils.get_distinct_bufr()
 print('bufr done, getting prepbufr')
-db_frame = utils.get_distinct_prepbufr()
+db_frame2 = utils.get_distinct_prepbufr()
 print('prepbufr done')
 
-#db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
+db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 print('concat done')
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
