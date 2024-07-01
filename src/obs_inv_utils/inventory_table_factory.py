@@ -21,37 +21,40 @@ OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE = 'obs_meta_nceplibs_prepbufr_aggregate'
 OBS_DATABASE = ''
 OBS_SQLITE_DEFAULT = 'observations_inventory.db'
 
-database_type = os.getenv('DATABASE_TYPE', 'sqlite')
-print('database type: ' + database_type)
-if(database_type.lower() == 'mysql'):
-    try: 
-        mysql_username = os.getenv('MYSQL_USERNAME')
-        mysql_password = os.getenv('MYSQL_PASSWORD')
-        mysql_host = os.getenv('MYSQL_HOST')
-        mysql_database = os.getenv('MYSQL_DATABASE')
+def get_engine():
+    database_type = os.getenv('DATABASE_TYPE', 'sqlite')
+    print('database type: ' + database_type)
+    if(database_type.lower() == 'mysql'):
+        try: 
+            mysql_username = os.getenv('MYSQL_USERNAME')
+            mysql_password = os.getenv('MYSQL_PASSWORD')
+            mysql_host = os.getenv('MYSQL_HOST')
+            mysql_database = os.getenv('MYSQL_DATABASE')
 
-        if(mysql_username == None or mysql_password == None or mysql_host == None or mysql_database == None):
-            raise Exception
-    except: 
-        print('There was an error pulling the required values for the MySQL database from the .env file.')
-        print('Required values for MySQL database: MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_DATABASE.')
+            if(mysql_username == None or mysql_password == None or mysql_host == None or mysql_database == None):
+                raise Exception
+        except: 
+            print('There was an error pulling the required values for the MySQL database from the .env file.')
+            print('Required values for MySQL database: MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_DATABASE.')
 
-    OBS_DATABASE = f'mysql+mysqlconnector://{mysql_username}:{mysql_password}@{mysql_host}:3306/{mysql_database}'
-else:
-    sqlite_database = OBS_SQLITE_DEFAULT
-    try: 
-        sqlite_database = os.getenv('SQLITE_DATABASE')
-        if(sqlite_database == None):
-            raise Exception
-    except:
-        print('No SQLITE_DATABASE value found in .env file. Defaulting to observations_inventory.db.')
+        OBS_DATABASE = f'mysql+mysqlconnector://{mysql_username}:{mysql_password}@{mysql_host}:3306/{mysql_database}'
+        return db.create_engine(OBS_DATABASE, pool_size=150, max_overflow=0)
+    else:
         sqlite_database = OBS_SQLITE_DEFAULT
-        pass
+        try: 
+            sqlite_database = os.getenv('SQLITE_DATABASE')
+            if(sqlite_database == None):
+                raise Exception
+        except:
+            print('No SQLITE_DATABASE value found in .env file. Defaulting to observations_inventory.db.')
+            sqlite_database = OBS_SQLITE_DEFAULT
+            pass
 
-    OBS_DATABASE = f"sqlite:///{sqlite_database}"
-    print('sqlite database: ' + OBS_DATABASE)   
-
-engine = db.create_engine(OBS_DATABASE, pool_size=150, max_overflow=0)
+        OBS_DATABASE = f"sqlite:///{sqlite_database}"
+        print('sqlite database: ' + OBS_DATABASE)
+        return db.create_engine(OBS_DATABASE)   
+    
+engine = get_engine()
 Base = declarative_base()
 metadata = MetaData(engine)
 Session = sessionmaker(bind=engine)
