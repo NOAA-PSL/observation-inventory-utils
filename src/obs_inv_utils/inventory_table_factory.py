@@ -25,8 +25,6 @@ database_type = os.getenv('DATABASE_TYPE', 'sqlite')
 print('database type: ' + database_type)
 
 def get_engine():
-    database_type = os.getenv('DATABASE_TYPE', 'sqlite')
-    print('database type: ' + database_type)
     if(database_type.lower() == 'mysql'):
         try: 
             mysql_username = os.getenv('MYSQL_USERNAME')
