@@ -21,6 +21,9 @@ OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE = 'obs_meta_nceplibs_prepbufr_aggregate'
 OBS_DATABASE = ''
 OBS_SQLITE_DEFAULT = 'observations_inventory.db'
 
+database_type = os.getenv('DATABASE_TYPE', 'sqlite')
+print('database type: ' + database_type)
+
 def get_engine():
     database_type = os.getenv('DATABASE_TYPE', 'sqlite')
     print('database type: ' + database_type)
