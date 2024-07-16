@@ -80,9 +80,6 @@ db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 
-#select only the gps rows 
-# db_frame = db_frame[(db_frame['sensor']=='gps')]
-
 #loop and plot sensors/sat_ids
 unique_sensor_sats = db_frame[['sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id_name'], ascending=[False, False])
 step=0.05
