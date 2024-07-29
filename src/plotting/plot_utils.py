@@ -133,7 +133,6 @@ def get_distinct_bufr():
     # Subquery to get the most recent inserted_at for each combination of other columns
     subquery = session.query(
         omnb.obs_id,
-        omnb.cmd_str,
         omnb.sat_id,
         omnb.sat_id_name,
         omnb.obs_count,
@@ -145,7 +144,6 @@ def get_distinct_bufr():
         func.max(omnb.inserted_at).label('max_inserted_at')
     ).group_by(
         omnb.obs_id,
-        omnb.cmd_str,
         omnb.sat_id,
         omnb.sat_id_name,
         omnb.obs_count,
@@ -157,15 +155,12 @@ def get_distinct_bufr():
     ).subquery()
 
     # Join the subquery with the main table to get the full records
-    query = session.query(omnb, oi.parent_dir, oi.s3_bucket).join(
+    query = session.query(omnb.obs_id, omnb.filename, omnb.sat_id, omnb.sat_id_name, omnb.obs_count, omnb.obs_day, omnb.file_size, oi.parent_dir, oi.s3_bucket).join(
         subquery,
         (omnb.obs_id == subquery.c.obs_id) &
-        (omnb.cmd_str == subquery.c.cmd_str) &
         (omnb.sat_id == subquery.c.sat_id) &
-        (omnb.sat_id_name == subquery.c.sat_id_name) &
         (omnb.obs_count == subquery.c.obs_count) &
         (omnb.sat_inst_id == subquery.c.sat_inst_id) &
-        (omnb.sat_inst_desc == subquery.c.sat_inst_desc) &
         (omnb.filename == subquery.c.filename) &
         (omnb.file_size == subquery.c.file_size) &
         (omnb.obs_day == subquery.c.obs_day) &
@@ -251,25 +246,13 @@ def get_distinct_prepbufr():
     ).subquery()
 
     # Join the subquery with the main table to get the full records
-    query = session.query(omnp, oi.parent_dir, oi.s3_bucket).join(
+    query = session.query(omnp.obs_id, omnp.variable, omnp.typ, omnp.tot, omnp.qm0thru3, omnp.filename, omnp.file_size, omnp.obs_day, oi.parent_dir, oi.s3_bucket).join(
         subquery,
         (omnp.obs_id == subquery.c.obs_id) &
-        (omnp.cmd_str == subquery.c.cmd_str) &
         (omnp.variable == subquery.c.variable) &
         (omnp.typ == subquery.c.typ) &
         (omnp.tot == subquery.c.tot) &
         (omnp.qm0thru3 == subquery.c.qm0thru3) &
-        (omnp.qm4thru7 == subquery.c.qm4thru7) &
-        (omnp.qm8 == subquery.c.qm8) &
-        (omnp.qm9 == subquery.c.qm9) &
-        (omnp.qm10 == subquery.c.qm10) &
-        (omnp.qm11 == subquery.c.qm11) &
-        (omnp.qm12 == subquery.c.qm12) &
-        (omnp.qm13 == subquery.c.qm13) &
-        (omnp.qm14 == subquery.c.qm14) &
-        (omnp.qm15 == subquery.c.qm15) &
-        (omnp.cka == subquery.c.cka) &
-        (omnp.ckb == subquery.c.ckb) &
         (omnp.filename == subquery.c.filename) &
         (omnp.file_size == subquery.c.file_size) &
         (omnp.obs_day == subquery.c.obs_day) &
