@@ -5,7 +5,7 @@ from collections import namedtuple, OrderedDict
 from obs_inv_utils import search_engine as se
 from sqlalchemy import Table, Column, MetaData
 from sqlalchemy import Integer, String, ForeignKey, Boolean, DateTime, Float
-from sqlalchemy import inspect
+from sqlalchemy import inspect, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -106,6 +106,7 @@ def create_obs_inventory_table():
               Column('permissions', String),
               Column('last_modified', DateTime),
               Column('inserted_at', DateTime),
+              Column('valid_at', DateTime)
         )
 
 
@@ -265,6 +266,18 @@ class CmdResult(Base):
 
 class ObsInventory(Base):
     __tablename__ = OBS_INVENTORY_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'filename',
+            'obs_day',
+            'platform',
+            's3_bucket',
+            'parent_dir',
+            'file_size',
+            'last_modified',
+            name='unique_obs_inventory'
+        ),
+    )
 
     obs_id = Column(Integer, primary_key=True)
     cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
@@ -285,12 +298,24 @@ class ObsInventory(Base):
     permissions = Column(String(15))
     last_modified = Column(DateTime())
     inserted_at = Column(DateTime())
+    valid_at = Column(DateTime())
 
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
 
 
 class ObsMetaNceplibsBufr(Base):
     __tablename__ = OBS_META_NCEPLIBS_BUFR_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'filename',
+            'obs_day',
+            'file_size',
+            'obs_id',
+            'sat_id',
+            'sat_inst_id',
+            name='unique_bufr_meta'
+        )
+    )
 
     meta_id = Column(Integer, primary_key=True)
     obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
@@ -311,6 +336,18 @@ class ObsMetaNceplibsBufr(Base):
 
 class ObsMetaNceplibsPrepbufr(Base):
     __tablename__ = OBS_META_NCEPLIBS_PREPBUFR_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'filename',
+            'obs_day',
+            'file_size',
+            'variable',
+            'typ',
+            'tot',
+            name='unqiue_prepbufr_meta'
+        )
+    )
 
     meta_id = Column(Integer, primary_key=True)
     obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
@@ -340,6 +377,17 @@ class ObsMetaNceplibsPrepbufr(Base):
 
 class ObsMetaNceplibsPrepbufrAggregate(Base):
     __tablename__ = OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'variable',
+            'tot',
+            'filename',
+            'file_size',
+            'obs_day',
+            name='unique_prebufr_agg_meta'
+        )
+    )
 
     meta_id = Column(Integer, primary_key=True)
     obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
