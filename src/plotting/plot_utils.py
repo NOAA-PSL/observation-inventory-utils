@@ -177,13 +177,19 @@ def get_distinct_bufr():
 
     # Convert results to a list of dictionaries
     result_dicts = [
-        {
-            **result[0].__dict__,
-            'parent_dir': result[1],
-            's3_bucket': result[2]
-        }
-        for result in results
-    ]
+    {
+        'obs_id': result.obs_id,
+        'filename': result.filename,
+        'sat_id': result.sat_id,
+        'sat_id_name': result.sat_id_name,
+        'obs_count': result.obs_count,
+        'obs_day': result.obs_day,
+        'file_size': result.file_size,
+        'parent_dir': result.parent_dir,
+        's3_bucket': result.s3_bucket
+    }
+    for result in results
+]
 
     # Remove the SQLAlchemy metadata from the dictionaries
     for result_dict in result_dicts:
@@ -270,9 +276,16 @@ def get_distinct_prepbufr():
     # Convert results to a list of dictionaries
     result_dicts = [
         {
-            **result[0].__dict__,
-            'parent_dir': result[1],
-            's3_bucket': result[2]
+            'obs_id': result.obs_id,
+            'variable': result.variable,
+            'typ': result.typ,
+            'tot': result.tot,
+            'qm0thru3': result.qm0thru3,
+            'filename': result.filename,
+            'file_size': result.file_size,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
         }
         for result in results
     ]
