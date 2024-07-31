@@ -446,6 +446,7 @@ def insert_obs_inv_items(obs_inv_items):
             permissions=obs_item.permissions,
             last_modified=obs_item.last_modified,
             inserted_at=obs_item.inserted_at,
+            valid_at=obs_item.valid_at,
         )
         rows.append(tbl_item)
 

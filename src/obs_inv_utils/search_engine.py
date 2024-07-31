@@ -55,6 +55,7 @@ TarballFileMeta = namedtuple(
         'submitted_at',
         'latency',
         'inserted_at',
+        'valid_at',
         'etag'
     ],
 )
@@ -244,6 +245,7 @@ def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
             contents.submitted_at,
             contents.latency,
             datetime.utcnow(),
+            datetime.utcnow(),
             listed_object.etag
         )
         files_meta.append(file_meta)
@@ -286,6 +288,7 @@ def process_aws_s3_clean_resp(cmd_result_id, contents):
             contents.submitted_at,
             contents.latency,
             datetime.utcnow(),
+            datetime.utcnow(),
             listed_object.etag
     ))
 
@@ -325,6 +328,7 @@ def process_inspect_tarball_resp(cmd_result_id, contents):
             inspected_file.last_modified,
             contents.submitted_at,
             contents.latency,
+            datetime.utcnow(),
             datetime.utcnow(),
             ''
         )
