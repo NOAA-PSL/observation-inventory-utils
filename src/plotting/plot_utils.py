@@ -177,23 +177,19 @@ def get_distinct_bufr():
 
     # Convert results to a list of dictionaries
     result_dicts = [
-    {
-        'obs_id': result.obs_id,
-        'filename': result.filename,
-        'sat_id': result.sat_id,
-        'sat_id_name': result.sat_id_name,
-        'obs_count': result.obs_count,
-        'obs_day': result.obs_day,
-        'file_size': result.file_size,
-        'parent_dir': result.parent_dir,
-        's3_bucket': result.s3_bucket
-    }
-    for result in results
-]
-
-    # Remove the SQLAlchemy metadata from the dictionaries
-    for result_dict in result_dicts:
-        result_dict.pop('_sa_instance_state', None)
+        {
+            'obs_id': result.obs_id,
+            'filename': result.filename,
+            'sat_id': result.sat_id,
+            'sat_id_name': result.sat_id_name,
+            'obs_count': result.obs_count,
+            'obs_day': result.obs_day,
+            'file_size': result.file_size,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
+        }
+        for result in results
+    ]
 
     # Convert the list of dictionaries to a pandas DataFrame
     df = pandas.DataFrame(result_dicts)
@@ -289,10 +285,6 @@ def get_distinct_prepbufr():
         }
         for result in results
     ]
-
-    # Remove the SQLAlchemy metadata from the dictionaries
-    for result_dict in result_dicts:
-        result_dict.pop('_sa_instance_state', None)
 
     # Convert the list of dictionaries to a pandas DataFrame
     df = pandas.DataFrame(result_dicts)
