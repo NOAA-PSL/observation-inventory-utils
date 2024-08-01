@@ -7,8 +7,12 @@ import pandas
 import os
 from datetime import datetime, date
 import glob
-from IPython.display import display
 import numpy as np
+from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsBufr as omnb
+from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsPrepbufr as omnp 
+from obs_inv_utils.inventory_table_factory import ObsInventory as oi
+import obs_inv_utils.inventory_table_factory as itf
+from sqlalchemy.sql import func
 
 #Dictionary of satellite names used for getting sat info files
 #For scripts to run successfully, they expect every sat we have data for to have a dictionary entry
@@ -35,11 +39,11 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                "SAC-C":"SAC C","TerraSAR-X":"TerraSAR-X","TERRA":"TERRA",
                "ERS 2":"ERS 2", "GMS 3" : "GMS 3 ","GMS 4":"GMS 4","GMS 5":"GMS 5",
                "INSAT 3A":"INSAT 3A","INSAT 3D":"INSAT 3D","INSAT 3DR":"INSAT 3DR",
-               "TIROS-N": "TIROS-N",  "Megha-Tropiques": "meghat",
+               "TIROS-N": "tirosn",  "Megha-Tropiques": "meghat",
                 "TanDEM-X": "TanDEM-X", "PAZ":"PAZ", "KOMPSAT-5": "KOMPSAT-5",
-               "LANDSAT 5":"LANDSAT 5", "GPM-core":"GPM-core", "TRMM":"TRMM",
+               "LANDSAT 5":"LANDSAT 5", "GPM-core":"gpm", "TRMM":"TRMM",
                "Himawari-8":"himawari8", "Himawari-9":"himawari9", "Spire Lemur 3U C":"Spire L3UC", "Sentinel 6A":"Sentinel 6A",
-               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"AURA"}
+               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"aura", "NIMBUS 7":"nim07"}
 
 #Dictionary for translating typ numbers from cmpbqm output into their full names
 typ_dictionary = {
@@ -71,7 +75,9 @@ satinfo_translate_dictionary={
     "avhrr_n16":"avhrr3_n16", "avhrr_n17":"avhrr3_n17", "avhrr_n18":"avhrr3_n18", "avhrr_n19":"avhrr3_n19",
     "goesnd_g11":"sndrD_g11", "goesnd_g12":"sndrD_g12", "goesnd_g13":"sndrD_g13", "goesnd_g14":"sndrD_g14",
     "goesnd_g15":"sndrD_g15", "goesnd_g08":"sndr_g08", "goesnd_g10":"sndr_g10", "goesnd_g11":"sndr_g11",
-    "goesnd_g12":"sndr_g12", "crisf4_n20":"cris-fsr_n20", "crisf4_n21":"cris-fsr_n21", "crisf4_npp":"cris-fsr_npp"
+    "goesnd_g12":"sndr_g12", "crisf4_n20":"cris-fsr_n20", "crisf4_n21":"cris-fsr_n21", "crisf4_npp":"cris-fsr_npp",
+    "cfsr_n09":"sbuv2_n09", "cfsr_n11":"sbuv2_n11", "cfsr_n14":"sbuv2_n14", "cfsr_n16":"sbuv2_n16", "cfsr_n17":"sbuv2_n17",
+    "cfsr_n18":"sbuv2_n18", "cfsr_n19":"sbuv2_n19", "cfsr_nim07":"sbuv2_nim07"
 }
 
 #function for reading from raw satinfo files which is standard across the various plot scripts 
@@ -97,3 +103,169 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
     satinfo.loc[len(satinfo.index)]=[date(2100,1,1), satinfo.status.iat[-1], satinfo.status_nan.iat[-1]]    
     satinfo.datetime = pandas.to_datetime(satinfo.datetime)
     return satinfo
+
+def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
+    if ozinfo_string in satinfo_translate_dictionary:
+            ozinfo_string = satinfo_translate_dictionary[ozinfo_string]
+    ozinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
+    for fn in glob.glob(os.path.join(ozinfo_db_root,ozinfo_string,'??????????')):
+        pd_tmp = pandas.read_csv(os.path.join(ozinfo_db_root,ozinfo_string,os.path.basename(fn))
+            ,header=None,sep='\s+'
+            ,names=['sensor','ch_num','status','pressure_level','gross_error','ob_error','b_oz','pg_oz'])
+        tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
+            ,columns=['datetime','status'])
+        ozinfo=pandas.concat([ozinfo,tmp_frame])
+    #if empty make 
+    if (ozinfo.empty):
+      print(f'Empty ozinfo: {ozinfo_string}')
+      ozinfo.loc[len(ozinfo.index)] = [date(1900,1,1), False, np.nan]
+      ozinfo.loc[len(ozinfo.index)] = [date(2100,1,1), False, np.nan]
+    #convert logical to floats with nans for plotting
+    ozinfo['status_nan'] = ozinfo.status.astype('int')
+    ozinfo['status_nan'].replace(0, np.nan, inplace=True)
+    #make sure the end of the series is in the future
+    ozinfo.loc[len(ozinfo.index)]=[date(2100,1,1), ozinfo.status.iat[-1], ozinfo.status_nan.iat[-1]]    
+    ozinfo.datetime = pandas.to_datetime(ozinfo.datetime)
+    return ozinfo
+
+def get_distinct_bufr():
+    session = itf.Session()
+    # Subquery to get the most recent inserted_at for each combination of other columns
+    subquery = session.query(
+        omnb.obs_id,
+        omnb.sat_id,
+        omnb.sat_id_name,
+        omnb.obs_count,
+        omnb.sat_inst_id,
+        omnb.sat_inst_desc,
+        omnb.filename,
+        omnb.file_size,
+        omnb.obs_day,
+        func.max(omnb.inserted_at).label('max_inserted_at')
+    ).group_by(
+        omnb.obs_id,
+        omnb.sat_id,
+        omnb.sat_id_name,
+        omnb.obs_count,
+        omnb.sat_inst_id,
+        omnb.sat_inst_desc,
+        omnb.filename,
+        omnb.file_size,
+        omnb.obs_day
+    ).subquery()
+
+    # Join the subquery with the main table to get the full records
+    query = session.query(omnb.obs_id, omnb.filename, omnb.sat_id, omnb.sat_id_name, omnb.obs_count, omnb.obs_day, omnb.file_size, oi.parent_dir, oi.s3_bucket).join(
+        subquery,
+        (omnb.obs_id == subquery.c.obs_id) &
+        (omnb.sat_id == subquery.c.sat_id) &
+        (omnb.obs_count == subquery.c.obs_count) &
+        (omnb.sat_inst_id == subquery.c.sat_inst_id) &
+        (omnb.filename == subquery.c.filename) &
+        (omnb.file_size == subquery.c.file_size) &
+        (omnb.obs_day == subquery.c.obs_day) &
+        (omnb.inserted_at == subquery.c.max_inserted_at)
+    ).join(
+        oi,
+        omnb.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [
+        {
+            'obs_id': result.obs_id,
+            'filename': result.filename,
+            'sat_id': result.sat_id,
+            'sat_id_name': result.sat_id_name,
+            'obs_count': result.obs_count,
+            'obs_day': result.obs_day,
+            'file_size': result.file_size,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
+
+def get_distinct_prepbufr():
+    session = itf.Session()
+    # Subquery to get the most recent inserted_at for each combination of other columns
+    subquery = session.query(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day,
+        func.max(omnp.inserted_at).label('max_inserted_at')
+    ).group_by(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day
+    ).subquery()
+
+    # Join the subquery with the main table to get the full records
+    query = session.query(omnp.obs_id, omnp.variable, omnp.typ, omnp.tot, omnp.qm0thru3, omnp.filename, omnp.file_size, omnp.obs_day, oi.parent_dir, oi.s3_bucket).join(
+        subquery,
+        (omnp.obs_id == subquery.c.obs_id) &
+        (omnp.variable == subquery.c.variable) &
+        (omnp.typ == subquery.c.typ) &
+        (omnp.tot == subquery.c.tot) &
+        (omnp.qm0thru3 == subquery.c.qm0thru3) &
+        (omnp.filename == subquery.c.filename) &
+        (omnp.file_size == subquery.c.file_size) &
+        (omnp.obs_day == subquery.c.obs_day) &
+        (omnp.inserted_at == subquery.c.max_inserted_at)
+    ).join(
+        oi,
+        omnp.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [
+        {
+            'obs_id': result.obs_id,
+            'variable': result.variable,
+            'typ': result.typ,
+            'tot': result.tot,
+            'qm0thru3': result.qm0thru3,
+            'filename': result.filename,
+            'file_size': result.file_size,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
