@@ -8,6 +8,7 @@ from datetime import datetime, date
 import matplotlib.dates as mdates
 import os
 import argparse
+import plot_utils as utils
 import obs_inv_utils.inventory_table_factory as itf
 
 #argparse section
@@ -33,20 +34,14 @@ def get_sensor(row):
 
 
 #read data from sql database of obs counts
-print('connecting to mysql db')
-mysql_conn = itf.engine.connect()
-#BUFR FILE INFO
-sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
-data = pandas.read_sql(sql, mysql_conn)
-db_frame1 = data.sort_values('inserted_at'
-        ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
-
-#PREPBUFR FILE INFO 
-sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
-data2 = pandas.read_sql(sql2, mysql_conn)
-db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size', 'typ'], keep='last')
+print('getting data from database')
+db_frame1 = utils.get_distinct_bufr()
+print('bufr done, getting prepbufr')
+db_frame2 = utils.get_distinct_prepbufr()
+print('prepbufr done')
 
 db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
+print('concat done')
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
@@ -98,4 +93,3 @@ if args.dev:
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
-mysql_conn.close()

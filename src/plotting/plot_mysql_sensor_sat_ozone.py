@@ -54,40 +54,30 @@ def get_sensor(row):
     sensor = directory.split("/")[2]
     return sensor
 
-def get_subsensor(row):
-    directory = row['parent_dir']
-    subsensor = directory.split("/")[3]
-    return subsensor
-
 def get_source_dir(row):
     directory = row['parent_dir']
     directory = directory.replace("observations/reanalysis", "")
     source_dir = re.split("/[12][90][0-9][0-9]/[01][0-9]/", directory)[0]
     return source_dir
 
+def get_subsensor(row):
+    source_dir = get_source_dir(row)
+    subsensor = source_dir.split("/")[-1]
+    return subsensor
+
 #read data from sql database of obs counts
 print('connecting to mysql db')
 mysql_conn = itf.engine.connect()
 #BUFR FILE INFO
-sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
+sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\' AND o.parent_dir LIKE 'observations/reanalysis/ozone/%' """
 data = pandas.read_sql(sql, mysql_conn)
-db_frame1 = data.sort_values('inserted_at'
+db_frame = data.sort_values('inserted_at'
         ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
-
-#PREPBUFR FILE INFO 
-sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
-data2 = pandas.read_sql(sql2, mysql_conn)
-db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size', 'typ'], keep='last')
-
-db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 db_frame['subsensor'] = db_frame.apply(get_subsensor, axis=1)
 db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
-
-#select only amv rows
-db_frame = db_frame[(db_frame['sensor']=='ozone')]
 
 #loop and plot sensors/sat_ids
 unique_sensor_sats = db_frame[['sensor', 'subsensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id', 'sat_id_name'], ascending=[False, False, False])
@@ -113,12 +103,14 @@ directory_labels = []
 counter=0
 for index, row in unique_sensor_sats.iterrows():
     try:
-        satinfo_string_ = row['sensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
+        satinfo_string_ = row['subsensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
+        print(satinfo_string_)
     except KeyError as err:
         print(f'unable to get satinfo string for row: {row}')
         print(f'Error: {err}')
-        satinfo_string_ = row['sensor']
-    satinfo = utils.read_satinfo_files(satinfo_db_root,satinfo_string_)
+        satinfo_string_ = row['subsensor']
+    satinfo = utils.read_ozinfo_files(satinfo_db_root,satinfo_string_)
+    print(f'satinfo for {satinfo_string_}: {satinfo}')
 
     pandas.options.mode.chained_assignment = None
     dftmp = select_subsensor_satellite_combo(row['subsensor'], row['sat_id'], db_frame, satinfo)

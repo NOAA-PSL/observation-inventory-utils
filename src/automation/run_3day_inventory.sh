@@ -4,6 +4,7 @@
 # the new data.
 
 SATINFO_DIR=/home/$USER/obs-inventory/build_gsinfo/satinfo
+OZINFO_DIR=/home/$USER/obs-inventory/build_gsinfo/ozinfo
 OUTPUT_LOC=/home/$USER/inventory-figures
 WORK_DIR=/lustre/home/work/inventory-work
 
@@ -14,10 +15,12 @@ source ../../obs_inv_utils_pw_cloud.sh
 #run inventory 
 python3 auto_inventory.py -cat atmosphere -ago 3 -n_jobs 150 -work_dir $WORK_DIR 
 
-#run all plots in parallel
-python3 ../plotting/plot_mysql_dir_sensor_sat.py --sidb $SATINFO_DIR -o $OUTPUT_LOC &
+#run plots individually to prevent connection / memory problems 
+python3 ../plotting/plot_mysql_dir_sensor_sat.py --sidb $SATINFO_DIR -o $OUTPUT_LOC 
 python3 ../plotting/plot_mysql_sensor.py -o $OUTPUT_LOC 
-python3 ../plotting/plot_mysql_sensor_sat_amv.py --sidb $SATINFO_DIR -o $OUTPUT_LOC &
+python3 ../plotting/plot_mysql_sensor_sat_amv.py --sidb $SATINFO_DIR -o $OUTPUT_LOC 
 python3 ../plotting/plot_mysql_sensor_sat_geo.py --sidb $SATINFO_DIR -o $OUTPUT_LOC 
-python3 ../plotting/plot_mysql_sensor_sat_gps.py --sidb $SATINFO_DIR -o $OUTPUT_LOC &
+python3 ../plotting/plot_mysql_sensor_sat_gps.py --sidb $SATINFO_DIR -o $OUTPUT_LOC
+python3 ../plotting/plot_mysql_sensor_sat_ozone.py --sidb $OZINFO_DIR -o $OUTPUT_LOC
 python3 ../plotting/plot_mysql_typ.py -o $OUTPUT_LOC 
+

@@ -62,22 +62,9 @@ def get_source_dir(row):
 
 
 #read data from sql database of obs counts
-print('connecting to mysql db')
-mysql_conn = itf.engine.connect()
-#BUFR FILE INFO
-sql = f"""select m.*, o.parent_dir, o.s3_bucket from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
-data = pandas.read_sql(sql, mysql_conn)
-db_frame1 = data.sort_values('inserted_at'
-        ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
-
-#PREPBUFR FILE INFO 
-sql2 = f"""select m.*, o.parent_dir, o.s3_bucket from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
-data2 = pandas.read_sql(sql2, mysql_conn)
-db_frame2 = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size', 'typ'], keep='last')
-
+print('connecting to mysql db') 
+db_frame = utils.get_distinct_bufr()
 print("Data pulled from mysql database")
-
-db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
@@ -92,6 +79,9 @@ db_frame.drop(index_amv, inplace=True)
 
 index_geo = db_frame[(db_frame['sensor']=='geo')].index
 db_frame.drop(index_geo, inplace=True)
+
+index_ozone = db_frame[(db_frame['sensor']=='ozone')].index
+db_frame.drop(index_ozone, inplace=True)
 
 #loop and plot sensors/sat_ids
 unique_dir_sensor_sats = db_frame[['source_dir', 'sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'source_dir', 'sat_id_name'], ascending=[False, False, False])
@@ -162,4 +152,3 @@ if args.dev:
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
-mysql_conn.close()
