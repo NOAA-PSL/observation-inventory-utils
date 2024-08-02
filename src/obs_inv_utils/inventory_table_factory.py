@@ -451,6 +451,7 @@ def insert_obs_inv_items(obs_inv_items):
         )
         rows.append(tbl_item)
 
+    #my sql version
     statement = insert(ObsInventory).values(rows)
     statement = statement.on_duplicate_key_update(
         valid_at=statement.inserted.valid_at
