@@ -425,31 +425,31 @@ def insert_obs_inv_items(obs_inv_items):
     for obs_item in obs_inv_items:
         if not isinstance(obs_item, se.TarballFileMeta):
             msg = 'Each observation inventory item must be in the form' \
-                  f' of TarballFileMeta. Item type: {type(obs_item)}'
+                f' of TarballFileMeta. Item type: {type(obs_item)}'
             raise TypeError(msg)
 
-        tbl_item = ObsInventory(
-            cmd_result_id=obs_item.cmd_result_id,
-            filename=obs_item.filename,
-            parent_dir=obs_item.parent_dir,
-            platform=obs_item.platform,
-            s3_bucket=obs_item.s3_bucket,
-            prefix=obs_item.prefix,
-            cycle_tag=obs_item.cycle_tag,
-            data_type=obs_item.data_type,
-            cycle_time=obs_item.cycle_time,
-            obs_day=obs_item.obs_day,
-            data_format=obs_item.data_format,
-            suffix=obs_item.suffix,
-            nr_tag=obs_item.nr_tag,
-            file_size=obs_item.file_size,
-            etag=obs_item.etag,
-            permissions=obs_item.permissions,
-            last_modified=obs_item.last_modified,
-            inserted_at=obs_item.inserted_at,
-            valid_at=obs_item.valid_at,
-        )
-        rows.append(tbl_item)
+        row = {
+            'cmd_result_id': obs_item.cmd_result_id,
+            'filename': obs_item.filename,
+            'parent_dir': obs_item.parent_dir,
+            'platform': obs_item.platform,
+            's3_bucket': obs_item.s3_bucket,
+            'prefix': obs_item.prefix,
+            'cycle_tag': obs_item.cycle_tag,
+            'data_type': obs_item.data_type,
+            'cycle_time': obs_item.cycle_time,
+            'obs_day': obs_item.obs_day,
+            'data_format': obs_item.data_format,
+            'suffix': obs_item.suffix,
+            'nr_tag': obs_item.nr_tag,
+            'file_size': obs_item.file_size,
+            'etag': obs_item.etag,
+            'permissions': obs_item.permissions,
+            'last_modified': obs_item.last_modified,
+            'inserted_at': obs_item.inserted_at,
+            'valid_at': obs_item.valid_at,
+        }
+        rows.append(row)
 
     statement = insert(ObsInventory).values(rows)
 
