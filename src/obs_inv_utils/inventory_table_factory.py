@@ -451,11 +451,15 @@ def insert_obs_inv_items(obs_inv_items):
         )
         rows.append(tbl_item)
 
-    #my sql version
     statement = insert(ObsInventory).values(rows)
-    statement = statement.on_duplicate_key_update(
-        valid_at=statement.inserted.valid_at
-    )
+
+    #handle the best way available for each database type
+    if(database_type.lower() == 'mysql'):
+        statement = statement.on_duplicate_key_update(
+            valid_at=statement.inserted.valid_at
+        )
+    else:
+        statement = statement.prefix_with("OR REPLACE")
 
     session = Session()
     session.execute(statement)
