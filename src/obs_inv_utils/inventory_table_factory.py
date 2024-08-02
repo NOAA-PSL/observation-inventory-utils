@@ -315,7 +315,7 @@ class ObsMetaNceplibsBufr(Base):
             'sat_id',
             'sat_inst_id',
             name='unique_bufr_meta'
-        )
+        ),
     )
 
     meta_id = Column(Integer, primary_key=True)
@@ -347,7 +347,7 @@ class ObsMetaNceplibsPrepbufr(Base):
             'typ',
             'tot',
             name='unqiue_prepbufr_meta'
-        )
+        ),
     )
 
     meta_id = Column(Integer, primary_key=True)
@@ -387,7 +387,7 @@ class ObsMetaNceplibsPrepbufrAggregate(Base):
             'file_size',
             'obs_day',
             name='unique_prebufr_agg_meta'
-        )
+        ),
     )
 
     meta_id = Column(Integer, primary_key=True)
