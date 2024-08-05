@@ -106,7 +106,17 @@ def create_obs_inventory_table():
               Column('permissions', String),
               Column('last_modified', DateTime),
               Column('inserted_at', DateTime),
-              Column('valid_at', DateTime)
+              Column('valid_at', DateTime),
+              UniqueConstraint(
+                'filename',
+                'obs_day',
+                'platform',
+                's3_bucket',
+                'parent_dir',
+                'file_size',
+                'last_modified',
+                'etag',
+                name='unique_obs_inventory' )
         )
 
 
@@ -162,6 +172,15 @@ def create_obs_meta_nceplibs_bufr_table():
               Column('file_size', Integer),
               Column('obs_day', DateTime),
               Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'filename',
+                'obs_day',
+                'file_size',
+                'obs_id',
+                'sat_id',
+                'sat_inst_id',
+                name='unique_bufr_meta'
+            )
         )
 
 def create_obs_meta_nceplibs_prepbufr_table():
@@ -203,7 +222,17 @@ def create_obs_meta_nceplibs_prepbufr_table():
               Column('filename', String),
               Column('file_size', Integer),
               Column('obs_day', DateTime),
-              Column('inserted_at', DateTime)
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'filename',
+                'obs_day',
+                'file_size',
+                'variable',
+                'typ',
+                'tot',
+                name='unqiue_prepbufr_meta'
+            )
         )
 
 def create_obs_meta_nceplibs_prepbufr_agg_table():
@@ -244,7 +273,16 @@ def create_obs_meta_nceplibs_prepbufr_agg_table():
               Column('filename', String),
               Column('file_size', Integer),
               Column('obs_day', DateTime),
-              Column('inserted_at', DateTime)
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'variable',
+                'tot',
+                'filename',
+                'file_size',
+                'obs_day',
+                name='unique_prebufr_agg_meta'
+            )
         )
 
 class CmdResult(Base):
@@ -459,7 +497,18 @@ def insert_obs_inv_items(obs_inv_items):
             valid_at=statement.inserted.valid_at
         )
     else:
-        statement = statement.prefix_with("OR REPLACE")
+        #sqlite specific
+        statement = statement.on_conflict_do_update(
+            index_elements=['filename',
+            'obs_day',
+            'platform',
+            's3_bucket',
+            'parent_dir',
+            'file_size',
+            'last_modified',
+            'etag'],
+            set_={'valid_at': statement.excluded.valid_at}
+        )
 
     session = Session()
     session.execute(statement)
