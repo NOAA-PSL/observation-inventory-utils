@@ -9,6 +9,8 @@ from sqlalchemy import inspect, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.dialects.mysql import insert as mysql_insert
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -489,15 +491,15 @@ def insert_obs_inv_items(obs_inv_items):
         }
         rows.append(row)
 
-    statement = insert(ObsInventory).values(rows)
-
     #handle the best way available for each database type
     if(database_type.lower() == 'mysql'):
+        statement = mysql_insert(ObsInventory).values(rows)
         statement = statement.on_duplicate_key_update(
             valid_at=statement.inserted.valid_at
         )
     else:
         #sqlite specific
+        statement = sqlite_insert(ObsInventory).values(rows)
         statement = statement.on_conflict_do_update(
             index_elements=['filename',
             'obs_day',
