@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.mysql import insert as mysql_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+import hashlib
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -107,14 +108,12 @@ def create_obs_inventory_table():
               Column('etag', String),
               Column('permissions', String),
               Column('last_modified', DateTime),
+              Column('unique_hash', String),
               Column('inserted_at', DateTime),
               Column('valid_at', DateTime),
               UniqueConstraint(
-                'filename',
+                'unique_hash',
                 'obs_day',
-                'platform',
-                's3_bucket',
-                'parent_dir',
                 'file_size',
                 'last_modified',
                 'etag',
@@ -308,11 +307,8 @@ class ObsInventory(Base):
     __tablename__ = OBS_INVENTORY_TABLE
     __table_args__ = (
         UniqueConstraint(
-            'filename',
+            'unique_hash',
             'obs_day',
-            'platform',
-            's3_bucket',
-            'parent_dir',
             'file_size',
             'last_modified',
             'etag',
@@ -338,6 +334,7 @@ class ObsInventory(Base):
     etag = Column(String(34))
     permissions = Column(String(15))
     last_modified = Column(DateTime())
+    unique_hash = Column(String(64))
     inserted_at = Column(DateTime())
     valid_at = Column(DateTime())
 
@@ -455,6 +452,10 @@ class ObsMetaNceplibsPrepbufrAggregate(Base):
 
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
 
+def generate_obs_inventory_hash(filename, parent_dir, platform, s3_bucket):
+    hash_input = f"{filename}{parent_dir}{platform}{s3_bucket}"
+    return hashlib.md5(hash_input.encode('utf-8')).hexdigest()
+
 def insert_obs_inv_items(obs_inv_items):
     if not isinstance(obs_inv_items, list):
         msg = 'Inserted observation inventory items must be in the form' \
@@ -467,6 +468,9 @@ def insert_obs_inv_items(obs_inv_items):
             msg = 'Each observation inventory item must be in the form' \
                 f' of TarballFileMeta. Item type: {type(obs_item)}'
             raise TypeError(msg)
+
+        hash_value = generate_obs_inventory_hash(obs_item.filename, obs_item.parent_dir, obs_item.platform,
+                                                 obs_item.s3_bucket)
 
         row = {
             'cmd_result_id': obs_item.cmd_result_id,
@@ -486,6 +490,7 @@ def insert_obs_inv_items(obs_inv_items):
             'etag': obs_item.etag,
             'permissions': obs_item.permissions,
             'last_modified': obs_item.last_modified,
+            'unique_hash': hash_value,
             'inserted_at': obs_item.inserted_at,
             'valid_at': obs_item.valid_at,
         }
