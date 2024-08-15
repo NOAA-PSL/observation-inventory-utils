@@ -570,7 +570,7 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
                 'sat_inst_desc': item.sat_inst_desc,
                 'filename': item.filename,
                 'file_size': item.file_size,
-                'obs_day': item.obs_day,
+                'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
                 'inserted_at': datetime.utcnow()
             }
         rows.append(row)
@@ -625,7 +625,7 @@ def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
             'ckb': item.ckb,
             'filename': item.filename,
             'file_size': item.file_size,
-            'obs_day': item.obs_day,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
             'inserted_at': datetime.utcnow()
         }
         rows.append(row)
@@ -677,7 +677,7 @@ def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
             'ckb': item.ckb,
             'filename': item.filename,
             'file_size': item.file_size,
-            'obs_day': item.obs_day,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
             'inserted_at': datetime.utcnow()
         }
         rows.append(row)
