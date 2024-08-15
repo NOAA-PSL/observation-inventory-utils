@@ -1,12 +1,12 @@
 import os
 import sqlalchemy as db
 from datetime import datetime
-from collections import namedtuple, OrderedDict
+from collections import namedtuple
 from obs_inv_utils import search_engine as se
-from sqlalchemy import Table, Column, MetaData, insert, text
+from sqlalchemy import Table, Column, MetaData, text
 from sqlalchemy import Integer, String, ForeignKey, Boolean, DateTime, Float
 from sqlalchemy import inspect, UniqueConstraint
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.mysql import insert as mysql_insert
