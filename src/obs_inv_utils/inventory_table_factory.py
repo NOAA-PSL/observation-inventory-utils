@@ -506,11 +506,8 @@ def insert_obs_inv_items(obs_inv_items):
         #sqlite specific
         statement = sqlite_insert(ObsInventory).values(rows)
         statement = statement.on_conflict_do_update(
-            index_elements=['filename',
+            index_elements=['unique_hash',
             'obs_day',
-            'platform',
-            's3_bucket',
-            'parent_dir',
             'file_size',
             'last_modified',
             'etag'],
