@@ -1,0 +1,8 @@
+#!/bin/bash
+
+python $OBS_INV_UTILS/obs_inv_cli.py get-obs-inventory -c $OBS_INV_HOME_DIR/src/tests/discover-interface/test_get_obs_aws.yaml ;
+python $OBS_INV_UTILS/obs_inv_cli.py get-obs-inventory -c $OBS_INV_HOME_DIR/src/tests/discover-interface/test_get_obs_discover.yaml
+
+python $OBS_INV_UTILS/obs_inv_cli.py get-obs-count-meta-sinv -c $OBS_INV_HOME_DIR/src/tests/discover-interface/test_get_sinv_aws.yaml ; 
+python $OBS_INV_UTILS/obs_inv_cli.py get-obs-count-meta-sinv -c $OBS_INV_HOME_DIR/src/tests/discover-interface/test_get_sinv_discover.yaml ;
+

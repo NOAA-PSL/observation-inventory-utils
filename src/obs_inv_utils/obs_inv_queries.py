@@ -66,11 +66,7 @@ def get_family_fs_data(obs_family):
         oi
     ).filter(
         and_(
-            #oi.platform.like('%discover%'),
             oi.platform != None,
-            #or_(
-            #    oi.platform.like('%aws_s3%')
-            #),
             or_(
                 oi.filename.like(fn) for fn in filenames
             )
@@ -175,12 +171,6 @@ def get_bufr_files_data(filenames, start, end):
     for filename in filenames:
         unique_filenames.add(filename)
 
-
-    unique_platforms = set()
-    unique_platforms.add('discover')
-    unique_platforms.add('aws_s3')
-    print(f'unique_platforms: {unique_platforms}')
- 
     fn_fs = session.query(
         oi.obs_id,
         oi.prefix.label('prefix'),
@@ -199,16 +189,7 @@ def get_bufr_files_data(filenames, start, end):
         oi
     ).filter(
         and_(
-            #oi.platform == 'discover',
-            #oi.platform == 'aws_s3',
-            #oi.platform.like('%discover%'),
-            #oi.platform.like('%aws_s3%'),
             oi.platform != None,
-            #oi.platform.like(p) for p in unique_platforms,
-            #or_(
-                #oi.platform.like('%aws_s3%')
-            #    oi.platform.like(p) for p in unique_platforms
-            #),
             or_(
                 oi.filename.like(fn) for fn in unique_filenames
             ),
@@ -227,8 +208,6 @@ def get_bufr_files_data(filenames, start, end):
     print(f'type(fn_fs): {type(fn_fs)}')
     print(f'fn_fs: {fn_fs}')
 
-    #df = DataFrame(fn_fs, columns= ['obs_id', 'prefix', 'filename', 'cycle_tag', 'cycle_time', 'data_type', 'file_size', 'obs_day', 'inserted_at', 'suffix', 'full_path', 'latest_record'])
-    #print(f'df: {df}')
     df = DataFrame(fn_fs)
     print(f'df: {df}')
     return df

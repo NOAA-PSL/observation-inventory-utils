@@ -10,6 +10,8 @@ from collections import namedtuple, OrderedDict
 import attr
 from datetime import datetime
 
+nl = '\n'
+
 DiscoverCommand = namedtuple(
     'DiscoverCommand',
     [
@@ -36,7 +38,6 @@ DiscoverCommandRawResponse = namedtuple(
 DiscoverListContents = namedtuple(
     'DiscoverListContents',
     [
-        #'parent_dir',
         'prefix',
         'files_count',
         'files_meta',
@@ -85,15 +86,32 @@ DiscoverFileMeta = namedtuple(
 CMD_GET_DISCOVER_OBJ_LIST = 'list_discover'
 EXPECTED_COMPONENTS_DISCOVER_OBJ_LIST = 8
 
+def inspect_discover_args_valid(args):
+    if not isinstance(args, list):
+        msg = f'Args must be in the form of a list, args: {args}'
+        raise TypeError(msg)
+    cmd = discover_cmds[CMD_GET_DISCOVER_OBJ_LIST].command
+    print(f'{nl}{nl}In inspect tarball args valid: cmd: {cmd}{nl}{nl}')
+    if (len(args) > 1 or len(args) == 0):
+        msg = f'Command "{cmd}" accepts exactly 1 argument, received ' \
+              f'{len(args)}.'
+        raise ValueError(msg)
 
-# A ~ 'command'
-#['ls', '-l','--time-style=+"%Y-%m-%d %H:%M:%S "']
+    arg = args[0]
 
-# B ~ 'arg_validator'
-def inspect_discover_args_valid(arg):
+    try:
+        m = re.search(r'[^A-Za-z0-9\._\-\/]', arg)
+        if m is not None and m.group(0) is not None:
+            print('Only a-z A-Z 0-9 and - . / _ characters allowed in filepath')
+            raise ValueError(f'Invalid characters found in file path: {arg}')
+    except Exception as e:
+        raise ValueError(f'Invalid file path: {e}')
+
+    #return {'bucket': AWS_BDP_BUCKET, 'prefix': args[0]}
+    return {'platform':'DISCOVER', 'prefix': args[0]}
+
     return True
 
-# C ~ 'arg_parser'
 def inspect_discover_parser(response, obs_day):
     print(f' --------- Running inspect_discover_parser -------- ')
     print(f'reponse.output: {response.output}')

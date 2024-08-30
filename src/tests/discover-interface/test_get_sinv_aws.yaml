@@ -1,0 +1,30 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/gps/gpsro/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  end: 20240706T180000Z
+  start: 20240701T000000Z
+bufr_files:
+  - gdas.%.t%z.gpsro.tm00.bufr_d
+  #- gdas.%Y%m%d.t%z.mtiasi.tm00.bufr_d
+  #- gdas.%Y%m%d.t%z.goesfv.tm00.bufr_d
+  #- gdas.%Y%m%d.t%z.atms.tm00.bufr_d
+  #- gdas.%Y%m%d.t%z.1bhrs2.tm00.bufr_d
+  #- gdas.%Y%m%d.t%z.1bhrs3.tm00.bufr_d
+  #- gdas.%Y%m%d.t%z.1bhrs4.tm00.bufr_d
+  #- gdas.%Y%m%d.t%z.cris.tm00.bufr_d
+  #- gdas.%Y%m%d.t%z.crisf4.tm00.bufr_d
+  #- gdas.t%z.1bamua.tm00.bufr_d
+  #- gdas.t%z.1bhrs4.tm00.bufr_d
+work_dir: '/discover/nobackup/sicohen/NNJA/function-output/tests'
+scrub_files: True
+    #key: observations/reanalysis/gps/gpsro/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.gpsro.tm00.bufr_d
+    #key: observations/reanalysis/iasi/mtiasi/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.mtiasi.tm00.bufr_d
+    #key: observations/reanalysis/geo/goesfv/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.goesfv.tm00.bufr_d
+    #key: observations/reanalysis/atms/atms/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.atms.tm00.bufr_d
+    #key: observations/reanalysis/hirs/1bhrs2/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.1bhrs2.tm00.bufr_d
+    #key: observations/reanalysis/hirs/1bhrs3/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.1bhrs3.tm00.bufr_d
+    #key: observations/reanalysis/hirs/1bhrs4/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.1bhrs4.tm00.bufr_d
+    #key: observations/reanalysis/cris/cris/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.cris.tm00.bufr_d
+    #key: observations/reanalysis/cris/crisf4/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.crisf4.tm00.bufr_d
+

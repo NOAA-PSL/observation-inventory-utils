@@ -1,0 +1,72 @@
+---
+plot_groupings:
+- grouping_name: test_plot_mysql_discover
+  data_type_families:
+  - data_type_family_name: all
+    external_obs_intervals:
+    - obs_src: discover 
+      intervals:
+      -   
+        start: 01-01-1998
+        end: 04-26-2024
+    family_members:
+    - data_type: 1bamub
+      prefix: "gdas1"
+      cycle_tag: "t%z."
+      suffix: ".tm00.bufr_d"
+    - data_type: avcsam
+      prefix: "gdas1"
+      cycle_tag: "t%z."
+      suffix: ".tm00.bufr_d"
+    - data_type: avcspm
+      prefix: "gdas1"
+      cycle_tag: "t%z."
+      suffix: ".tm00.bufr_d"
+    #- data_type: cris
+    #  prefix: "gdas1"
+    #  cycle_tag: "t%z."
+    #  suffix: ".tm00.bufr_d"
+    #- data_type: crisf4
+    #  prefix: "gdas1"
+    #  cycle_tag: "t%z."
+    #  suffix: ".tm00.bufr_d"
+    - data_type: goesfv
+      prefix: "gdas1"
+      cycle_tag: "t%z."
+      suffix: ".tm00.bufr_d"
+    - data_type: gpsro
+      prefix: "gdas1"
+      cycle_tag: "t%z."
+      suffix: ".tm00.bufr_d"
+    - data_type: satwnd
+      prefix: "gdas1"
+      cycle_tag: "t%z."
+      suffix: ".tm00.bufr_d"
+    - data_type: sbuv8
+      prefix: "gdas1"
+      cycle_tag: "t%z."
+      suffix: ".tm00.bufr_d"
+    - data_type: ssmisu
+      prefix: "gdas1"
+      cycle_tag: "t%z."
+      suffix: ".tm00.bufr_d"
+
+#('aws_s3', '1bamua', 37051)
+#('aws_s3', '1bhrs3', 22706)
+#('aws_s3', '1bhrs4', 14173)
+#('aws_s3', 'atms', 17996)
+#('aws_s3', 'crisf4', 9348)
+#('aws_s3', 'goesfv', 19034)
+#('aws_s3', 'gpsro', 33163)
+#('discover', '1bamua', 29128)
+#('discover', '1bhrs3', 14465)
+#('discover', '1bmhs', 23892)
+#('discover', 'atms', 2175)
+#('discover', 'cris', 11836)
+#('discover', 'goesfv', 19105)
+#('discover', 'gpsro', 65132)
+#('discover', 'mtiasi', 22806)
+#('discover', 'omi', 17617)
+#('discover', 'prepbufr', 11866)
+#('discover', 'ssmisu', 19464)
+
