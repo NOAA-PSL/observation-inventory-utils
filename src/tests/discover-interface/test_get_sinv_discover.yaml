@@ -1,0 +1,20 @@
+cycling_interval: 21600
+s3_bucket: ''
+s3_prefix: ''
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  end: 20240706T180000Z
+  start: 19000101T000000Z
+search_info:
+  -
+    platform: discover
+    #key: /discover/nobackup/projects/gmao/input/dao_ops/obs/flk/ncep_g5obs/bufr/GPSRO/Y%Y/M%m/gdas1.%y%m%d.t%Hz.gpsro.tm00.bufr_d
+    #key: /discover/nobackup/projects/gmao/input/dao_ops/obs/flk/ncep_g5obs/bufr/GPSRO_PlanetIQ/Y%Y/M%m/gdas1.%y%m%d.t%Hz.gpsro.tm00.bufr_d
+    #key: /discover/nobackup/projects/gmao/input/dao_ops/obs/flk/ncep_g5obs/bufr/GPSRO_PlanetIQ/Y%Y/M%m/piqpost.gpsro.t%Hz.%Y%m%d.bufr
+    #key: /discover/nobackup/projects/gmao/input/dao_ops/obs/flk/ncep_g5obs/bufr/GPSRO_R/Y%Y/M%m/gdas1.%y%m%d.t%Hz.gpsro.tm00.bufr_d
+bufr_files:
+  - gdas1.%.t%z.gpsro.tm00.bufr_d
+work_dir: '/discover/nobackup/sicohen/NNJA/function-output/tests'
+scrub_files: False
+
+

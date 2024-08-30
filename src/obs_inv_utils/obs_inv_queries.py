@@ -1,3 +1,8 @@
+# 2024-04-16
+# obs_inv_queries.py
+# Seth Cohen
+# Discover additions
+
 from datetime import datetime
 
 from pandas import DataFrame
@@ -13,8 +18,9 @@ from sqlalchemy.orm import sessionmaker
 
 
 from obs_inv_utils import inventory_table_factory as itf
+from obs_inv_utils import obs_storage_platforms as platforms
 
-engine = itf.engine
+engine = db.create_engine(itf.OBS_DATABASE, echo=True)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
@@ -34,9 +40,14 @@ def get_family_fs_data(obs_family):
         f'Here in sql query - table_exists: {table_exists}, obs_family: {obs_family}')
     filenames = set()
     members = obs_family.get_members()
+    #print(f'------------------- print(oi) --------- \ {oi}')
+    #print(f'------------------- print(obs_family) ----------- \ {print(obs_family)} ')
+    #print(f'------------------- print(members) ----------- \ {print(members)}')
     for member in members:
-        filename = 'gdas.%.' + member.get('data_type') + member.get('suffix')
+        filename = member.get('prefix') + '.%.' + member.get('cycle_tag') + member.get('data_type') + member.get('suffix')
         filenames.add(filename)
+
+    print(f'filenames: {filenames}')
 
     fn_fs = session.query(
         oi.prefix,
@@ -48,13 +59,14 @@ def get_family_fs_data(obs_family):
         oi.obs_day,
         oi.inserted_at,
         oi.suffix,
+        oi.platform,
         oi.parent_dir.concat(oi.filename).label('full_path'),
         func.max(oi.inserted_at).label('latest_record')
     ).select_from(
         oi
     ).filter(
         and_(
-            oi.platform == 'aws_s3',
+            oi.platform != None,
             or_(
                 oi.filename.like(fn) for fn in filenames
             )
@@ -87,6 +99,7 @@ def get_filesize_timeline_data(min_instances):
         func.count(oi.filename).label('instances'),
         oi.data_type,
         oi.suffix,
+        #oi.platform,
         oi.data_type.concat(oi.suffix).label('un')
     ).select_from(
         oi
@@ -105,6 +118,7 @@ def get_filesize_timeline_data(min_instances):
         oi.file_size,
         oi.obs_day,
         oi.inserted_at,
+        oi.platform,
         unique_names.c.instances,
         unique_names.c.un
     ).select_from(
@@ -156,10 +170,10 @@ def get_bufr_files_data(filenames, start, end):
     unique_filenames = set()
     for filename in filenames:
         unique_filenames.add(filename)
-    
+
     fn_fs = session.query(
         oi.obs_id,
-        oi.prefix,
+        oi.prefix.label('prefix'),
         oi.filename,
         oi.cycle_tag,
         oi.cycle_time,
@@ -168,13 +182,14 @@ def get_bufr_files_data(filenames, start, end):
         oi.obs_day,
         oi.inserted_at,
         oi.suffix,
+        oi.platform,
         oi.parent_dir.concat(oi.filename).label('full_path'),
         func.max(oi.inserted_at).label('latest_record')
     ).select_from(
         oi
     ).filter(
         and_(
-            oi.platform == 'aws_s3',
+            oi.platform != None,
             or_(
                 oi.filename.like(fn) for fn in unique_filenames
             ),
@@ -189,11 +204,10 @@ def get_bufr_files_data(filenames, start, end):
         oi.obs_day,
         oi.filename
     ).all()
-
+    
+    print(f'type(fn_fs): {type(fn_fs)}')
     print(f'fn_fs: {fn_fs}')
 
     df = DataFrame(fn_fs)
-
     print(f'df: {df}')
-
     return df

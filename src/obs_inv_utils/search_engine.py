@@ -1,7 +1,13 @@
+# 2024-04-16
+# search_engine.py
+# Seth Cohen
+# Discover interface additions
+
 from collections import namedtuple
 import json
 import os
 import pathlib
+from pathlib import Path
 from datetime import datetime
 from obs_inv_utils import hpss_io_interface as hpss
 from obs_inv_utils import obs_storage_platforms as platforms
@@ -15,6 +21,10 @@ from obs_inv_utils.aws_s3_interface import AwsS3CommandRawResponse
 from typing import Optional
 from dataclasses import dataclass, field
 from obs_inv_utils import inventory_table_factory as tbl_factory
+from obs_inv_utils import discover_interface as discover
+from obs_inv_utils.discover_interface import DiscoverCommandRawResponse
+import hashlib
+
 
 SECONDS_IN_A_DAY = 24*3600
 
@@ -87,11 +97,31 @@ AwsS3CmdResult = namedtuple(
     ],
 )
 
+# NASA Addition: CmdResult Object for discover_interface
+DiscoverCmdResult = namedtuple(
+    'HpssCmdResult',
+    [
+        'command',
+        'arg0',
+        'raw_output',
+        'raw_error',
+        'error_code',
+        'obs_cycle_time',
+        'submitted_at',
+        'latency'
+    ],
+)
 
-# filename parts definitions
-PREFIX = 0
-CYCLE_TAG = 1
-DATA_TYPE = 2
+# NASA Discover filenames require different values due to different file naming conventions. See parse_filename_discover at below.
+# NOAA values
+#PREFIX = 0
+#CYCLE_TAG = 1 #1
+#DATA_TYPE = 2 #2 
+
+# NASA values
+PREFIX = PREFIX_DISCOVER = 0
+CYCLE_TAG = CYCLE_TAG_DISCOVER = 2
+DATA_TYPE = DATA_TYPE_DISCOVER = 3
 
 OBS_FORMAT_BUFR = 'bufr'
 OBS_FORMAT_BUFR_D = 'bufr_d'
@@ -109,14 +139,17 @@ ADDITIONAL_GRIB2_FORMAT_EXTENSIONS = ['1536', '576']
 
 
 def get_cycle_tag(parts):
-    if not isinstance(parts, list) or len(parts) < 2:
+    if not isinstance(parts, list): # or len(parts) < 2: # or len(parts) < 2:
         return None
+    print(f'CYCLE_TAG: {CYCLE_TAG}')
     return parts[CYCLE_TAG]
 
 
 def get_data_type(parts):
-    if not isinstance(parts, list) or len(parts) < 3:
+    if not isinstance(parts, list): # or len(parts) < 3: #or len(parts) < 3:
         return None
+    print(f'parts: {parts}')
+    print(f'len(parts): {len(parts)}')
     return parts[DATA_TYPE]
 
 
@@ -160,10 +193,10 @@ def get_data_format(filename):
 
 
 def get_combined_suffix(parts):
-    if not isinstance(parts, list) or len(parts) < 4:
+    if not isinstance(parts, list): # or len(parts) < 4:
         return None
-
-    suffix_parts = parts[3:]
+    
+    suffix_parts = parts[-2:]
     suffix = ''
     for part in suffix_parts:
         if not isinstance(part, str):
@@ -194,11 +227,34 @@ def parse_filename(filename):
 
 
 def parse_filename_clean_bucket(filename):
+    print(f'filename: {filename}')
     parts = filename.split('.')
-    del parts[1] # clean bucket has one extra part. the rest are the same as the dirty bucket
+    print(f'parts: {parts}')
+    #del parts[1] # clean bucket has one extra part. the rest are the same as the dirty bucket
     cycle_tag = get_cycle_tag(parts)
     filename_meta = FilenameMeta(
         parts[PREFIX],
+        cycle_tag,
+        get_data_type(parts),
+        get_cycle_time(cycle_tag),
+        get_data_format(filename),
+        get_combined_suffix(parts),
+        filename.endswith('.nr')
+    )
+
+    return filename_meta
+
+
+def parse_filename_discover(filename):
+    # NASA values
+    PREFIX = PREFIX_DISCOVER = 0 
+    CYCLE_TAG = CYCLE_TAG_DISCOVER = 2 
+    DATA_TYPE = DATA_TYPE_DISCOVER = 3 
+    parts = filename.split('.')
+    #del parts[1] # clean bucket has one extra part. the rest are the same as the dirty bucket
+    cycle_tag = get_cycle_tag(parts)
+    filename_meta = FilenameMeta(
+        parts[PREFIX], #parts[PREFIX],
         cycle_tag,
         get_data_type(parts),
         get_cycle_time(cycle_tag),
@@ -332,10 +388,51 @@ def process_inspect_tarball_resp(cmd_result_id, contents):
 
     tbl_factory.insert_obs_inv_items(tarball_files_meta)
 
-
+def process_discover_resp(cmd_result_id, contents):
+    if not isinstance(contents, discover.DiscoverListContents):
+        print('Not instance type discover.DiscoverListContents')
+        return None
+    listed_files_meta = contents.files_meta
+    listed_files_meta = listed_files_meta[0]
+    files_meta = []
+    fn = os.path.basename(listed_files_meta.name)
+    full_path = os.path.join(contents.prefix,fn)
+    checkfilepath = Path(full_path)
+    if checkfilepath.is_file():
+        etag = hashlib.md5(open(full_path,'rb').read()).hexdigest()
+    else:
+        etag = ''
+    fn_meta = parse_filename_discover(fn)
+    files_meta.append(TarballFileMeta(
+            cmd_result_id,
+            fn,
+            contents.prefix + "/",
+            platforms.DISCOVER, 
+            '',             
+            fn_meta.prefix,
+            fn_meta.cycle_tag,
+            fn_meta.data_type,
+            fn_meta.cycle_time,
+            contents.obs_cycle_time,
+            fn_meta.data_format,
+            fn_meta.suffix,
+            fn_meta.not_restricted_tag,
+            listed_files_meta.size,
+            '',
+            listed_files_meta.last_modified, 
+            contents.submitted_at,
+            contents.latency,
+            datetime.utcnow(),
+            etag 
+    ))
+    print(f'files_meta: {files_meta}')
+    if len(files_meta) > 0:
+        tbl_factory.insert_obs_inv_items(files_meta)
+        
+        
 def default_datetime_converter(obj):
-   if isinstance(obj, datetime):
-      return obj.__str__()
+    if isinstance(obj, datetime):
+        return obj.__str__()
 
 
 def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
@@ -385,7 +482,31 @@ def post_hpss_cmd_result(raw_response, obs_day):
 
     return cmd_result_id
 
+# NASA Discover Addition 5: post to cmd_result function for discover (based on post_hpss_cmd_result)
+def post_discover_cmd_result(raw_response, obs_day):
+    if not isinstance(raw_response, DiscoverCommandRawResponse):
+        msg = 'raw_response must be of type DiscoverCommandRawResponse. It is'\
+              f' actually of type: {type(raw_response)}'
+        raise TypeError(msg)
 
+    cmd_result_data = tbl_factory.CmdResultData(
+        raw_response.command,
+        raw_response.args_0,
+        raw_response.output,
+        raw_response.error,
+        raw_response.return_code,
+        obs_day,
+        raw_response.submitted_at,
+        raw_response.latency,
+        datetime.utcnow()
+    )
+
+    print(f'Discover cmd_result: {cmd_result_data}')
+    cmd_result_id = tbl_factory.insert_cmd_result(cmd_result_data)
+
+    return cmd_result_id
+
+# NASA Discover: ObsInventorySearchEngine conditional statements for working with Discover
 @dataclass
 class ObsInventorySearchEngine(object):
     obs_inv_conf: ObservationsConfig
@@ -395,8 +516,8 @@ class ObsInventorySearchEngine(object):
     def __post_init__(self):
         self.search_configs = self.obs_inv_conf.get_obs_inv_search_configs()
 
-    def get_obs_file_info(self):
 
+    def get_obs_file_info(self):
         date_range = self.obs_inv_conf.get_search_date_range()
         master_list = []
         print(f'search config date range: {date_range}')
@@ -409,7 +530,6 @@ class ObsInventorySearchEngine(object):
             loop_count += 1
             finished_count = 0
             for key, search_config in self.search_configs.items():
-                # print(f'search_config: {search_config}')
                 search_path = search_config.get_current_search_path()
 
                 if search_config.get_date_range().at_end():
@@ -421,15 +541,30 @@ class ObsInventorySearchEngine(object):
                 args = [search_path]
                 print(f'args: {args}, search_path: {search_path}')
                 platform = search_config.get_storage_platform()
+                if platform == platforms.AWS_S3 or platform == platforms.AWS_S3_CLEAN:
+                    # NOAA values
+                    PREFIX = 0
+                    CYCLE_TAG = 1 #1
+                    DATA_TYPE = 2 #2 
+                elif platform == platforms.DISCOVER:
+                    # NASA values
+                    PREFIX = PREFIX_DISCOVER = 0
+                    CYCLE_TAG = CYCLE_TAG_DISCOVER = 2
+                    DATA_TYPE = DATA_TYPE_DISCOVER = 3
+
                 n_hours = 6
                 n_days = 0
                 if platform == platforms.AWS_S3 or platform == platforms.AWS_S3_CLEAN:
-                    cmd = s3.AwsS3CommandHandler(s3.CMD_GET_S3_OBJ_LIST, args)
+                    cmd = s3.AwsS3CommandHandler(
+                        s3.CMD_GET_S3_OBJ_LIST, args)
                 elif platform == platforms.HERA_HPSS:
                     cmd = hpss.HpssCommandHandler(
                         hpss.CMD_INSPECT_TARBALL, args)
                     n_hours = 0
                     n_days = 1
+                elif platform == platforms.DISCOVER:
+                    cmd = discover.DiscoverCommandHandler(
+                        discover.CMD_GET_DISCOVER_OBJ_LIST, args)
 
                 print(f'cmd: {cmd}, finished_count: {finished_count}')
 
@@ -445,6 +580,12 @@ class ObsInventorySearchEngine(object):
                     )
                 elif platform == platforms.HERA_HPSS:
                     self.cmd_post_id = post_hpss_cmd_result(
+                        raw_resp,
+                        search_config.get_date_range().current
+                    )
+                elif platform == platforms.DISCOVER:
+                    print('posting command results for discover')
+                    self.cmd_post_id = post_discover_cmd_result(
                         raw_resp,
                         search_config.get_date_range().current
                     )
@@ -471,6 +612,11 @@ class ObsInventorySearchEngine(object):
                             self.cmd_post_id,
                             contents
                         )
+                    elif platform == platforms.DISCOVER:
+                        file_meta = process_discover_resp(
+                            self.cmd_post_id,
+                            contents
+                        )
                 else:
                     msg = f'Command failed!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - error code: {cmd.get_raw_response}.'
                     print(msg)
@@ -482,3 +628,4 @@ class ObsInventorySearchEngine(object):
 
             if finished_count == len(self.search_configs):
                 all_search_paths_finished = True
+

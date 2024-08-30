@@ -23,6 +23,8 @@ from obs_inv_utils import subprocess_cmd_handler as sch
 from obs_inv_utils.subprocess_cmd_handler import SubprocessCmd
 from obs_inv_utils import nceplibs_cmds as nc_cmds
 
+import yaml
+
 CALLING_DIR = pathlib.Path(__file__).parent.resolve()
 TMP_OBS_DATA_DIR = 'tmp_obs_data'
 
@@ -100,10 +102,30 @@ class ObsBufrFileMetaHandler(object):
     meta_config: ObsMetaSinvConfig
     bufr_files: list = field(default_factory=list, init=False)
     date_range: DateRange = field(init=False)
+    #config_yaml: str
+    config_data: dict = field(default_factory=str, init=False)
+    s3_bucket: str = field(default_factory=str, init=False)
+    s3_prefix: str = field(default_factory=str, init=False)
+
 
     def __post_init__(self):
         self.date_range = self.meta_config.get_date_range()
         self.bufr_files = self.meta_config.get_bufr_file_list()
+        self.config_data = self.meta_config.load()
+
+        #self.yaml.safe_load()
+        print(f' -----0------- self: {self} ---')
+        print(f' ')
+        print(f' ')
+        print(f' -----1------- self.config_data: {self.config_data} ---')
+        print(f' ') 
+        print(f' ')
+        print(f' -----2------- self.config_data: {self.config_data} ---')
+        #print(f' -----1------- meta_configconfig_data: {meta_config.config_data} -------------------------------------')
+        #print(f' ------------ self.meta_config.s3_bucket: {self.s3_bucket} ------------------')
+        #print(f' ------------ self.s3_bucket: {self.s3_bucket} ------------------')
+        #print(f'self.meta_config.platform: {self.platform}')
+
 
     def __repr__(self):
         """
@@ -120,29 +142,92 @@ class ObsBufrFileMetaHandler(object):
             self.date_range.start,
             self.date_range.end
         )
+        
+        #temp_uuid = str(uuid.uuid4())
 
-        temp_uuid = str(uuid.uuid4())
+        #work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
+        bucket = self.meta_config.s3_bucket
+        prefix = self.meta_config.s3_prefix
+        print(f' ------------ bucket: {bucket} ------------------')
+        print(f' ------------ prefix: {prefix} ------------------')
+        print(f' ------------ bucket: {self.meta_config.s3_bucket} ------------------')
+        print(bucket is self.meta_config.s3_bucket)
+        print()
+        ####### 1. NOAA S3 Clean Bucket
+        #if self.s3_bucket == 'noaa-reanalyses-pds' or self.s3_bucket == 'aws_s3':
+        if bucket == 'noaa-reanalyses-pds': #or bucket == 'aws_s3':
+            #print(f'!!!! {self.s3_bucket}')
+            print(f'  ------ {self.s3_bucket} -----------------------------------------------------------------')
+            print(f'Running get_bufr_file_meta for NOAA S3 Clean Bucket (aws_s3) {self.s3_bucket}')
 
-        work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
+            temp_uuid = str(uuid.uuid4())
 
-        print(f'inventory_bufr_files: {inventory_bufr_files}')
-        print(f'scrub_files: {self.meta_config.scrub_files}')
-        for idx, bufr_file in inventory_bufr_files.iterrows():
-            file_downloaded = False
-            print(
-               f'bufr_file: {bufr_file}')
+            work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
 
-            saved_filename = download_bufr_file_from_s3(work_dir, bufr_file)
+            print(f'inventory_bufr_files: {inventory_bufr_files}')
+            print(f'scrub_files: {self.meta_config.scrub_files}')
+            for idx, bufr_file in inventory_bufr_files.iterrows():
+                file_downloaded = False
+                print(
+                   f'bufr_file: {bufr_file}')
 
-            if saved_filename is None:
-                continue
+                saved_filename = download_bufr_file_from_s3(work_dir, bufr_file)
 
-            self.get_obs_counts_with_sinv(saved_filename, bufr_file)
+                if saved_filename is None:
+                    continue
 
-            # clean up files
-            if self.meta_config.scrub_files:
-                #os.remove( saved_filename )
-                shutil.rmtree( work_dir )
+                self.get_obs_counts_with_sinv(saved_filename, bufr_file)
+
+                # clean up files
+                if self.meta_config.scrub_files:
+                    #os.remove( saved_filename )
+                    shutil.rmtree( work_dir )
+              
+        ####### 2. NASA Discover
+        elif self.s3_bucket == None or self.s3_bucket == 'discover' or self.s3_bucket == '':
+            #get_s3_bucket(self)
+            print(f'  ------ {self.s3_bucket} -----------------------------------------------------------------')
+            print(f'Running get_bufr_file_meta for NASA Discover {self.s3_bucket}')
+
+            temp_uuid = str(uuid.uuid4())
+
+            work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
+
+            #print(f'self.meta_config.platform: {self.platform}')
+            #print(f'self.meta_config.s3_bucket: {self.s3_bucket}')
+            #print(f'inventory_bufr_files: {inventory_bufr_files}')
+            #print(f'scrub_files: {self.meta_config.scrub_files}')
+            for idx, bufr_file in inventory_bufr_files.iterrows():
+                file_downloaded = False
+                print(
+                   f'bufr_file: {bufr_file}')
+
+                #if self.meta_config.s3_bucket == 'noaa-reanalyses-pds':
+                #    print(#f's3_bucket: {self.s3_bucket} *********** !!!! '
+                #          f's3_bucket.meta_config: {self.meta_config.s3_bucket} *********** !!!! ')
+                #    saved_filename = download_bufr_file_from_s3(work_dir, bufr_file)
+                try:
+                    saved_filename = bufr_file['full_path'] 
+                except Exception as err:
+                    msg = f'\'saved_filename\' line 147 - err: {err}'
+                    raise ValueError(msg) from err 
+
+                print(
+                   f'work_dir: {work_dir}')
+                print(
+                   f'saved_filename: {saved_filename}')
+
+                if saved_filename is None:
+                    continue
+
+                self.get_obs_counts_with_sinv(saved_filename, bufr_file)
+
+                # clean up files
+                #if self.meta_config.scrub_files:
+                    #os.remove( saved_filename )
+                    #shutil.rmtree( work_dir )
+
+
 
     def get_obs_counts_with_sinv(self, filename, bufr_file):
         
