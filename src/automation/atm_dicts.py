@@ -369,7 +369,7 @@ ozone_cfsr = InventoryInfo(
 
 ozone_nasa_sbuv_v87 = InventoryInfo(
     obs_name='ozone_nasa_sbuv_v87',
-    key='observations/reanalysis/ozone/nasa/sbuv_v87/%Y/%m/bufr/sbuv_v87.%Y%m%d.t%Hz.bufr',
+    key='observations/reanalysis/ozone/nasa/sbuv_v87/%Y/%m/bufr/sbuv_v87.%Y%m%d.%Hz.bufr',
     start='19991015T000000Z',
     s3_prefix='observations/reanalysis/ozone/nasa/sbuv_v87/%Y/%m/bufr/', 
     bufr_files='sbuv_v87.%z.bufr',
