@@ -977,4 +977,6 @@ else:
     create_obs_meta_nceplibs_bufr_table()
     create_obs_meta_nceplibs_prepbufr_table()
     create_obs_meta_nceplibs_prepbufr_agg_table()
+    create_obs_meta_hv_ioda_netcdf_table()
+    create_obs_meta_hv_ioda_netcdf_agg_table()
     metadata.create_all(engine)
