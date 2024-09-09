@@ -4,7 +4,7 @@ from datetime import datetime
 from collections import namedtuple
 from obs_inv_utils import search_engine as se
 from sqlalchemy import Table, Column, MetaData, text
-from sqlalchemy import Integer, String, ForeignKey, Boolean, DateTime, Float
+from sqlalchemy import Integer, String, ForeignKey, Boolean, DateTime, Float, Decimal
 from sqlalchemy import inspect, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -21,6 +21,8 @@ CMD_RESULTS_TABLE = 'cmd_results'
 OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
 OBS_META_NCEPLIBS_PREPBUFR_TABLE = 'obs_meta_nceplibs_prepbufr'
 OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE = 'obs_meta_nceplibs_prepbufr_aggregate'
+OBS_META_HV_IODA_NETCDF_TABLE = 'obs_meta_hv_ioda_netcdf'
+OBS_META_HV_IODA_NETCDF_AGG_TABLE = 'obs_meta_hv_ioda_netcdf_aggregate'
 OBS_DATABASE = ''
 OBS_SQLITE_DEFAULT = 'observations_inventory.db'
 
@@ -286,6 +288,95 @@ def create_obs_meta_nceplibs_prepbufr_agg_table():
             )
         )
 
+def create_obs_meta_hv_ioda_netcdf_table():
+    insp = inspect(engine)
+    table_exists = insp.has_table(OBS_META_HV_IODA_NETCDF_TABLE)
+    print(f'{OBS_META_HV_IODA_NETCDF_TABLE} table exists: {table_exists}')
+    if not insp.has_table(OBS_META_HV_IODA_NETCDF_TABLE):
+
+        Table(OBS_META_HV_IODA_NETCDF_TABLE, metadata,
+              Column('meta_id', Integer, primary_key=True),
+              Column(
+                  'obs_id',
+                  Integer,
+                  ForeignKey('obs_inventory.obs_id'),
+                  nullable=False
+              ),
+              Column(
+                  'cmd_result_id',
+                  Integer,
+                  ForeignKey('cmd_results.cmd_result_id'),
+                  nullable=False
+              ),
+              Column('cmd_str', String),
+              Column('variable', String),
+              Column('num_locs', Integer),
+              Column('hasPreQC', Boolean),
+              Column('hasObsError', Boolean),
+              Column('sensor', String),
+              Column('platform', String),
+              Column('ioda_layout', String),
+              Column('processing_level', String),
+              Column('thinning', Decimal),
+              Column('ioda_version', String),
+              Column('filename', String),
+              Column('obs_day', DateTime),
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'variable',
+                'num_locs',
+                'filename',
+                'obs_day',
+                name='unique_ioda_nc_meta'
+            )
+        )
+
+def create_obs_meta_hv_ioda_netcdf_agg_table():
+    insp = inspect(engine)
+    table_exists = insp.has_table(OBS_META_HV_IODA_NETCDF_AGG_TABLE)
+    print(f'{OBS_META_HV_IODA_NETCDF_AGG_TABLE} table exists: {table_exists}')
+    if not insp.has_table(OBS_META_HV_IODA_NETCDF_AGG_TABLE):
+
+        Table(OBS_META_HV_IODA_NETCDF_AGG_TABLE, metadata,
+              Column('meta_id', Integer, primary_key=True),
+              Column(
+                  'obs_id',
+                  Integer,
+                  ForeignKey('obs_inventory.obs_id'),
+                  nullable=False
+              ),
+              Column(
+                  'cmd_result_id',
+                  Integer,
+                  ForeignKey('cmd_results.cmd_result_id'),
+                  nullable=False
+              ),
+              Column('cmd_str', String),
+              Column('variable_names', String),
+              Column('num_vars', Integer),
+              Column('num_locs', Integer),
+              Column('hasPreQC', Boolean),
+              Column('hasObsError', Boolean),
+              Column('sensor', String),
+              Column('platform', String),
+              Column('ioda_layout', String),
+              Column('processing_level', String),
+              Column('thinning', Decimal),
+              Column('ioda_version', String),
+              Column('filename', String),
+              Column('obs_day', DateTime),
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'num_vars',
+                'num_locs',
+                'filename',
+                'obs_day',
+                name='unique_ioda_nc_agg_meta'
+            )
+        )
+
 class CmdResult(Base):
     __tablename__ = CMD_RESULTS_TABLE
 
@@ -451,6 +542,74 @@ class ObsMetaNceplibsPrepbufrAggregate(Base):
     inserted_at = Column(DateTime())
 
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
+class ObsMetaHvIodaNetcdf(Base):
+    __tablename__ = OBS_META_HV_IODA_NETCDF_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'variable',
+            'num_locs',
+            'filename',
+            'obs_day',
+            name='unique_ioda_nc_meta'
+        ),
+    )
+
+    meta_id = Column(Integer, primary_key=True)
+    obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
+    cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
+    cmd_str = Column(String(31))
+    variable = Column(String(63))
+    num_locs = Column(Integer())
+    hasPreQC = Column(Boolean())
+    hasObsError = Column(Boolean())
+    sensor = Column(String(63))
+    platform = Column(String(128))
+    ioda_layout = Column(String(63))
+    processing_level = Column(String())
+    thinning = Column(Float())
+    ioda_version = Column(String(63))
+    filename = Column(String(63))
+    obs_day = Column(DateTime())
+    inserted_at = Column(DateTime())
+
+    cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
+class ObsMetaHvIodaNetcdfAggregate(Base):
+    __tablename__ = OBS_META_HV_IODA_NETCDF_AGG_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'num_vars',
+            'num_locs',
+            'filename',
+            'obs_day',
+            name='unique_ioda_nc_agg_meta'
+        ),
+    )
+
+    meta_id = Column(Integer, primary_key=True)
+    obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
+    cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
+    cmd_str = Column(String(31))
+    variable_names = Column(String(1023))
+    num_vars = Column(Integer())
+    num_locs = Column(Integer())
+    hasPreQC = Column(Boolean())
+    hasObsError = Column(Boolean())
+    sensor = Column(String(63))
+    platform = Column(String(128))
+    ioda_layout = Column(String(63))
+    processing_level = Column(String())
+    thinning = Column(Float())
+    ioda_version = Column(String(63))
+    filename = Column(String(63))
+    obs_day = Column(DateTime())
+    inserted_at = Column(DateTime())
+
+    cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
 
 def generate_obs_inventory_hash(filename, parent_dir, platform, s3_bucket):
     hash_input = f"{filename}{parent_dir}{platform}{s3_bucket}"
