@@ -857,6 +857,118 @@ def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
     session.commit()
     session.close()
 
+def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items):
+    if not isinstance(obs_meta_items, list):
+        msg = 'Inserted obs meta IODA NetCDF items must be in the form of a list.' \
+              f' Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
+
+    rows = []
+    for item in obs_meta_items:
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable': item.variable,
+            'num_locs': item.num_locs,
+            'hasPreQC': item.hasPreQC,
+            'hasObsError': item.hasObsError,
+            'sensor': item.sensor,
+            'platform': item.platform,
+            'ioda_layout': item.ioda_layout,
+            'processing_level': item.processing_level,
+            'thinning': item.thinning,
+            'ioda_version': item.ioda_version,
+            'filename': item.filename,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.utcnow()
+        }
+        rows.append(row)
+
+    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, num_locs, hasPreQC, hasObsError, 
+            sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :hasPreQC, :hasObsError, 
+            :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :obs_day, :inserted_at)
+        """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, num_locs, hasPreQC, hasObsError, 
+            sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :hasPreQC, :hasObsError, 
+            :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :obs_day, :inserted_at)
+        """
+
+    session = Session()
+    session.execute(text(sql), rows)
+    session.commit()
+    session.close()
+
+def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
+    if not isinstance(obs_meta_items, list):
+        msg = 'Inserted obs meta IODA NetCDF Aggregate items must be in the form of a list.' \
+              f' Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
+
+    rows = []
+    for item in obs_meta_items:
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable_names': item.variable_names,
+            'num_vars': item.num_vars,
+            'num_locs': item.num_locs,
+            'hasPreQC': item.hasPreQC,
+            'hasObsError': item.hasObsError,
+            'sensor': item.sensor,
+            'platform': item.platform,
+            'ioda_layout': item.ioda_layout,
+            'processing_level': item.processing_level,
+            'thinning': item.thinning,
+            'ioda_version': item.ioda_version,
+            'filename': item.filename,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.utcnow()
+        }
+        rows.append(row)
+
+    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf_agg
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, hasPreQC, 
+            hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :hasPreQC, 
+            :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :obs_day, :inserted_at)
+        """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf_agg
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, hasPreQC, 
+            hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :hasPreQC, 
+            :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :obs_day, :inserted_at)
+        """
+
+    session = Session()
+    session.execute(text(sql), rows)
+    session.commit()
+    session.close()
+
+
 if(database_type.lower() == 'mysql'):
     Base.metadata.create_all(engine)
 else:
