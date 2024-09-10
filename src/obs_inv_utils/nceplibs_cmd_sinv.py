@@ -146,7 +146,7 @@ def parse_output(output, bufr_file):
     for line in output_lines:
         line_type = get_line_type(line)
         if line_type == OBS_DATA_LINE:
-            line_data = parse_line(line)
+            line_data = parse_data_line(line)
             if line_data.obs_count is not None:
                 obs_cnt_sum += line_data.obs_count
             try:
@@ -165,15 +165,14 @@ def parse_output(output, bufr_file):
             except Exception as e:
                 print(f'Problem with sinv output parsing - error: {e}')
         elif line_type == OBS_COUNT_TOTAL_LINE:
-            line_data = parse_line(line)
-            check_obs_cnt_sum = line_data.obs_count
-            if obs_cnt_sum != check_obs_cnt_sum:
+            check_obs_cnt_sum = parse_total_obs_line(line)
+            if check_obs_cnt_sum is not None and obs_cnt_sum != check_obs_cnt_sum:
                 print(f'Output obs count sum: {check_obs_cnt_sum} ' \
                        f'does not match lines sum: {obs_cnt_sum}')
 
     return lines_meta
 
-def parse_line(line):
+def parse_data_line(line):
     split_line = line.split(maxsplit=4) #know there's 5 columns
 
     #define variables to be assigned
@@ -218,6 +217,15 @@ def parse_line(line):
         sat_inst_id,
         sat_inst_desc
     )
+
+def parse_total_obs_line(line):
+    total_obs_count = None
+    try:
+        clean_line = line.strip()
+        total_obs_count = int(clean_line)
+    except Exception as e:
+        print(f'Error parsing total_obs_count from line: {clean_line}, error: {e}')
+    return total_obs_count
     
 
 def post_obs_meta_data(cmd_id, lines_meta, bufr_file):
