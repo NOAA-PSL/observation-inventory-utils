@@ -69,55 +69,6 @@ HEADER_LINE = 'header_line'
 def validate_args(args):
     return True
 
-# def get_sat_id(line):
-#     try:
-#         raw_val = line[SAT_ID_START:SAT_ID_END]
-#         sat_id = int(raw_val)
-#     except Exception as e:
-#         print(f'Error parsing sat_id: raw_val: {raw_val}, error: {e}')
-#         sat_id = None
-#     return sat_id
-
-
-# def get_sat_id_name(line):
-#     try:
-#         sat_id_name = line[SAT_ID_NAME_START:SAT_ID_NAME_END]
-#         sat_id_name = sat_id_name.strip()
-#     except Exception as e:
-#         print(f'Error parsing sat_id_name: {sat_id_name}, error: {e}')
-#     return sat_id_name
-
-
-# def get_obs_count(line):
-#     try:
-#         raw_val = line[OBS_COUNT_START:OBS_COUNT_END]
-#         obs_count = int(raw_val)
-#     except Exception as e:
-#         print(f'Error parsing obs_count: raw_val: {raw_val}, error: {e}')
-#         obs_count = None
-#     return obs_count
-
-
-# def get_sat_inst_id(line):
-#     try:
-#         raw_val = line[SAT_INST_ID_START:SAT_INST_ID_END]
-#         sat_inst_id = int(raw_val)
-#     except Exception as e:
-#         print(f'Error parsing sat_inst_id: raw_val: {raw_val}, error: {e}')
-#         sat_inst_id = None
-#     return sat_inst_id
-
-
-# def get_sat_inst_dsc(line):
-#     try:
-#         sat_inst_dsc = line[SAT_INST_DSC_START:SAT_INST_DSC_END]
-#         sat_inst_dsc = sat_inst_dsc.strip()
-#     except Exception as e:
-#         print(f'Error parsing sat_inst_dsc: {sat_inst_dsc}, error: {e}')
-#         sat_inst_dsc = None
-#     return sat_inst_dsc
-
-
 def get_line_type(line):
     if len(line) <=1:
         return FILLER_LINE
