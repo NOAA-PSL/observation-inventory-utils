@@ -129,6 +129,7 @@ def parse_output(output, bufr_file):
     lines_meta = []
     obs_cnt_sum = 0
     for line in output_lines:
+        print(f"line: {line}")
         line_type = get_line_type(line)
         if line_type == OBS_DATA_LINE:
             sat_id = get_sat_id(line)
@@ -158,7 +159,7 @@ def parse_output(output, bufr_file):
                 print(f'Output obs count sum: {check_obs_cnt_sum} ' \
                        f'does not match lines sum: {obs_cnt_sum}')
 
-    return lines_meta        
+    return lines_meta
 
 def post_obs_meta_data(cmd_id, lines_meta, bufr_file):
     # package obs meta for file insert
