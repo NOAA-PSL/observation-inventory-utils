@@ -122,7 +122,7 @@ def get_line_type(line):
     if len(line) <=1:
         return FILLER_LINE
     try:
-        header_keywords = ["id", "satellite", "subsets", "instruments"]
+        header_keywords = ["id", "satellite", "subsets", "instrument"]
         if all(keyword.lower() in line.lower() for keyword in header_keywords):
             return HEADER_LINE
         if line.strip() == "":
