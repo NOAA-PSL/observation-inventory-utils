@@ -1,14 +1,17 @@
 import os
 import sqlalchemy as db
 from datetime import datetime
-from collections import namedtuple, OrderedDict
+from collections import namedtuple
 from obs_inv_utils import search_engine as se
-from sqlalchemy import Table, Column, MetaData
+from sqlalchemy import Table, Column, MetaData, text
 from sqlalchemy import Integer, String, ForeignKey, Boolean, DateTime, Float
-from sqlalchemy import inspect
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy import inspect, UniqueConstraint
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.dialects.mysql import insert as mysql_insert
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+import hashlib
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -105,7 +108,16 @@ def create_obs_inventory_table():
               Column('etag', String),
               Column('permissions', String),
               Column('last_modified', DateTime),
+              Column('unique_hash', String),
               Column('inserted_at', DateTime),
+              Column('valid_at', DateTime),
+              UniqueConstraint(
+                'unique_hash',
+                'obs_day',
+                'file_size',
+                'last_modified',
+                'etag',
+                name='unique_obs_inventory' )
         )
 
 
@@ -161,6 +173,15 @@ def create_obs_meta_nceplibs_bufr_table():
               Column('file_size', Integer),
               Column('obs_day', DateTime),
               Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'filename',
+                'obs_day',
+                'file_size',
+                'obs_id',
+                'sat_id',
+                'sat_inst_id',
+                name='unique_bufr_meta'
+            )
         )
 
 def create_obs_meta_nceplibs_prepbufr_table():
@@ -202,7 +223,17 @@ def create_obs_meta_nceplibs_prepbufr_table():
               Column('filename', String),
               Column('file_size', Integer),
               Column('obs_day', DateTime),
-              Column('inserted_at', DateTime)
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'filename',
+                'obs_day',
+                'file_size',
+                'variable',
+                'typ',
+                'tot',
+                name='unqiue_prepbufr_meta'
+            )
         )
 
 def create_obs_meta_nceplibs_prepbufr_agg_table():
@@ -243,7 +274,16 @@ def create_obs_meta_nceplibs_prepbufr_agg_table():
               Column('filename', String),
               Column('file_size', Integer),
               Column('obs_day', DateTime),
-              Column('inserted_at', DateTime)
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'variable',
+                'tot',
+                'filename',
+                'file_size',
+                'obs_day',
+                name='unique_prebufr_agg_meta'
+            )
         )
 
 class CmdResult(Base):
@@ -265,6 +305,16 @@ class CmdResult(Base):
 
 class ObsInventory(Base):
     __tablename__ = OBS_INVENTORY_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'unique_hash',
+            'obs_day',
+            'file_size',
+            'last_modified',
+            'etag',
+            name='unique_obs_inventory'
+        ),
+    )
 
     obs_id = Column(Integer, primary_key=True)
     cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
@@ -284,13 +334,26 @@ class ObsInventory(Base):
     etag = Column(String(34))
     permissions = Column(String(15))
     last_modified = Column(DateTime())
+    unique_hash = Column(String(64))
     inserted_at = Column(DateTime())
+    valid_at = Column(DateTime())
 
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
 
 
 class ObsMetaNceplibsBufr(Base):
     __tablename__ = OBS_META_NCEPLIBS_BUFR_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'filename',
+            'obs_day',
+            'file_size',
+            'obs_id',
+            'sat_id',
+            'sat_inst_id',
+            name='unique_bufr_meta'
+        ),
+    )
 
     meta_id = Column(Integer, primary_key=True)
     obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
@@ -311,6 +374,18 @@ class ObsMetaNceplibsBufr(Base):
 
 class ObsMetaNceplibsPrepbufr(Base):
     __tablename__ = OBS_META_NCEPLIBS_PREPBUFR_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'filename',
+            'obs_day',
+            'file_size',
+            'variable',
+            'typ',
+            'tot',
+            name='unqiue_prepbufr_meta'
+        ),
+    )
 
     meta_id = Column(Integer, primary_key=True)
     obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
@@ -340,6 +415,17 @@ class ObsMetaNceplibsPrepbufr(Base):
 
 class ObsMetaNceplibsPrepbufrAggregate(Base):
     __tablename__ = OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'variable',
+            'tot',
+            'filename',
+            'file_size',
+            'obs_day',
+            name='unique_prebufr_agg_meta'
+        ),
+    )
 
     meta_id = Column(Integer, primary_key=True)
     obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
@@ -366,6 +452,10 @@ class ObsMetaNceplibsPrepbufrAggregate(Base):
 
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
 
+def generate_obs_inventory_hash(filename, parent_dir, platform, s3_bucket):
+    hash_input = f"{filename}{parent_dir}{platform}{s3_bucket}"
+    return hashlib.md5(hash_input.encode('utf-8')).hexdigest()
+
 def insert_obs_inv_items(obs_inv_items):
     if not isinstance(obs_inv_items, list):
         msg = 'Inserted observation inventory items must be in the form' \
@@ -376,33 +466,56 @@ def insert_obs_inv_items(obs_inv_items):
     for obs_item in obs_inv_items:
         if not isinstance(obs_item, se.TarballFileMeta):
             msg = 'Each observation inventory item must be in the form' \
-                  f' of TarballFileMeta. Item type: {type(obs_item)}'
+                f' of TarballFileMeta. Item type: {type(obs_item)}'
             raise TypeError(msg)
 
-        tbl_item = ObsInventory(
-            cmd_result_id=obs_item.cmd_result_id,
-            filename=obs_item.filename,
-            parent_dir=obs_item.parent_dir,
-            platform=obs_item.platform,
-            s3_bucket=obs_item.s3_bucket,
-            prefix=obs_item.prefix,
-            cycle_tag=obs_item.cycle_tag,
-            data_type=obs_item.data_type,
-            cycle_time=obs_item.cycle_time,
-            obs_day=obs_item.obs_day,
-            data_format=obs_item.data_format,
-            suffix=obs_item.suffix,
-            nr_tag=obs_item.nr_tag,
-            file_size=obs_item.file_size,
-            etag=obs_item.etag,
-            permissions=obs_item.permissions,
-            last_modified=obs_item.last_modified,
-            inserted_at=obs_item.inserted_at,
+        hash_value = generate_obs_inventory_hash(obs_item.filename, obs_item.parent_dir, obs_item.platform,
+                                                 obs_item.s3_bucket)
+
+        row = {
+            'cmd_result_id': obs_item.cmd_result_id,
+            'filename': obs_item.filename,
+            'parent_dir': obs_item.parent_dir,
+            'platform': obs_item.platform,
+            's3_bucket': obs_item.s3_bucket,
+            'prefix': obs_item.prefix,
+            'cycle_tag': obs_item.cycle_tag,
+            'data_type': obs_item.data_type,
+            'cycle_time': obs_item.cycle_time,
+            'obs_day': obs_item.obs_day,
+            'data_format': obs_item.data_format,
+            'suffix': obs_item.suffix,
+            'nr_tag': obs_item.nr_tag,
+            'file_size': obs_item.file_size,
+            'etag': obs_item.etag,
+            'permissions': obs_item.permissions,
+            'last_modified': obs_item.last_modified,
+            'unique_hash': hash_value,
+            'inserted_at': obs_item.inserted_at,
+            'valid_at': obs_item.valid_at,
+        }
+        rows.append(row)
+
+    #handle the best way available for each database type
+    if(database_type.lower() == 'mysql'):
+        statement = mysql_insert(ObsInventory).values(rows)
+        statement = statement.on_duplicate_key_update(
+            valid_at=statement.inserted.valid_at
         )
-        rows.append(tbl_item)
+    else:
+        #sqlite specific
+        statement = sqlite_insert(ObsInventory).values(rows)
+        statement = statement.on_conflict_do_update(
+            index_elements=['unique_hash',
+            'obs_day',
+            'file_size',
+            'last_modified',
+            'etag'],
+            set_={'valid_at': statement.excluded.valid_at}
+        )
 
     session = Session()
-    session.bulk_save_objects(rows)
+    session.execute(statement)
     session.commit()
     session.close()
 
@@ -440,29 +553,43 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
         msg = 'Inserted obs nceplibs bufr meta items must be in the form' \
               f' of a list.  Received type: {type(obs_meta_items)}'
         raise TypeError(msg)
-
+    
     rows = []
     for item in obs_meta_items:
+        row = {
+                'obs_id': item.obs_id,
+                'cmd_result_id': item.cmd_result_id,
+                'cmd_str': item.cmd_str,
+                'sat_id': item.sat_id,
+                'sat_id_name': item.sat_id_name,
+                'obs_count': item.obs_count,
+                'sat_inst_id': item.sat_inst_id,
+                'sat_inst_desc': item.sat_inst_desc,
+                'filename': item.filename,
+                'file_size': item.file_size,
+                'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+                'inserted_at': datetime.utcnow()
+            }
+        rows.append(row)
 
-        tbl_item = ObsMetaNceplibsBufr(
-            obs_id=item.obs_id,
-            cmd_result_id=item.cmd_result_id,
-            cmd_str=item.cmd_str,
-            sat_id=item.sat_id,
-            sat_id_name=item.sat_id_name,
-            obs_count=item.obs_count,
-            sat_inst_id=item.sat_inst_id,
-            sat_inst_desc=item.sat_inst_desc,
-            filename=item.filename,
-            file_size=item.file_size,
-            obs_day=item.obs_day,
-            inserted_at=datetime.utcnow()
-        )
-
-        rows.append(tbl_item)
+    #This has to be raw SQL to use the INSERT/IGNORE call
+    if(database_type.lower() == 'mysql'):
+        #mysql compatible
+        sql = """
+            INSERT IGNORE INTO obs_meta_nceplibs_bufr
+            (obs_id, cmd_result_id, cmd_str, sat_id, sat_id_name, obs_count, sat_inst_id, sat_inst_desc, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :sat_id, :sat_id_name, :obs_count, :sat_inst_id, :sat_inst_desc, :filename, :file_size, :obs_day, :inserted_at)
+            """
+    else:
+        #sqlite compatible
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_nceplibs_bufr
+            (obs_id, cmd_result_id, cmd_str, sat_id, sat_id_name, obs_count, sat_inst_id, sat_inst_desc, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :sat_id, :sat_id_name, :obs_count, :sat_inst_id, :sat_inst_desc, :filename, :file_size, :obs_day, :inserted_at)
+            """
 
     session = Session()
-    session.bulk_save_objects(rows)
+    session.execute(text(sql), rows)
     session.commit()
     session.close()
 
@@ -474,35 +601,48 @@ def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
 
     rows = []
     for item in obs_meta_items:
-        tbl_item = ObsMetaNceplibsPrepbufr(
-            obs_id=item.obs_id,
-            cmd_result_id=item.cmd_result_id,
-            cmd_str=item.cmd_str,
-            variable=item.variable,
-            typ = item.typ,
-            tot=item.tot,
-            qm0thru3=item.qm0thru3,
-            qm4thru7=item.qm4thru7,
-            qm8=item.qm8,
-            qm9=item.qm9,
-            qm10=item.qm10,
-            qm11=item.qm11,
-            qm12=item.qm12,
-            qm13=item.qm13,
-            qm14=item.qm14,
-            qm15=item.qm15,
-            cka=item.cka,
-            ckb=item.ckb,
-            filename=item.filename,
-            file_size=item.file_size,
-            obs_day=item.obs_day,
-            inserted_at=datetime.utcnow()
-        )
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable': item.variable,
+            'typ': item.typ,
+            'tot': item.tot,
+            'qm0thru3': item.qm0thru3,
+            'qm4thru7': item.qm4thru7,
+            'qm8': item.qm8,
+            'qm9': item.qm9,
+            'qm10': item.qm10,
+            'qm11': item.qm11,
+            'qm12': item.qm12,
+            'qm13': item.qm13,
+            'qm14': item.qm14,
+            'qm15': item.qm15,
+            'cka': item.cka,
+            'ckb': item.ckb,
+            'filename': item.filename,
+            'file_size': item.file_size,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.utcnow()
+        }
+        rows.append(row)
 
-        rows.append(tbl_item)
+    # SQL statement with INSERT/IGNORE
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_nceplibs_prepbufr
+            (obs_id, cmd_result_id, cmd_str, variable, typ, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :typ, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
+            """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_nceplibs_prepbufr
+            (obs_id, cmd_result_id, cmd_str, variable, typ, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :typ, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
+            """
 
     session = Session()
-    session.bulk_save_objects(rows)
+    session.execute(text(sql), rows)
     session.commit()
     session.close()
 
@@ -511,37 +651,50 @@ def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
         msg = 'Inserted obs nceplibs prepbufr aggregate meta items must be in the form' \
               f' of a list.  Received type: {type(obs_meta_items)}'
         raise TypeError(msg)
-
+    
     rows = []
     for item in obs_meta_items:
-        tbl_item = ObsMetaNceplibsPrepbufrAggregate(
-            obs_id=item.obs_id,
-            cmd_result_id=item.cmd_result_id,
-            cmd_str=item.cmd_str,
-            variable=item.variable,
-            tot=item.tot,
-            qm0thru3=item.qm0thru3,
-            qm4thru7=item.qm4thru7,
-            qm8=item.qm8,
-            qm9=item.qm9,
-            qm10=item.qm10,
-            qm11=item.qm11,
-            qm12=item.qm12,
-            qm13=item.qm13,
-            qm14=item.qm14,
-            qm15=item.qm15,
-            cka=item.cka,
-            ckb=item.ckb,
-            filename=item.filename,
-            file_size=item.file_size,
-            obs_day=item.obs_day,
-            inserted_at=datetime.utcnow()
-        )
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable': item.variable,
+            'tot': item.tot,
+            'qm0thru3': item.qm0thru3,
+            'qm4thru7': item.qm4thru7,
+            'qm8': item.qm8,
+            'qm9': item.qm9,
+            'qm10': item.qm10,
+            'qm11': item.qm11,
+            'qm12': item.qm12,
+            'qm13': item.qm13,
+            'qm14': item.qm14,
+            'qm15': item.qm15,
+            'cka': item.cka,
+            'ckb': item.ckb,
+            'filename': item.filename,
+            'file_size': item.file_size,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.utcnow()
+        }
+        rows.append(row)
 
-        rows.append(tbl_item)
+    # SQL statement with INSERT IGNORE
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_nceplibs_prepbufr_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
+            """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_nceplibs_prepbufr_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
+            """
 
     session = Session()
-    session.bulk_save_objects(rows)
+    session.execute(text(sql), rows)
     session.commit()
     session.close()
 
