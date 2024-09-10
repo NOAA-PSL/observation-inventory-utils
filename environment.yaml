@@ -21,4 +21,4 @@ dependencies:
   - meson
   - attrs
   - joblib
-  - mysql-connector-python=8.
+  - mysql-connector-python=8.3
