@@ -127,6 +127,7 @@ def get_line_type(line):
             return HEADER_LINE
         if line.strip() == "":
             return FILLER_LINE
+        
         if line[0] != ' ':
             return OBS_DATA_LINE
         else:
