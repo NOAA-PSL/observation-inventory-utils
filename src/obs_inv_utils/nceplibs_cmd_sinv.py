@@ -129,7 +129,6 @@ def parse_output(output, bufr_file):
     lines_meta = []
     obs_cnt_sum = 0
     for line in output_lines:
-        print(f"line: {line}")
         line_type = get_line_type(line)
         if line_type == OBS_DATA_LINE:
             sat_id = get_sat_id(line)
