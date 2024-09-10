@@ -173,7 +173,7 @@ def parse_output(output, bufr_file):
     return lines_meta
 
 def parse_data_line(line):
-    split_line = line.split(maxsplit=4) #know there's 5 columns
+    split_line = line.split('  ', maxsplit=4) #know there's 5 columns
 
     #define variables to be assigned
     sat_id = None
