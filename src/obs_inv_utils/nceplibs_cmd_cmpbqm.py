@@ -90,7 +90,6 @@ def parse_output(output, prepbufr_file):
         lines_meta = []
         current_variable = ""
         for line in output_lines:
-            print(f'line: {line}')
             # skip any lines which are all whitespace
             if line.isspace():
                 continue
@@ -135,7 +134,6 @@ def parse_output(output, prepbufr_file):
                 if cleaned_line[3].isalpha():
                         cleaned_line = cleaned_line[0:4] + ' ' + cleaned_line[4:]
                 split = cleaned_line.split()
-                print(f'split line: {split}')
                 typ = split[0]
                 tot = split[1]
                 qm0thru3 = split[2]
