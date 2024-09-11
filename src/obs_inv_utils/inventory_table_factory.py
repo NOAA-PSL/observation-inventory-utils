@@ -571,7 +571,10 @@ class ObsMetaHvIodaNetcdf(Base):
     thinning = Column(Float())
     ioda_version = Column(String(63))
     filename = Column(String(63))
-    obs_day = Column(DateTime())
+    #file date time (what's in it)
+    #min date time inside (computed)
+    #max date time inside 
+    obs_day = Column(DateTime()) #base this on the ifle anme for consistentcy
     inserted_at = Column(DateTime())
 
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
