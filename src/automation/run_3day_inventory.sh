@@ -10,7 +10,7 @@ WORK_DIR=/lustre/home/work/inventory-work
 
 cd $(dirname $0)
 
-source ../../obs_inv_utils_pw_cloud.sh
+source ../../obs_inv_utils_pw_inv_cluster.sh
 
 #run inventory 
 python3 auto_inventory.py -cat atmosphere -ago 3 -n_jobs 150 -work_dir $WORK_DIR 

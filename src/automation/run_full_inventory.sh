@@ -9,7 +9,7 @@ WORK_DIR=/lustre/home/work/inventory-work
 
 cd $(dirname $0)
 
-source ../../obs_inv_utils_pw_cloud.sh
+source ../../obs_inv_utils_pw_inv_cluster.sh
 
 #run inventory 
 python3 auto_inventory.py -cat list -n_jobs 80 -work_dir $WORK_DIR --list airs_airsev airs_aqua amsua_1bamua amsua_nasa_aqua amsua_nasa_r21c \
