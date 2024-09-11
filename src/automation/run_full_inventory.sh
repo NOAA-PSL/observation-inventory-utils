@@ -2,9 +2,9 @@
 # This script is for running the automated inventory for 
 # the full period of each variable to get updates for added data
 
-SATINFO_DIR=/home/$USER/obs-inventory/build_gsinfo/satinfo
-OZINFO_DIR=/home/$USER/obs-inventory/build_gsinfo/ozinfo
-OUTPUT_LOC=/home/$USER/inventory-figures
+SATINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/satinfo
+OZINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/ozinfo
+OUTPUT_LOC=/contrib/$USER/home/inventory-figures
 WORK_DIR=/lustre/home/work/inventory-work
 
 cd $(dirname $0)
