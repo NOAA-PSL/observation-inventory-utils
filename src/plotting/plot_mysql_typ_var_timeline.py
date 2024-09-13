@@ -246,7 +246,7 @@ variables = None
 if args.var_list is not None:
     variables = filter_acceptable_variables(args.var_list)
 
-df = utils.get_distinct_prepbufr_by_typ(args.typ_list)
+df = utils.get_distinct_prepbufr_by_typ_variable(args.typ_list, variables)
 
 if args.qc_only: #quality controlled only
     if args.plot_together:
