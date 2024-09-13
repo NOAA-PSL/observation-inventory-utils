@@ -70,10 +70,11 @@ def plot_timeseries_by_typ_and_variable_tot(df):
     plt.tight_layout()
     plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
     
+    #TODO: handle so the file name doesn't get too long
     # Create the output file name based on unique typ and variable combinations
     file_name = f"timeseries_typ_variable_{combo_string}.png"
     if args.dev:
-        file_name = f"timeseries_typ_variable_{combo_string}" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+        file_name = f"timeseries_typ_variable_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
     
     fnout = os.path.join(args.out_dir, file_name)
     print(f"saving {fnout}")
@@ -176,10 +177,11 @@ def plot_timeseries_by_typ_and_variable_qm0thru3(df):
     plt.tight_layout()
     plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
     
+    #TODO: handle so the file name doesn't get too long
     # Create the output file name based on unique typ and variable combinations
     file_name = f"timeseries_qm0thru3_typ_variable_{combo_string}.png"
     if args.dev:
-        file_name = f"timeseries_qm0thru3_typ_variable_{combo_string}" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+        file_name = f"timeseries_qm0thru3_typ_variable_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
     
     fnout = os.path.join(args.out_dir, file_name)
     print(f"saving {fnout}")
