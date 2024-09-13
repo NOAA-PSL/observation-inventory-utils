@@ -57,7 +57,6 @@ def plot_timeseries_by_typ_and_variable_tot(df):
     ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
     ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
-    ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
     plt.xticks(rotation=45, ha='right')
 
     # Add grid and legend
@@ -111,7 +110,6 @@ def plot_timeseries_each_typ_variable_tot(df):
         ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
         ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
-        ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
         plt.xticks(rotation=45, ha='right')
 
         # Add grid and legend
@@ -165,7 +163,6 @@ def plot_timeseries_by_typ_and_variable_qm0thru3(df):
     ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
     ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
-    ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
     plt.xticks(rotation=45, ha='right')
 
     # Add grid and legend
@@ -219,7 +216,6 @@ def plot_timeseries_each_typ_variable_qm0thru3(df):
         ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
         ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
-        ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
         plt.xticks(rotation=45, ha='right')
 
         # Add grid and legend
