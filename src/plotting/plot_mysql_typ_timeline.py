@@ -32,7 +32,7 @@ def plot_timeseries_all_typ_tot(df):
     df = df.sort_values(by='obs_day')
     
     # Create the plot
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
     # Plot data for each typ
     unique_typs = df['typ'].unique()
@@ -46,9 +46,11 @@ def plot_timeseries_all_typ_tot(df):
     ax.set_ylabel('TOT')
 
     # Formatting the x-axis for dates
-    ax.xaxis.set_major_locator(mdates.MonthLocator())  # Adjust the granularity as needed
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-    plt.xticks(rotation=45)
+    ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
+    ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
+    plt.xticks(rotation=45, ha='right')
 
     # Add grid and legend
     ax.grid(True)
@@ -82,7 +84,7 @@ def plot_timeseries_by_typ_tot(df):
         typ_df = typ_df.sort_values(by='obs_day')
         
         # Create the plot
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
         ax.plot(typ_df['obs_day'], typ_df['tot'], marker='o', label=f'Typ {typ}')
         
         # Set title and labels
@@ -91,9 +93,11 @@ def plot_timeseries_by_typ_tot(df):
         ax.set_ylabel('TOT')
         
         # Formatting the x-axis for dates
-        ax.xaxis.set_major_locator(mdates.MonthLocator())  # Change to whatever granularity you need (e.g., day, month)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-        plt.xticks(rotation=45)
+        ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
+        ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
+        ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
+        plt.xticks(rotation=45, ha='right')
 
         # Add grid and legend
         ax.grid(True)
@@ -122,7 +126,7 @@ def plot_timeseries_all_typ_qm0thru3(df):
     df = df.sort_values(by='obs_day')
     
     # Create the plot
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
     # Plot data for each typ
     unique_typs = df['typ'].unique()
@@ -136,9 +140,11 @@ def plot_timeseries_all_typ_qm0thru3(df):
     ax.set_ylabel('qm0thru3')
 
     # Formatting the x-axis for dates
-    ax.xaxis.set_major_locator(mdates.MonthLocator())  # Adjust the granularity as needed
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-    plt.xticks(rotation=45)
+    ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
+    ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
+    plt.xticks(rotation=45, ha='right')
 
     # Add grid and legend
     ax.grid(True)
@@ -172,7 +178,7 @@ def plot_timeseries_by_typ_qm0thru3(df):
         typ_df = typ_df.sort_values(by='obs_day')
         
         # Create the plot
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
         ax.plot(typ_df['obs_day'], typ_df['qm0thru3'], marker='o', label=f'Typ {typ}')
         
         # Set title and labels
@@ -181,9 +187,11 @@ def plot_timeseries_by_typ_qm0thru3(df):
         ax.set_ylabel('qm0thru3')
         
         # Formatting the x-axis for dates
-        ax.xaxis.set_major_locator(mdates.MonthLocator())  # Change to whatever granularity you need (e.g., day, month)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-        plt.xticks(rotation=45)
+        ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
+        ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
+        ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
+        plt.xticks(rotation=45, ha='right')
 
         # Add grid and legend
         ax.grid(True)

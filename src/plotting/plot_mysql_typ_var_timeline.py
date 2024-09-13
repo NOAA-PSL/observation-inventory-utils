@@ -33,7 +33,7 @@ def plot_timeseries_by_typ_and_variable_tot(df):
     df = df.sort_values(by='obs_day')
     
     # Create the plot
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
     # Get unique combinations of typ and variable
     unique_combos = df[['typ', 'variable']].drop_duplicates()
@@ -54,9 +54,11 @@ def plot_timeseries_by_typ_and_variable_tot(df):
     ax.set_ylabel('TOT')
 
     # Formatting the x-axis for dates (display only the year)
-    ax.xaxis.set_major_locator(mdates.YearLocator())  # Use YearLocator for major ticks
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Display only the year
-    plt.xticks(rotation=45)
+    ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
+    ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
+    plt.xticks(rotation=45, ha='right')
 
     # Add grid and legend
     ax.grid(True)
@@ -97,7 +99,7 @@ def plot_timeseries_each_typ_variable_tot(df):
         combo_df = df[(df['typ'] == typ) & (df['variable'] == variable)]
         
         # Create the plot
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
         ax.plot(combo_df['obs_day'], combo_df['tot'], marker='o', label=f'Typ {typ} - Variable {variable}')
         
         # Set title and labels
@@ -106,9 +108,11 @@ def plot_timeseries_each_typ_variable_tot(df):
         ax.set_ylabel('TOT')
 
         # Formatting the x-axis for dates (display only the year)
-        ax.xaxis.set_major_locator(mdates.YearLocator())  # Use YearLocator for major ticks
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Display only the year
-        plt.xticks(rotation=45)
+        ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
+        ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
+        ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
+        plt.xticks(rotation=45, ha='right')
 
         # Add grid and legend
         ax.grid(True)
@@ -137,7 +141,7 @@ def plot_timeseries_by_typ_and_variable_qm0thru3(df):
     df = df.sort_values(by='obs_day')
     
     # Create the plot
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
     # Get unique combinations of typ and variable
     unique_combos = df[['typ', 'variable']].drop_duplicates()
@@ -158,9 +162,11 @@ def plot_timeseries_by_typ_and_variable_qm0thru3(df):
     ax.set_ylabel('qm0thru3')
 
     # Formatting the x-axis for dates (display only the year)
-    ax.xaxis.set_major_locator(mdates.YearLocator())  # Use YearLocator for major ticks
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Display only the year
-    plt.xticks(rotation=45)
+    ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
+    ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
+    plt.xticks(rotation=45, ha='right')
 
     # Add grid and legend
     ax.grid(True)
@@ -201,7 +207,7 @@ def plot_timeseries_each_typ_variable_qm0thru3(df):
         combo_df = df[(df['typ'] == typ) & (df['variable'] == variable)]
         
         # Create the plot
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
         ax.plot(combo_df['obs_day'], combo_df['tot'], marker='o', label=f'Typ {typ} - Variable {variable}')
         
         # Set title and labels
@@ -210,9 +216,11 @@ def plot_timeseries_each_typ_variable_qm0thru3(df):
         ax.set_ylabel('qm0thru3')
 
         # Formatting the x-axis for dates (display only the year)
-        ax.xaxis.set_major_locator(mdates.YearLocator())  # Use YearLocator for major ticks
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Display only the year
-        plt.xticks(rotation=45)
+        ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
+        ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
+        ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))  # Format minor ticks as months
+        plt.xticks(rotation=45, ha='right')
 
         # Add grid and legend
         ax.grid(True)
