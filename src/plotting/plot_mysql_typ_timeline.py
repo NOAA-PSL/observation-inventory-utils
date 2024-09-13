@@ -131,7 +131,7 @@ def plot_timeseries_all_typ_qm0thru3(df):
         ax.plot(typ_df['obs_day'], typ_df['qm0thru3'], marker='o', label=f'Typ {typ}')
     
     # Set title and labels
-    ax.set_title('Time Series for All Type Values')
+    ax.set_title('Time Series for All Type Values Quality Controlled')
     ax.set_xlabel('Observation Day')
     ax.set_ylabel('qm0thru3')
 
