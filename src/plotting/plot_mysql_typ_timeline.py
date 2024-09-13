@@ -208,13 +208,13 @@ def plot_timeseries_by_typ_qm0thru3(df):
 
 df = utils.get_distinct_prepbufr_by_typ(args.typ_list)
 
-if args.qc_only: #quality controlled only
-    if args.plot_together:
+if args.qc_only is True: #quality controlled only
+    if args.plot_together is True:
         plot_timeseries_all_typ_qm0thru3(df)
     else: 
         plot_timeseries_by_typ_qm0thru3(df)
 else: #total 
-    if args.plot_together:
+    if args.plot_together is True:
         plot_timeseries_all_typ_tot(df)
     else: 
         plot_timeseries_by_typ_tot(df)

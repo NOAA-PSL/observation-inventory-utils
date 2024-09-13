@@ -250,15 +250,17 @@ variables = None
 if args.var_list is not None:
     variables = filter_acceptable_variables(args.var_list)
 
+print(f"Args: QC: {args.qc_only} , Plot Together: {args.plot_together}")
+
 df = utils.get_distinct_prepbufr_by_typ_variable(args.typ_list, variables)
 
-if args.qc_only: #quality controlled only
-    if args.plot_together:
+if args.qc_only is True: #quality controlled only
+    if args.plot_together is True:
         plot_timeseries_by_typ_and_variable_qm0thru3(df)
     else: 
         plot_timeseries_each_typ_variable_qm0thru3(df)
 else: #total 
-    if args.plot_together:
+    if args.plot_together is True:
         plot_timeseries_by_typ_and_variable_tot(df)
     else: 
         plot_timeseries_each_typ_variable_tot(df)
