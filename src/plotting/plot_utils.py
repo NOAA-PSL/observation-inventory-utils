@@ -346,8 +346,12 @@ def get_distinct_prepbufr_by_typ(typ_list):
     return df
 
 def get_distinct_prepbufr_by_typ_variable(typ_list, var_list):
-    if typ_list is None:
+    if typ_list is None and var_list is None:
         return get_distinct_prepbufr() #return all values if no filter given
+    if var_list is None:
+        return get_distinct_prepbufr_by_typ(typ_list) #no variables, just use typ list
+    if typ_list is None: 
+        return get_distinct_prepbufr() #return all values since no variable only options right now
 
     session = itf.Session()
     # Subquery to get the most recent inserted_at for each combination of other columns
@@ -389,7 +393,8 @@ def get_distinct_prepbufr_by_typ_variable(typ_list, var_list):
         omnp.obs_id == oi.obs_id
     ).filter(
         oi.s3_bucket == 'noaa-reanalyses-pds',
-        omnp.typ.in_(typ_list) #filter by typ_list
+        omnp.typ.in_(typ_list), #filter by typ_list
+        omnp.variable.in_(var_list)
     )
 
     # Execute the query
