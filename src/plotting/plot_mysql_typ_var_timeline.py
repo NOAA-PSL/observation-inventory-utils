@@ -16,9 +16,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 parser.add_argument("-qc_only", dest='qc_only', help="Use this flag to only get the qm0thru3 values versus the default of total ", default=False, type=bool)
+parser.add_argument("-plot_together", dest="plot_together", help="Boolean to say if you want all typs on one plot or on their own individual. True [default] produces one plot, False produces individuals", default=True, type=bool)
 parser.add_argument("-typ_list", dest="typ_list", help="List of the typs to plot", type=int, nargs='+')
 parser.add_argument("-var_list", dest="var_list", help="List of variables to plot", type=str, nargs='+')
-parser.add_argument("-plot_together", dest="plot_together", help="Boolean to say if you want all typs on one plot or on their own individual. True [default] produces one plot, False produces individuals", default=True, type=bool)
 args = parser.parse_args()
 
 
