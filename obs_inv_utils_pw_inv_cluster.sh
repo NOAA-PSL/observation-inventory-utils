@@ -2,7 +2,7 @@
 #
 # script for configuring set up to run on obs inventory cluster on parallel works
 
-
+conda activate obs-inventory-env
 module load gnu
 module load intel/2023.2.0
 module load impi/2023.2.0

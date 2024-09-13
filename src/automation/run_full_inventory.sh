@@ -9,7 +9,6 @@ WORK_DIR=/lustre/home/work/inventory-work
 
 cd $(dirname $0)
 
-conda activate obs-inventory-env
 source ../../obs_inv_utils_pw_inv_cluster.sh
 
 #run inventory 
