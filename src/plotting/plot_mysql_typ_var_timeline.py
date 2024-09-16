@@ -46,7 +46,7 @@ def plot_timeseries_by_typ_and_variable_tot(df):
         combo_df = df[(df['typ'] == typ) & (df['variable'] == variable)]
         
         # Plot the data with a label that includes both typ and variable
-        ax.plot(combo_df['obs_day'], combo_df['tot'], marker='o', label=f'Typ {typ} - Variable {variable}')
+        ax.scatter(combo_df['obs_day'], combo_df['tot'], marker='o', label=f'Typ {typ} - Variable {variable}')
     
     # Set title and labels
     ax.set_title('Time Series for Typ and Variable Combinations')
@@ -100,7 +100,7 @@ def plot_timeseries_each_typ_variable_tot(df):
         
         # Create the plot
         fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
-        ax.plot(combo_df['obs_day'], combo_df['tot'], marker='o', label=f'Typ {typ} - Variable {variable}')
+        ax.scatter(combo_df['obs_day'], combo_df['tot'], marker='o', label=f'Typ {typ} - Variable {variable}')
         
         # Set title and labels
         ax.set_title(f'Time Series for Typ {typ} and Variable {variable}')
@@ -153,7 +153,7 @@ def plot_timeseries_by_typ_and_variable_qm0thru3(df):
         combo_df = df[(df['typ'] == typ) & (df['variable'] == variable)]
         
         # Plot the data with a label that includes both typ and variable
-        ax.plot(combo_df['obs_day'], combo_df['qm0thru3'], marker='o', label=f'Typ {typ} - Variable {variable}')
+        ax.scatter(combo_df['obs_day'], combo_df['qm0thru3'], marker='o', label=f'Typ {typ} - Variable {variable}')
     
     # Set title and labels
     ax.set_title('Time Series for Typ and Variable Combinations Quality Controlled')
@@ -207,7 +207,7 @@ def plot_timeseries_each_typ_variable_qm0thru3(df):
         
         # Create the plot
         fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
-        ax.plot(combo_df['obs_day'], combo_df['tot'], marker='o', label=f'Typ {typ} - Variable {variable}')
+        ax.scatter(combo_df['obs_day'], combo_df['tot'], marker='o', label=f'Typ {typ} - Variable {variable}')
         
         # Set title and labels
         ax.set_title(f'Time Series for Typ {typ} and Variable {variable} Quality Controlled')
