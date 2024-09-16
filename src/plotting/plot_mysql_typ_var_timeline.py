@@ -254,7 +254,7 @@ if args.var_list is not None:
 
 print(f"Args: QC: {args.qc_only} , Plot Separate: {args.plot_separate}")
 
-#df = utils.get_distinct_prepbufr_by_typ_variable(args.typ_list, variables)
+df = utils.get_distinct_prepbufr_by_typ_variable(args.typ_list, variables)
 
 if args.qc_only is True: #quality controlled only
     if args.plot_separate is False:
