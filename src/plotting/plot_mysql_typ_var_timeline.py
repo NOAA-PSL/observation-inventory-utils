@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 parser.add_argument("-qc_only", dest='qc_only', help="Use this flag to only get the qm0thru3 values versus the default of total ", default=False, type=bool)
-parser.add_argument("-together", dest="plot_together", help="Boolean to say if you want all typs on one plot or on their own individual. True [default] produces one plot, False produces individuals", default=True, type=bool)
+parser.add_argument("-separate", dest="plot_separate", help="Boolean to say if you want all typs on one plot or on their own individual. Passing in True will plot each one individually", default=False, type=bool)
 parser.add_argument("-typ_list", dest="typ_list", help="List of the typs to plot", type=int, nargs='+')
 parser.add_argument("-var_list", dest="var_list", help="List of variables to plot", type=str, nargs='+')
 args = parser.parse_args()
@@ -252,17 +252,17 @@ variables = None
 if args.var_list is not None:
     variables = filter_acceptable_variables(args.var_list)
 
-print(f"Args: QC: {args.qc_only} , Plot Together: {args.plot_together}")
+print(f"Args: QC: {args.qc_only} , Plot Separate: {args.plot_separate}")
 
 #df = utils.get_distinct_prepbufr_by_typ_variable(args.typ_list, variables)
 
 if args.qc_only is True: #quality controlled only
-    if args.plot_together is True:
+    if args.plot_separate is False:
         plot_timeseries_by_typ_and_variable_qm0thru3(df)
     else: 
         plot_timeseries_each_typ_variable_qm0thru3(df)
 else: #total 
-    if args.plot_together is True:
+    if args.plot_separate is False:
         plot_timeseries_by_typ_and_variable_tot(df)
     else: 
         plot_timeseries_each_typ_variable_tot(df)
