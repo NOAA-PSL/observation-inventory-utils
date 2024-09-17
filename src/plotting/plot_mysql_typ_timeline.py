@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 parser.add_argument("-qc_only", dest='qc_only', help="Use this flag to only get the qm0thru3 values versus the default of total ", default=False, type=bool)
-parser.add_argument("-plot_together", dest="plot_together", help="Boolean to say if you want all typs on one plot or on their own individual. True [default] produces one plot, False produces individuals", default=True, type=bool)
+parser.add_argument("-separate", dest="plot_separate", help="Boolean to say if you want all typs on one plot or on their own individual. Passing in True will plot each one individually", default=False, type=bool)
 parser.add_argument("--list", dest="typ_list", help="List of the typs to plot", type=int, nargs='+')
 args = parser.parse_args()
 
@@ -38,7 +38,7 @@ def plot_timeseries_all_typ_tot(df):
     unique_typs = df['typ'].unique()
     for typ in unique_typs:
         typ_df = df[df['typ'] == typ]
-        ax.plot(typ_df['obs_day'], typ_df['tot'], marker='o', label=f'Typ {typ}')
+        ax.scatter(typ_df['obs_day'], typ_df['tot'], marker='o', label=f'Typ {typ}')
     
     # Set title and labels
     ax.set_title('Time Series for All Type Values')
@@ -84,7 +84,7 @@ def plot_timeseries_by_typ_tot(df):
         
         # Create the plot
         fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
-        ax.plot(typ_df['obs_day'], typ_df['tot'], marker='o', label=f'Typ {typ}')
+        ax.scatter(typ_df['obs_day'], typ_df['tot'], marker='o', label=f'Typ {typ}')
         
         # Set title and labels
         ax.set_title(f'Time Series for Typ {typ}')
@@ -130,7 +130,7 @@ def plot_timeseries_all_typ_qm0thru3(df):
     unique_typs = df['typ'].unique()
     for typ in unique_typs:
         typ_df = df[df['typ'] == typ]
-        ax.plot(typ_df['obs_day'], typ_df['qm0thru3'], marker='o', label=f'Typ {typ}')
+        ax.scatter(typ_df['obs_day'], typ_df['qm0thru3'], marker='o', label=f'Typ {typ}')
     
     # Set title and labels
     ax.set_title('Time Series for All Type Values Quality Controlled')
@@ -176,7 +176,7 @@ def plot_timeseries_by_typ_qm0thru3(df):
         
         # Create the plot
         fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
-        ax.plot(typ_df['obs_day'], typ_df['qm0thru3'], marker='o', label=f'Typ {typ}')
+        ax.scatter(typ_df['obs_day'], typ_df['qm0thru3'], marker='o', label=f'Typ {typ}')
         
         # Set title and labels
         ax.set_title(f'Time Series for Typ {typ} Quality Controlled')
@@ -209,12 +209,12 @@ def plot_timeseries_by_typ_qm0thru3(df):
 df = utils.get_distinct_prepbufr_by_typ(args.typ_list)
 
 if args.qc_only is True: #quality controlled only
-    if args.plot_together is True:
+    if args.plot_separate is False:
         plot_timeseries_all_typ_qm0thru3(df)
     else: 
         plot_timeseries_by_typ_qm0thru3(df)
 else: #total 
-    if args.plot_together is True:
+    if args.plot_separate is False:
         plot_timeseries_all_typ_tot(df)
     else: 
         plot_timeseries_by_typ_tot(df)
