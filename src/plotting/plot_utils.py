@@ -12,7 +12,7 @@ from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsBufr as omnb
 from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsPrepbufr as omnp 
 from obs_inv_utils.inventory_table_factory import ObsInventory as oi
 import obs_inv_utils.inventory_table_factory as itf
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, or_
 
 #Dictionary of satellite names used for getting sat info files
 #For scripts to run successfully, they expect every sat we have data for to have a dictionary entry
@@ -198,6 +198,88 @@ def get_distinct_bufr():
     session.close()
 
     return df
+
+def get_distinct_bufr_by_sensors(sensor_list):
+    session = itf.Session()
+
+    # Subquery to get the most recent inserted_at for each combination of other columns
+    subquery = session.query(
+        omnb.obs_id,
+        omnb.sat_id,
+        omnb.sat_id_name,
+        omnb.obs_count,
+        omnb.sat_inst_id,
+        omnb.sat_inst_desc,
+        omnb.filename,
+        omnb.file_size,
+        omnb.obs_day,
+        func.max(omnb.inserted_at).label('max_inserted_at')
+    ).group_by(
+        omnb.obs_id,
+        omnb.sat_id,
+        omnb.sat_id_name,
+        omnb.obs_count,
+        omnb.sat_inst_id,
+        omnb.sat_inst_desc,
+        omnb.filename,
+        omnb.file_size,
+        omnb.obs_day
+    ).subquery()
+
+    # Join the subquery with the main table to get the full records
+    query = session.query(
+        omnb.obs_id, omnb.filename, omnb.sat_id, omnb.sat_id_name,
+        omnb.obs_count, omnb.obs_day, omnb.file_size, 
+        oi.parent_dir, oi.s3_bucket
+    ).join(
+        subquery,
+        (omnb.obs_id == subquery.c.obs_id) &
+        (omnb.sat_id == subquery.c.sat_id) &
+        (omnb.obs_count == subquery.c.obs_count) &
+        (omnb.sat_inst_id == subquery.c.sat_inst_id) &
+        (omnb.filename == subquery.c.filename) &
+        (omnb.file_size == subquery.c.file_size) &
+        (omnb.obs_day == subquery.c.obs_day) &
+        (omnb.inserted_at == subquery.c.max_inserted_at)
+    ).join(
+        oi,
+        omnb.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    # Add filter for parent_dir using LIKE with the sensor_list
+    if sensor_list:
+        sensor_filters = [oi.parent_dir.like(f"{sensor}%") for sensor in sensor_list]
+        query = query.filter(or_(*sensor_filters))
+
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [
+        {
+            'obs_id': result.obs_id,
+            'filename': result.filename,
+            'sat_id': result.sat_id,
+            'sat_id_name': result.sat_id_name,
+            'obs_count': result.obs_count,
+            'obs_day': result.obs_day,
+            'file_size': result.file_size,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
+
 
 def get_distinct_prepbufr():
     session = itf.Session()
