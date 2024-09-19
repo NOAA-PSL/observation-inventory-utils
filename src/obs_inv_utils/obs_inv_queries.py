@@ -13,6 +13,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 from obs_inv_utils import inventory_table_factory as itf
+from obs_inv_utils import obs_storage_platforms as platforms
 
 engine = itf.engine
 Base = declarative_base()
@@ -35,7 +36,7 @@ def get_family_fs_data(obs_family):
     filenames = set()
     members = obs_family.get_members()
     for member in members:
-        filename = 'gdas.%.' + member.get('data_type') + member.get('suffix')
+        filename = member.get('prefix') + '.%.' + member.get('cycle_tag') + member.get('data_type') + member.get('suffix')
         filenames.add(filename)
 
     fn_fs = session.query(
@@ -48,13 +49,14 @@ def get_family_fs_data(obs_family):
         oi.obs_day,
         oi.inserted_at,
         oi.suffix,
+        oi.platform,
         oi.parent_dir.concat(oi.filename).label('full_path'),
         func.max(oi.inserted_at).label('latest_record')
     ).select_from(
         oi
     ).filter(
         and_(
-            oi.platform == 'aws_s3',
+            oi.platform != None,
             or_(
                 oi.filename.like(fn) for fn in filenames
             )
@@ -105,6 +107,7 @@ def get_filesize_timeline_data(min_instances):
         oi.file_size,
         oi.obs_day,
         oi.inserted_at,
+        oi.platform,
         unique_names.c.instances,
         unique_names.c.un
     ).select_from(
@@ -168,13 +171,14 @@ def get_bufr_files_data(filenames, start, end):
         oi.obs_day,
         oi.inserted_at,
         oi.suffix,
+        oi.platform,
         oi.parent_dir.concat(oi.filename).label('full_path'),
         func.max(oi.inserted_at).label('latest_record')
     ).select_from(
         oi
     ).filter(
         and_(
-            oi.platform == 'aws_s3',
+            oi.platform != None,
             or_(
                 oi.filename.like(fn) for fn in unique_filenames
             ),
