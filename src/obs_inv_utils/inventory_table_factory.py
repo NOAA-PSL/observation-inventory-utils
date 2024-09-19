@@ -588,10 +588,13 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :sat_id, :sat_id_name, :obs_count, :sat_inst_id, :sat_inst_desc, :filename, :file_size, :obs_day, :inserted_at)
             """
 
-    session = Session()
-    session.execute(text(sql), rows)
-    session.commit()
-    session.close()
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the bufr meta table.")
 
 def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
     if not isinstance(obs_meta_items, list):
@@ -640,11 +643,13 @@ def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
             (obs_id, cmd_result_id, cmd_str, variable, typ, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :typ, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
             """
-
-    session = Session()
-    session.execute(text(sql), rows)
-    session.commit()
-    session.close()
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the prepbufr meta table.")
 
 def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
     if not isinstance(obs_meta_items, list):
@@ -693,10 +698,13 @@ def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
             """
 
-    session = Session()
-    session.execute(text(sql), rows)
-    session.commit()
-    session.close()
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the prepbufr agggregate meta table.")
 
 if(database_type.lower() == 'mysql'):
     Base.metadata.create_all(engine)

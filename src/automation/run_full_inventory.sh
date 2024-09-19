@@ -2,14 +2,14 @@
 # This script is for running the automated inventory for 
 # the full period of each variable to get updates for added data
 
-SATINFO_DIR=/home/$USER/obs-inventory/build_gsinfo/satinfo
-OZINFO_DIR=/home/$USER/obs-inventory/build_gsinfo/ozinfo
-OUTPUT_LOC=/home/$USER/inventory-figures
+SATINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/satinfo
+OZINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/ozinfo
+OUTPUT_LOC=/contrib/$USER/home/inventory-figures
 WORK_DIR=/lustre/home/work/inventory-work
 
 cd $(dirname $0)
 
-source ../../obs_inv_utils_pw_cloud.sh
+source ../../obs_inv_utils_pw_inv_cluster.sh
 
 #run inventory 
 python3 auto_inventory.py -cat list -n_jobs 80 -work_dir $WORK_DIR --list airs_airsev airs_aqua amsua_1bamua amsua_nasa_aqua amsua_nasa_r21c \
