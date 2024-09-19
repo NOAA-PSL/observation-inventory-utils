@@ -17,7 +17,7 @@ module load aws/2
 module load python/GEOSpyD/Min23.5.2-0_py3.11
 
 # Environment Variables ~ required (?) by obs_inv_utils
-setenv OBS_INV_HOME_DIR $NOBACKUP/workenv/observation-inventory-utils
+setenv OBS_INV_HOME_DIR $PWD
 setenv OBS_INV_SRC $OBS_INV_HOME_DIR/src
 setenv PYTHONPATH $OBS_INV_HOME_DIR/src:$PYTHONPATH
 setenv PATH $NOBACKUP/workenv/NCEPLIBS-bufr/NCEPLIBS-bufr-bufr_v12.0.0/utils:$PATH

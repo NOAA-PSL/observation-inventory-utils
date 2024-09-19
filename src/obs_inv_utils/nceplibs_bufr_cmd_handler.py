@@ -102,7 +102,7 @@ class ObsBufrFileMetaHandler(object):
     meta_config: ObsMetaSinvConfig
     bufr_files: list = field(default_factory=list, init=False)
     date_range: DateRange = field(init=False)
-    #config_yaml: str
+    # additional fields required in order to differentiate between aws and discover
     config_data: dict = field(default_factory=str, init=False)
     s3_bucket: str = field(default_factory=str, init=False)
     s3_prefix: str = field(default_factory=str, init=False)
@@ -129,12 +129,12 @@ class ObsBufrFileMetaHandler(object):
             self.date_range.end
         )
         
-        #temp_uuid = str(uuid.uuid4())
-
-        #work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
         bucket = self.meta_config.s3_bucket
         prefix = self.meta_config.s3_prefix
-        if bucket == 'noaa-reanalyses-pds': #or bucket == 'aws_s3':
+
+
+        # Because s3 bucket bufr files require download and new work_dir and discover files do not they need to be handled differently. 
+        if bucket == 'noaa-reanalyses-pds': 
             print(f'Running get_bufr_file_meta for NOAA S3 Clean Bucket (aws_s3) {self.s3_bucket}')
 
             temp_uuid = str(uuid.uuid4())
@@ -157,10 +157,10 @@ class ObsBufrFileMetaHandler(object):
 
                 # clean up files
                 if self.meta_config.scrub_files:
-                    #os.remove( saved_filename )
+                    os.remove( saved_filename )
                     shutil.rmtree( work_dir )
               
-        elif self.s3_bucket == None or self.s3_bucket == 'discover' or self.s3_bucket == '':
+        elif self.s3_bucket == None or self.s3_bucket == '':
             print(f'Running get_bufr_file_meta for NASA Discover {self.s3_bucket}')
 
             temp_uuid = str(uuid.uuid4())
@@ -177,11 +177,6 @@ class ObsBufrFileMetaHandler(object):
                 except Exception as err:
                     msg = f'\'saved_filename\' line 147 - err: {err}'
                     raise ValueError(msg) from err 
-
-                print(
-                   f'work_dir: {work_dir}')
-                print(
-                   f'saved_filename: {saved_filename}')
 
                 if saved_filename is None:
                     continue
