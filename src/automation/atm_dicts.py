@@ -38,8 +38,20 @@ amsr2_nasa = InventoryInfo(
     platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_6H,
     s3_bucket=au.REANALYSIS_BUCKET,
-    s3_prefix='observations/reanalysis/airs/nasa/aqua/%Y/%m/bufr/',
+    s3_prefix='observations/reanalysis/amsr2/nasa/%Y/%m/bufr/',
     bufr_files='gmao.amsr2_gw1.%z.bufr',
+    nceplibs_cmd=au.NCEPLIBS_SINV
+)
+
+amsre_nasa = InventoryInfo(
+    obs_name='amsre_nasa',
+    key='observations/reanalysis/amsre/nasa/%Y/%m/bufr/gmao.amsre_aqua.%Y%m%d.t%Hz.bufr',
+    start='20020901T000000Z',
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+    s3_prefix='observations/reanalysis/amsre/nasa/%Y/%m/bufr/',
+    bufr_files='gmao.amsre_aqua.%z.bufr',
     nceplibs_cmd=au.NCEPLIBS_SINV
 )
 
@@ -118,7 +130,7 @@ amv_satwnd = InventoryInfo(
 atms_atms = InventoryInfo(
     obs_name='atms_atms',
     key='observations/reanalysis/atms/atms/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.atms.tm00.bufr_d',
-    start='20120101T000000Z',
+    start='20120215T000000Z',
     s3_prefix='observations/reanalysis/atms/atms/%Y/%m/bufr/',
     bufr_files='gdas.%z.atms.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -145,6 +157,138 @@ avhrr_avcspm = InventoryInfo(
     start='20010301T000000Z',
     s3_prefix='observations/reanalysis/avhrr/nasa/21cr_repro/avcspm/%Y/%m/bufr/',
     bufr_files='gmao.%z.avcspm.tm00.bufr_d',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+avhrr_avcspm_n16 = InventoryInfo(
+    obs_name='avhrr_avcspm_n16',
+    key='observations/reanalysis/avhrr/nasa/21cr_repro/avcspm/%Y/%m/bufr/n16/gmao.%Y%m%d.t%Hz.avcspm.tm00.n16.bufr_d',
+    start='20010301T000000Z',
+    s3_prefix='observations/reanalysis/avhrr/nasa/21cr_repro/avcspm/%Y/%m/bufr/n16/',
+    bufr_files='gmao.%z.avcspm.tm00.n16.bufr_d',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_adpsfc = InventoryInfo(
+    obs_name='conv_convbufr_adpsfc',
+    key='observations/reanalysis/conv/convbufr/adpsfc/%Y/%m/gdas.%Y%m%d.t%Hz.adpsfc.bufr_d.nr',
+    start='20210101T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/adpsfc/%Y/%m/',
+    bufr_files='gdas.%z.adpsfc.bufr_d.nr',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_adpupa = InventoryInfo(
+    obs_name='conv_convbufr_adpupa',
+    key='observations/reanalysis/conv/convbufr/adpupa/%Y/%m/gdas.%Y%m%d.t%Hz.adpupa.bufr_d.nr',
+    start='20210101T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/adpupa/%Y/%m/',
+    bufr_files='gdas.%z.adpupa.bufr_d.nr',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_aircar = InventoryInfo(
+    obs_name='conv_convbufr_aircar',
+    key='observations/reanalysis/conv/convbufr/aircar/%Y/%m/gdas.%Y%m%d.t%Hz.aircar.bufr_d.nr',
+    start='20210101T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/aircar/%Y/%m/',
+    bufr_files='gdas.%z.aircar.bufr_d.nr',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_aircft = InventoryInfo(
+    obs_name='conv_convbufr_aircft',
+    key='observations/reanalysis/conv/convbufr/aircft/%Y/%m/gdas.%Y%m%d.t%Hz.aircft.bufr_d.nr',
+    start='20210101T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/aircft/%Y/%m/',
+    bufr_files='gdas.%z.aircft.bufr_d.nr',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_ascatt = InventoryInfo(
+    obs_name='conv_convbufr_ascatt',
+    key='observations/reanalysis/conv/convbufr/ascatt/%Y/%m/gdas.%Y%m%d.t%Hz.ascatt.bufr_d.nr',
+    start='20210101T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/ascatt/%Y/%m/',
+    bufr_files='gdas.%z.ascatt.bufr_d.nr',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_ascatw = InventoryInfo(
+    obs_name='conv_convbufr_ascatw',
+    key='observations/reanalysis/conv/convbufr/ascatw/%Y/%m/gdas.%Y%m%d.t%Hz.ascatw.bufr_d.nr',
+    start='20210101T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/ascatw/%Y/%m/',
+    bufr_files='gdas.%z.ascatw.bufr_d.nr',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_hdob = InventoryInfo(
+    obs_name='conv_convbufr_hdob',
+    key='observations/reanalysis/conv/convbufr/hdob/%Y/%m/gdas.%Y%m%d.t%Hz.hdob.bufr_d.nr',
+    start='20210323T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/hdob/%Y/%m/',
+    bufr_files='gdas.%z.hdob.bufr_d.nr',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_proflr = InventoryInfo(
+    obs_name='conv_convbufr_proflr',
+    key='observations/reanalysis/conv/convbufr/proflr/%Y/%m/gdas.%Y%m%d.t%Hz.proflr.bufr_d.nr',
+    start='20210101T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/proflr/%Y/%m/',
+    bufr_files='gdas.%z.proflr.bufr_d.nr',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_rassda = InventoryInfo(
+    obs_name='conv_convbufr_rassda',
+    key='observations/reanalysis/conv/convbufr/rassda/%Y/%m/gdas.%Y%m%d.t%Hz.rassda.bufr_d.nr',
+    start='20210101T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/rassda/%Y/%m/',
+    bufr_files='gdas.%z.rassda.bufr_d.nr',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+conv_convbufr_vadwnd = InventoryInfo(
+    obs_name='conv_convbufr_vadwnd',
+    key='observations/reanalysis/conv/convbufr/vadwnd/%Y/%m/gdas.%Y%m%d.t%Hz.vadwnd.bufr_d.nr',
+    start='20210101T000000Z',
+    s3_prefix='observations/reanalysis/conv/convbufr/vadwnd/%Y/%m/',
+    bufr_files='gdas.%z.vadwnd.bufr_d.nr',
     nceplibs_cmd=au.NCEPLIBS_SINV,
     platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_6H,
@@ -190,9 +334,21 @@ cris_cris = InventoryInfo(
 cris_crisf4 = InventoryInfo(
     obs_name='cris_crisf4',
     key='observations/reanalysis/cris/crisf4/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.crisf4.tm00.bufr_d',
-    start='20180101T000000Z',
+    start='20180116T180000Z',
     s3_prefix='observations/reanalysis/cris/crisf4/%Y/%m/bufr/',
     bufr_files='gdas.%z.crisf4.tm00.bufr_d',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+geo_ahicsr = InventoryInfo(
+    obs_name='geo_ahicsr',
+    key='observations/reanalysis/geo/ahicsr/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.ahicsr.tm00.bufr_d',
+    start='20190101T000000Z',
+    s3_prefix='observations/reanalysis/geo/ahicsr/%Y/%m/bufr/',
+    bufr_files='gdas.%z.ahicsr.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
     platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_6H,
@@ -214,7 +370,7 @@ geo_geoimr = InventoryInfo(
 geo_goesfv = InventoryInfo(
     obs_name='geo_goesfv',
     key='observations/reanalysis/geo/goesfv/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.goesfv.tm00.bufr_d',
-    start='20070201T000000Z',
+    start='20070221T120000Z',
     s3_prefix='observations/reanalysis/geo/goesfv/%Y/%m/bufr/',
     bufr_files='gdas.%z.goesfv.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -238,7 +394,7 @@ geo_goesnd = InventoryInfo(
 geo_gsrasr = InventoryInfo(
     obs_name='geo_gsrasr',
     key='observations/reanalysis/geo/gsrasr/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.gsrasr.tm00.bufr_d',
-    start='20210322T120000Z',
+    start='20191201T000000Z',
     s3_prefix='observations/reanalysis/geo/gsrasr/%Y/%m/bufr/',
     bufr_files='gdas.%z.gsrasr.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -250,7 +406,7 @@ geo_gsrasr = InventoryInfo(
 geo_gsrcsr = InventoryInfo(
     obs_name='geo_gsrcsr',
     key='observations/reanalysis/geo/gsrcsr/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.gsrcsr.tm00.bufr_d',
-    start='20210322T120000Z',
+    start='20191201T000000Z',
     s3_prefix='observations/reanalysis/geo/gsrcsr/%Y/%m/bufr/',
     bufr_files='gdas.%z.gsrcsr.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -286,7 +442,7 @@ gps_eumetsat = InventoryInfo(
 gps_gpsro = InventoryInfo(
     obs_name='gps_gpsro',
     key='observations/reanalysis/gps/gpsro/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.gpsro.tm00.bufr_d',
-    start='20010501T000000Z',
+    start='20010519T000000Z',
     s3_prefix='observations/reanalysis/gps/gpsro/%Y/%m/bufr/',
     bufr_files='gdas.%z.gpsro.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -394,9 +550,21 @@ ozone_nasa_sbuv_v87 = InventoryInfo(
 ozone_ncep_gome = InventoryInfo(
     obs_name='ozone_ncep_gome',
     key='observations/reanalysis/ozone/ncep/gome/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.gome.tm00.bufr_d',
-    start='20090101T000000Z',
+    start='20080916T180000Z',
     s3_prefix='observations/reanalysis/ozone/ncep/gome/%Y/%m/bufr/',
     bufr_files='gdas.%z.gome.tm00.bufr_d',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+ozone_ncep_mls = InventoryInfo(
+    obs_name='ozone_ncep_mls',
+    key='observations/reanalysis/ozone/ncep/mls/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.mls.tm00.bufr_d',
+    start='20120301T000000Z',
+    s3_prefix='observations/reanalysis/ozone/ncep/mls/%Y/%m/bufr/',
+    bufr_files='gdas.%z.mls.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
     platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_6H,
@@ -406,7 +574,7 @@ ozone_ncep_gome = InventoryInfo(
 ozone_ncep_omi = InventoryInfo(
     obs_name='ozone_ncep_omi',
     key='observations/reanalysis/ozone/ncep/omi/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.omi.tm00.bufr_d',
-    start='20100101T000000Z',
+    start='20091027T120000Z',
     s3_prefix='observations/reanalysis/ozone/ncep/omi/%Y/%m/bufr/',
     bufr_files='gdas.%z.omi.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -454,7 +622,7 @@ ozone_ncep_ompst8 = InventoryInfo(
 saphir_saphir = InventoryInfo(
     obs_name='saphir_saphir',
     key='observations/reanalysis/saphir/saphir/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.saphir.tm00.bufr_d',
-    start='20170201T000000Z', 
+    start='20170221T120000Z', 
     s3_prefix='observations/reanalysis/saphir/saphir/%Y/%m/bufr/',
     bufr_files='gdas.%z.saphir.tm00.bufr_d', 
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -466,7 +634,7 @@ saphir_saphir = InventoryInfo(
 seviri_sevcsr = InventoryInfo(
     obs_name='seviri_sevcsr',
     key='observations/reanalysis/seviri/sevcsr/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.sevcsr.tm00.bufr_d',
-    start='20100512T000000Z',
+    start='20120214T180000Z',
     s3_prefix='observations/reanalysis/seviri/sevcsr/%Y/%m/bufr/',
     bufr_files='gdas.%z.sevcsr.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -478,7 +646,7 @@ seviri_sevcsr = InventoryInfo(
 ssmi_eumetsat = InventoryInfo(
     obs_name='ssmi_eumetsat',
     key='observations/reanalysis/ssmi/eumetsat/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.ssmit.tm00.bufr_d',
-    start='19870109T120000Z',
+    start='19870709T120000Z',
     s3_prefix='observations/reanalysis/ssmi/eumetsat/%Y/%m/bufr/',
     bufr_files='gdas.%z.ssmit.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -514,7 +682,7 @@ ssmis_eumetsat = InventoryInfo(
 ssmis_ssmisu = InventoryInfo(
     obs_name='ssmis_ssmisu',
     key='observations/reanalysis/ssmis/ssmisu/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.ssmisu.tm00.bufr_d',
-    start='20091001T000000Z',
+    start='20091027T120000Z',
     s3_prefix='observations/reanalysis/ssmis/ssmisu/%Y/%m/bufr/',
     bufr_files='gdas.%z.ssmisu.tm00.bufr_d',
     nceplibs_cmd=au.NCEPLIBS_SINV,
@@ -548,9 +716,11 @@ trmm_nasa_tmi = InventoryInfo(
 )
 
 
-atm_infos = [airs_airsev, airs_aqua, amsr2_nasa, amsua_1bamua, amsua_nasa_aqua, amsua_nasa_r21c, amsub_1bamub, amv_merged, amv_satwnd, atms_atms,
-             avhrr_avcsam, avhrr_avcspm, conv_prepbufr_acft_profiles, conv_prepbufr, cris_cris, cris_crisf4, geo_geoimr,
-             geo_goesfv, geo_goesnd, geo_gsrasr, geo_gsrcsr, gmi_nasa_gmiv7, gps_eumetsat, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4,
-             iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_cfsr, ozone_nasa_sbuv_v87, ozone_ncep_gome, ozone_ncep_omi, ozone_ncep_ompslp,
+atm_infos = [airs_airsev, airs_aqua, amsr2_nasa, amsre_nasa, amsua_1bamua, amsua_nasa_aqua, amsua_nasa_r21c, amsub_1bamub, amv_merged, amv_satwnd, atms_atms,
+             avhrr_avcsam, avhrr_avcspm, avhrr_avcspm_n16, conv_convbufr_adpsfc, conv_convbufr_adpupa, conv_convbufr_aircar, conv_convbufr_aircft,
+             conv_convbufr_ascatt, conv_convbufr_ascatw, conv_convbufr_hdob, conv_convbufr_proflr, conv_convbufr_rassda, conv_convbufr_vadwnd,
+             conv_prepbufr_acft_profiles, conv_prepbufr, cris_cris, cris_crisf4, geo_ahicsr, geo_geoimr, geo_goesfv, geo_goesnd, geo_gsrasr, geo_gsrcsr,
+             gmi_nasa_gmiv7, gps_eumetsat, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4, iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_cfsr, 
+             ozone_nasa_sbuv_v87, ozone_ncep_gome, ozone_ncep_mls, ozone_ncep_omi, ozone_ncep_ompslp,
              ozone_ncep_ompsn8, ozone_ncep_ompst8, saphir_saphir, seviri_sevcsr, ssmi_eumetsat,
              ssmi_ssmit, ssmis_eumetsat, ssmis_ssmisu, ssu_1bssu, trmm_nasa_tmi]
