@@ -10,6 +10,9 @@ NCEPLIBS_CMPBQM = 'cmpbqm'
 CLEAN_PLATFORM = 'aws_s3_clean'
 REANALYSIS_BUCKET = 'noaa-reanlyses-pds'
 
+PRIVATE_EUMETSAT_PLATFORM = 'aws_s3_private'
+PRIVATE_EUMETSAT_BUCKET = 'nnja-private-eumetsat'
+
 DATESTR_FORMAT = '%Y%m%dT%H%M%SZ'
 ESCAPED_DATESTR_FORMAT = '%%Y%%m%%dT%%H%%M%%SZ'
 
