@@ -21,7 +21,7 @@ python3 auto_inventory.py -cat list -n_jobs 80 -work_dir $WORK_DIR --list airs_a
     conv_convbufr_adpsfc conv_convbufr_adpupa conv_convbufr_aircar conv_convbufr_aircft conv_convbufr_ascatt \
     conv_convbufr_ascatw conv_convbufr_hdob conv_convbufr_proflr conv_convbufr_rassda conv_convbufr_vadwnd &
 python3 auto_inventory.py -cat list -n_jobs 8 -ago 8400 -end 20020101T000000Z -work_dir $WORK_DIR --list ssu_1bssu ozone_cfsr msu_1bmsu hirs_1bhrs2 \
-    conv_prepbufr_acft_profiles conv_prepbufr & 
+    conv_prepbufr_acft_profiles conv_prepbufr &
 python3 auto_inventory.py -cat list -n_jobs 8 -ago 8400 -work_dir $WORK_DIR --list ssu_1bssu ozone_cfsr msu_1bmsu hirs_1bhrs2 \
     conv_prepbufr_acft_profiles conv_prepbufr   
 
