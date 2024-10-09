@@ -1,0 +1,11 @@
+s3_bucket: noaa-reanalyses-pds
+s3_prefix: observations/reanalysis/gps/gpsro/%Y/%m/bufr/
+date_range:
+  datestr: '%Y%m%dT%H%M%SZ'
+  end: 20240402T180000Z
+  start: 20240101T000000Z
+bufr_files:
+  - gdas.%.t%z.1bamua.tm00.bufr_d
+work_dir: '$NOBACKUP/observation-inventory-utils'
+scrub_files: True
+

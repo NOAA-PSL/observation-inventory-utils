@@ -23,6 +23,8 @@ from obs_inv_utils import subprocess_cmd_handler as sch
 from obs_inv_utils.subprocess_cmd_handler import SubprocessCmd
 from obs_inv_utils import nceplibs_cmds as nc_cmds
 
+import yaml
+
 CALLING_DIR = pathlib.Path(__file__).parent.resolve()
 TMP_OBS_DATA_DIR = 'tmp_obs_data'
 
@@ -100,10 +102,16 @@ class ObsBufrFileMetaHandler(object):
     meta_config: ObsMetaSinvConfig
     bufr_files: list = field(default_factory=list, init=False)
     date_range: DateRange = field(init=False)
+    # additional fields required in order to differentiate between aws and discover
+    config_data: dict = field(default_factory=str, init=False)
+    s3_bucket: str = field(default_factory=str, init=False)
+    s3_prefix: str = field(default_factory=str, init=False)
+
 
     def __post_init__(self):
         self.date_range = self.meta_config.get_date_range()
         self.bufr_files = self.meta_config.get_bufr_file_list()
+        self.config_data = self.meta_config.load()
 
     def __repr__(self):
         """
@@ -120,29 +128,62 @@ class ObsBufrFileMetaHandler(object):
             self.date_range.start,
             self.date_range.end
         )
+        
+        bucket = self.meta_config.s3_bucket
+        prefix = self.meta_config.s3_prefix
 
-        temp_uuid = str(uuid.uuid4())
 
-        work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
+        # Because s3 bucket bufr files require download and new work_dir and discover files do not they need to be handled differently. 
+        if bucket == 'noaa-reanalyses-pds': 
+            print(f'Running get_bufr_file_meta for NOAA S3 Clean Bucket (aws_s3) {self.s3_bucket}')
 
-        print(f'inventory_bufr_files: {inventory_bufr_files}')
-        print(f'scrub_files: {self.meta_config.scrub_files}')
-        for idx, bufr_file in inventory_bufr_files.iterrows():
-            file_downloaded = False
-            print(
-               f'bufr_file: {bufr_file}')
+            temp_uuid = str(uuid.uuid4())
 
-            saved_filename = download_bufr_file_from_s3(work_dir, bufr_file)
+            work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
 
-            if saved_filename is None:
-                continue
+            print(f'inventory_bufr_files: {inventory_bufr_files}')
+            print(f'scrub_files: {self.meta_config.scrub_files}')
+            for idx, bufr_file in inventory_bufr_files.iterrows():
+                file_downloaded = False
+                print(
+                   f'bufr_file: {bufr_file}')
 
-            self.get_obs_counts_with_sinv(saved_filename, bufr_file)
+                saved_filename = download_bufr_file_from_s3(work_dir, bufr_file)
 
-            # clean up files
-            if self.meta_config.scrub_files:
-                #os.remove( saved_filename )
-                shutil.rmtree( work_dir )
+                if saved_filename is None:
+                    continue
+
+                self.get_obs_counts_with_sinv(saved_filename, bufr_file)
+
+                # clean up files
+                if self.meta_config.scrub_files:
+                    os.remove( saved_filename )
+                    shutil.rmtree( work_dir )
+              
+        elif self.s3_bucket == None or self.s3_bucket == '':
+            print(f'Running get_bufr_file_meta for NASA Discover {self.s3_bucket}')
+
+            temp_uuid = str(uuid.uuid4())
+
+            work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
+
+            for idx, bufr_file in inventory_bufr_files.iterrows():
+                file_downloaded = False
+                print(
+                   f'bufr_file: {bufr_file}')
+
+                try:
+                    saved_filename = bufr_file['full_path'] 
+                except Exception as err:
+                    msg = f'\'saved_filename\' line 147 - err: {err}'
+                    raise ValueError(msg) from err 
+
+                if saved_filename is None:
+                    continue
+
+                self.get_obs_counts_with_sinv(saved_filename, bufr_file)
+
+
 
     def get_obs_counts_with_sinv(self, filename, bufr_file):
         
