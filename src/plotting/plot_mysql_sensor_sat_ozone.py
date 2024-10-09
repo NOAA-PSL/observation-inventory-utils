@@ -66,13 +66,7 @@ def get_subsensor(row):
     return subsensor
 
 #read data from sql database of obs counts
-print('connecting to mysql db')
-mysql_conn = itf.engine.connect()
-#BUFR FILE INFO
-sql = f"""select m.*, o.parent_dir from obs_meta_nceplibs_bufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\' AND o.parent_dir LIKE 'observations/reanalysis/ozone/%' """
-data = pandas.read_sql(sql, mysql_conn)
-db_frame = data.sort_values('inserted_at'
-        ).drop_duplicates(['filename', 'obs_day', 'sat_id', 'sat_inst_id'],keep='last')
+db_frame = utils.get_distinct_bufr_by_sensors(['observations/reanalysis/ozone/'])
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
@@ -145,4 +139,3 @@ if args.dev:
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
-mysql_conn.close()

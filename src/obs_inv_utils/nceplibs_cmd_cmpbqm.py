@@ -93,8 +93,12 @@ def parse_output(output, prepbufr_file):
             # skip any lines which are all whitespace
             if line.isspace():
                 continue
+            #skip empty lines 
+            if line == "":
+                continue
 
             cleaned_line = line.strip() # strip to remove whitespace so calls can be to first character of line
+
             #file is done when line starts with * 
             if '*' in cleaned_line:
                 break
