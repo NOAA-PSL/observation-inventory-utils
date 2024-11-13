@@ -320,6 +320,9 @@ def create_obs_meta_hv_ioda_netcdf_table():
               Column('thinning', Decimal),
               Column('ioda_version', String),
               Column('filename', String),
+              Column('file_date', DateTime),
+              Column('min_data_date', DateTime),
+              Column('max_data_date', DateTime),
               Column('obs_day', DateTime),
               Column('inserted_at', DateTime),
               UniqueConstraint(
@@ -365,6 +368,9 @@ def create_obs_meta_hv_ioda_netcdf_agg_table():
               Column('thinning', Decimal),
               Column('ioda_version', String),
               Column('filename', String),
+              Column('file_date', DateTime),
+              Column('min_data_date', DateTime),
+              Column('max_data_date', DateTime),
               Column('obs_day', DateTime),
               Column('inserted_at', DateTime),
               UniqueConstraint(
@@ -562,6 +568,8 @@ class ObsMetaHvIodaNetcdf(Base):
     cmd_str = Column(String(31))
     variable = Column(String(63))
     num_locs = Column(Integer())
+    min_depth = Column(Float())
+    max_depth = Column(Float())
     hasPreQC = Column(Boolean())
     hasObsError = Column(Boolean())
     sensor = Column(String(63))
@@ -571,10 +579,10 @@ class ObsMetaHvIodaNetcdf(Base):
     thinning = Column(Float())
     ioda_version = Column(String(63))
     filename = Column(String(63))
-    #file date time (what's in it)
-    #min date time inside (computed)
-    #max date time inside 
-    obs_day = Column(DateTime()) #base this on the ifle anme for consistentcy
+    file_date = Column(DateTime())
+    min_data_date = Column(DateTime())
+    max_data_date = Column(DateTime())
+    obs_day = Column(DateTime()) 
     inserted_at = Column(DateTime())
 
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
@@ -599,6 +607,8 @@ class ObsMetaHvIodaNetcdfAggregate(Base):
     variable_names = Column(String(1023))
     num_vars = Column(Integer())
     num_locs = Column(Integer())
+    min_depth = Column(Float())
+    max_depth = Column(Float())
     hasPreQC = Column(Boolean())
     hasObsError = Column(Boolean())
     sensor = Column(String(63))
@@ -608,6 +618,9 @@ class ObsMetaHvIodaNetcdfAggregate(Base):
     thinning = Column(Float())
     ioda_version = Column(String(63))
     filename = Column(String(63))
+    file_date = Column(DateTime())
+    min_data_date = Column(DateTime())
+    max_data_date = Column(DateTime())
     obs_day = Column(DateTime())
     inserted_at = Column(DateTime())
 
@@ -882,6 +895,8 @@ def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items):
             'cmd_str': item.cmd_str,
             'variable': item.variable,
             'num_locs': item.num_locs,
+            'min_depth': item.min_depth,
+            'max_depth': item.max_depth,
             'hasPreQC': item.hasPreQC,
             'hasObsError': item.hasObsError,
             'sensor': item.sensor,
@@ -891,6 +906,9 @@ def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items):
             'thinning': item.thinning,
             'ioda_version': item.ioda_version,
             'filename': item.filename,
+            'file_date': item.file_date,
+            'min_data_date': item.min_data_date,
+            'max_data_date': item.max_data_date,
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
             'inserted_at': datetime.utcnow()
         }
@@ -900,22 +918,22 @@ def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items):
     if(database_type.lower() == 'mysql'):
         sql = """
             INSERT IGNORE INTO obs_meta_hv_ioda_netcdf
-            (obs_id, cmd_result_id, cmd_str, variable, num_locs, hasPreQC, hasObsError, 
+            (obs_id, cmd_result_id, cmd_str, variable, num_locs, min_depth, max_depth, hasPreQC, hasObsError, 
             sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
-            filename, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :hasPreQC, :hasObsError, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :min_depth, :max_depth, :hasPreQC, :hasObsError, 
             :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :obs_day, :inserted_at)
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
     else:
         sql = """
             INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf
-            (obs_id, cmd_result_id, cmd_str, variable, num_locs, hasPreQC, hasObsError, 
+            (obs_id, cmd_result_id, cmd_str, variable, num_locs, min_depth, max_depth, hasPreQC, hasObsError, 
             sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
-            filename, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :hasPreQC, :hasObsError, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :min_depth, :max_depth, :hasPreQC, :hasObsError, 
             :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :obs_day, :inserted_at)
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
 
     session = Session()
@@ -938,6 +956,8 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
             'variable_names': item.variable_names,
             'num_vars': item.num_vars,
             'num_locs': item.num_locs,
+            'min_depth': item.min_depth,
+            'max_depth': item.max_depth,
             'hasPreQC': item.hasPreQC,
             'hasObsError': item.hasObsError,
             'sensor': item.sensor,
@@ -947,6 +967,9 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
             'thinning': item.thinning,
             'ioda_version': item.ioda_version,
             'filename': item.filename,
+            'file_date': item.file_date,
+            'min_data_date': item.min_data_date,
+            'max_data_date': item.max_data_date,
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
             'inserted_at': datetime.utcnow()
         }
@@ -956,22 +979,22 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
     if(database_type.lower() == 'mysql'):
         sql = """
             INSERT IGNORE INTO obs_meta_hv_ioda_netcdf_agg
-            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, hasPreQC, 
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
             hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
-            filename, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :hasPreQC, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
             :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :obs_day, :inserted_at)
+            :filename, :file_data, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
     else:
         sql = """
             INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf_agg
-            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, hasPreQC, 
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
             hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
-            filename, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :hasPreQC, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
             :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :obs_day, :inserted_at)
+            :filename, :file_data, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
 
     session = Session()
