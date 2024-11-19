@@ -35,15 +35,6 @@ CmdRawResponse = namedtuple(
 )
 
 
-def is_valid_subprocess_cmd(value, subprocess_cmds):
-    print(f'In is_valid_hpss_cmd: value: {value}')
-    if subprocess_cmds.get(value) is None:
-        msg = f'subprocess command {value} is not valid. Use one of: ' \
-              f'{subprocess_cmds.keys()}'
-        raise KeyError(msg)
-    return True
-
-
 @dataclass
 class SubprocessCmdHandler(object):
     command: str
