@@ -138,19 +138,25 @@ class ObsIodaFileMetaHandler(object):
 
 
     def get_obs_meta_with_hv_ioda(self, filename, ioda_file):
-        args = [filename]
-        cmd = sch.SubprocessCmdHandler(
+        args = {'filename:': filename}
+        cmd = cmhd.ScoreHVCmdHandler(
             hv_cmds.HV_IODA_META,
             hv_cmds.score_hv_cmds,
             args
         )
-        print(f'cmd: {cmd}')
 
-        if not cmd.send():
-            return False
-        
+        cmd.harvest()
         cmd.post_cmd_result(ioda_file.obs_day)
-        ioda_meta = cmd.parse_output(ioda_file)
-        cmd.post_parsed_result(ioda_meta, ioda_file)
+        cmd.post_harvest_results(ioda_file)
+
+
+        # cmd.post_cmd_result(ioda_file.obs_day)
+        # ioda_meta = cmd.parse_output(ioda_file)
+        # cmd.post_parsed_result(ioda_meta, ioda_file)
+
+        #make / get the harvester request dict
+        #submit to harvester
+        #parse output to table columns
+        #store in table 
 
 
