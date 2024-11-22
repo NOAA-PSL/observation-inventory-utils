@@ -46,7 +46,6 @@ class ObsMetaIodaConfig(ConfigInterface):
     def parse(self):
         print(f'type(self.config_data): {type(self.config_data)}')
         
-
         self.s3_bucket = self.yaml_loader.get_value(
             key='s3_bucket',
             document=self.config_data,
@@ -64,7 +63,6 @@ class ObsMetaIodaConfig(ConfigInterface):
             document=self.config_data,
             return_type=dict
         )
-
         
         self.date_range = time_utils.get_date_range_from_dict(
             date_range)
@@ -86,9 +84,6 @@ class ObsMetaIodaConfig(ConfigInterface):
             document=self.config_data,
             return_type=bool
         )
-
-
-
 
     def get_date_range(self):
         return self.date_range

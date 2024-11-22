@@ -68,8 +68,8 @@ class ScoreHVCmdHandler(object):
             float(self.get_cmd_duration())
         )
 
-    def build_harvest_dict(self, context):
-        self.harvest_dict = self.cmd_obj.build_harvest_dict(self.command, self.args, context)
+    def build_harvest_dict(self):
+        self.harvest_dict = self.cmd_obj.build_harvest_dict(self.command, self.args)
             
     def get_cmd_duration(self):
         diff = self.finished_at - self.submitted_at

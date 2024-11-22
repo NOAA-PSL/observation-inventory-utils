@@ -138,7 +138,7 @@ class ObsIodaFileMetaHandler(object):
 
 
     def get_obs_meta_with_hv_ioda(self, filename, ioda_file):
-        args = {'filename:': filename}
+        args = {'filename': filename}
         cmd = cmhd.ScoreHVCmdHandler(
             hv_cmds.HV_IODA_META,
             hv_cmds.score_hv_cmds,
