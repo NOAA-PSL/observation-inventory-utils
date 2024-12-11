@@ -575,7 +575,7 @@ class ObsMetaHvIodaNetcdf(Base):
     sensor = Column(String(63))
     platform = Column(String(128))
     ioda_layout = Column(String(63))
-    processing_level = Column(String())
+    processing_level = Column(String(63))
     thinning = Column(Float())
     ioda_version = Column(String(63))
     filename = Column(String(63))
