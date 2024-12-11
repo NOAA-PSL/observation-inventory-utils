@@ -4,7 +4,7 @@ from datetime import datetime
 from collections import namedtuple
 from obs_inv_utils import search_engine as se
 from sqlalchemy import Table, Column, MetaData, text
-from sqlalchemy import Integer, String, ForeignKey, Boolean, DateTime, Float, Decimal
+from sqlalchemy import Integer, String, ForeignKey, Boolean, DateTime, Float
 from sqlalchemy import inspect, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -317,7 +317,7 @@ def create_obs_meta_hv_ioda_netcdf_table():
               Column('platform', String),
               Column('ioda_layout', String),
               Column('processing_level', String),
-              Column('thinning', Decimal),
+              Column('thinning', Float),
               Column('ioda_version', String),
               Column('filename', String),
               Column('file_date', DateTime),
@@ -365,7 +365,7 @@ def create_obs_meta_hv_ioda_netcdf_agg_table():
               Column('platform', String),
               Column('ioda_layout', String),
               Column('processing_level', String),
-              Column('thinning', Decimal),
+              Column('thinning', Float),
               Column('ioda_version', String),
               Column('filename', String),
               Column('file_date', DateTime),
