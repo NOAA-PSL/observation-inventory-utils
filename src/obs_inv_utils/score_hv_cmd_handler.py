@@ -38,12 +38,12 @@ class ScoreHVCmdHandler(object):
     hv_cmds: dict
     args: dict
     cmd_obj: ScoreHVCmd = field(default=ScoreHVCmd, init=False)
-    harvest_dict: dict
-    hv_response: dict
+    harvest_dict: dict = field(default=dict, init=False)
+    hv_response: dict = field(default=dict, init=False)
     raw_resp: CmdRawResponse = field(default=CmdRawResponse, init=False)
     submitted_at: datetime = field(default=datetime, init=False)
     finished_at: datetime = field(default=datetime, init=False)
-    cmd_id: int
+    cmd_id: int = field(default=int, init=False)
 
     def __post_init__(self):
         self.cmd_obj = self.hv_cmds[self.command]
