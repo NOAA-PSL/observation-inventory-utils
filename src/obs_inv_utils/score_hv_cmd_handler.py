@@ -61,7 +61,7 @@ class ScoreHVCmdHandler(object):
         self.raw_resp = CmdRawResponse(
             self.cmd_obj.harvester_command,
             repr(self.harvest_dict),
-            self.hv_response,
+            repr(self.hv_response),
             '',
             0,
             self.submitted_at,
