@@ -97,6 +97,7 @@ def build_harvest_dict(command, args):
 def post_harvest_results(cmd_id, harvest_response, ioda_file):
     #go through response, if multiple variables insert each individually and then insert an agg value
     if harvest_response is not list:
+        print(f'Error posting harvest results as the response is not of type list but {type(harvest_response)}')
         return #can't parse if not a list of objects
     
     obs_meta_data_items = []
@@ -159,7 +160,8 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
         )
 
         obs_meta_data_agg_item.append(new_agg_item)
-
+    
+    print('submitting items for insert')
     #once all items have been translated to work with columns, insert to correct tables 
     itf.insert_obs_meta_hv_ioda_netcdf_item(obs_meta_data_items)
     itf.insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_data_agg_item)

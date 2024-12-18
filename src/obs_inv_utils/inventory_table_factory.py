@@ -936,10 +936,13 @@ def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items):
             :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
 
-    session = Session()
-    session.execute(text(sql), rows)
-    session.commit()
-    session.close()
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the ioda netcdf meta table.")
 
 def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
     if not isinstance(obs_meta_items, list):
@@ -997,10 +1000,13 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
             :filename, :file_data, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
 
-    session = Session()
-    session.execute(text(sql), rows)
-    session.commit()
-    session.close()
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the ioda netcdf aggregate meta table.")
 
 
 if(database_type.lower() == 'mysql'):
