@@ -154,6 +154,7 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
             harvest_response[0].thinning,
             harvest_response[0].ioda_version,
             harvest_response[0].filename,
+            harvest_response[0].file_date_time,
             min_data_date,
             max_data_date,
             ioda_file.obs_day
