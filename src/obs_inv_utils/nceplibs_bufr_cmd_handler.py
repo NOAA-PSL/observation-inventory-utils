@@ -115,7 +115,7 @@ class ObsBufrFileMetaHandler(object):
 
     def get_bufr_file_meta(self, cmd_type):
 
-        inventory_bufr_files = oiq.get_bufr_files_data(
+        inventory_bufr_files = oiq.get_files_data(
             self.bufr_files,
             self.date_range.start,
             self.date_range.end
@@ -187,7 +187,7 @@ class ObsPrepBufrFileMetaHandler(object):
 
     def get_prepbufr_file_meta(self, cmd_type):
 
-        inventory_prepbufr_files = oiq.get_bufr_files_data(
+        inventory_prepbufr_files = oiq.get_files_data(
             self.prepbufr_files,
             self.date_range.start,
             self.date_range.end

@@ -108,7 +108,7 @@ class ObsIodaFileMetaHandler(object):
             f'date_range: {self.date_range}'
     
     def get_ioda_file_meta(self, cmd_type):
-        inventory_ioda_files = oiq.get_ioda_files_data(
+        inventory_ioda_files = oiq.get_files_data(
             self.ioda_files,
             self.date_range.start,
             self.date_range.end
@@ -129,11 +129,10 @@ class ObsIodaFileMetaHandler(object):
             if saved_filename is None:
                 continue
 
-            self.get_obs_counts_with_sinv(saved_filename, ioda_file) #change this
+            self.get_obs_meta_with_hv_ioda(saved_filename, ioda_file)
 
             # clean up files
             if self.meta_config.scrub_files:
-                #os.remove( saved_filename )
                 shutil.rmtree( work_dir )
 
 
