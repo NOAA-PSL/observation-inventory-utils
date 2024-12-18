@@ -1,6 +1,6 @@
 from collections import namedtuple, OrderedDict
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from dataclasses import dataclass, field
 
@@ -51,9 +51,9 @@ class ScoreHVCmdHandler(object):
 
     def harvest(self):
         try:
-            self.submitted_at = datetime.now(datetime.timezone.utc)
+            self.submitted_at = datetime.now(timezone.utc)
             self.hv_response = harvest(self.harvest_dict)
-            self.finished_at = datetime.now(datetime.timezone.utc)
+            self.finished_at = datetime.now(timezone.utc)
         except Exception as e:
             msg = f'Error harvesting using dict {self.harvest_dict}, error: {e}'
             raise ValueError(msg)
