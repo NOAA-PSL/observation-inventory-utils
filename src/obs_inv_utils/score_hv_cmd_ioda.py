@@ -96,7 +96,7 @@ def build_harvest_dict(command, args):
 # )
 def post_harvest_results(cmd_id, harvest_response, ioda_file):
     #go through response, if multiple variables insert each individually and then insert an agg value
-    if harvest_response is not list:
+    if not isinstance(harvest_response, list):
         print(f'Error posting harvest results as the response is not of type list but {type(harvest_response)}')
         return #can't parse if not a list of objects
     
