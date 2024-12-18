@@ -85,7 +85,7 @@ class ScoreHVCmdHandler(object):
             obs_datetime,
             self.raw_resp.submitted_at,
             self.raw_resp.latency,
-            datetime.now(datetime.timezone.utc)
+            datetime.now(timezone.utc)
         )
 
         self.cmd_id = tbl_factory.insert_cmd_result(cmd_result_data)
