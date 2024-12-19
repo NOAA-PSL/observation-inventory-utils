@@ -991,7 +991,7 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
             filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
             :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :file_data, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
     else:
         sql = """
@@ -1001,7 +1001,7 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
             filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
             :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :file_data, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
 
     if len(rows) > 0:
