@@ -985,7 +985,7 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
     # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
     if(database_type.lower() == 'mysql'):
         sql = """
-            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf_agg
+            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf_aggregate
             (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
             hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
             filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
@@ -995,7 +995,7 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
         """
     else:
         sql = """
-            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf_agg
+            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf_aggregate
             (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
             hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
             filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
