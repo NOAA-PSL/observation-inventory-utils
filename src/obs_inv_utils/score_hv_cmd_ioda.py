@@ -132,8 +132,8 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
 
     if len(harvest_response) > 1:
         var_names = ", ".join(item.variable_name for item in harvest_response)
-        min_data_date = min(harvest_response, key=lambda item: item.min_date_time)
-        max_data_date = max(harvest_response, key=lambda item: item.max_date_time)
+        min_data_date_response = min(harvest_response, key=lambda item: item.min_date_time)
+        max_data_date_response = max(harvest_response, key=lambda item: item.max_date_time)
         min_depth_response = min(harvest_response, key=lambda item: item.min_depth)
         max_depth_response = max(harvest_response, key=lambda item: item.max_depth)
         new_agg_item = ObsMetaIodaAggData(
@@ -155,8 +155,8 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
             harvest_response[0].ioda_version,
             harvest_response[0].filename,
             harvest_response[0].file_date_time,
-            min_data_date,
-            max_data_date,
+            min_data_date_response.min_date_time,
+            max_data_date_response.max_date_time,
             ioda_file.obs_day
         )
 
