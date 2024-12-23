@@ -100,6 +100,7 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
         print(f'Error posting harvest results as the response is not of type list but {type(harvest_response)}')
         return #can't parse if not a list of objects
     
+    print(f'inital harvest response: {harvest_response}')
     obs_meta_data_items = []
     obs_meta_data_agg_item = [] #if this is only going to be data from one file, there will be at most one agg item (since agg is a full file)
     
@@ -163,6 +164,8 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
         obs_meta_data_agg_item.append(new_agg_item)
     
     print('submitting items for insert')
+    print(f'obs_meta_data_items: {obs_meta_data_items}')
+    print(f'obs_meta_data_agg_item: {obs_meta_data_agg_item}')
     #once all items have been translated to work with columns, insert to correct tables 
     itf.insert_obs_meta_hv_ioda_netcdf_item(obs_meta_data_items)
     itf.insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_data_agg_item)
