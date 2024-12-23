@@ -111,9 +111,9 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
             cmd_id, 
             score_hv_cmds.HV_IODA_META,
             item.variable_name, 
-            item.var_count,
-            item.min_depth,
-            item.max_depth,
+            convert_to_int(item.var_count),
+            convert_to_float(item.min_depth),
+            convert_to_float(item.max_depth),
             item.has_PreQC,
             item.has_ObsError,
             item.sensor,
@@ -143,9 +143,9 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
             score_hv_cmds.HV_IODA_META,
             var_names,
             harvest_response[0].num_vars,
-            harvest_response[0].num_locs,
-            min_depth_response.min_depth,
-            max_depth_response.max_depth,
+            convert_to_int(harvest_response[0].num_locs),
+            convert_to_float(min_depth_response.min_depth),
+            convert_to_float(max_depth_response.max_depth),
             harvest_response[0].has_PreQC,
             harvest_response[0].has_ObsError,
             harvest_response[0].sensor,
@@ -169,3 +169,21 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
     #once all items have been translated to work with columns, insert to correct tables 
     itf.insert_obs_meta_hv_ioda_netcdf_item(obs_meta_data_items)
     itf.insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_data_agg_item)
+
+def convert_to_int(value):
+    """Safely convert a value to an int."""
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return None
+
+def convert_to_float(value):
+    """Safely convert a value to a float."""
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return None
