@@ -427,15 +427,12 @@ class ObsInventorySearchEngine(object):
                 args = [search_path]
                 print(f'args: {args}, search_path: {search_path}')
                 platform = search_config.get_storage_platform()
-                n_hours = 6
-                n_days = 0
                 if platform == platforms.AWS_S3 or platform == platforms.AWS_S3_CLEAN:
                     cmd = s3.AwsS3CommandHandler(s3.CMD_GET_S3_OBJ_LIST, args)
                 elif platform == platforms.HERA_HPSS:
                     cmd = hpss.HpssCommandHandler(
                         hpss.CMD_INSPECT_TARBALL, args)
-                    n_hours = 0
-                    n_days = 1
+  
 
                 print(f'cmd: {cmd}, finished_count: {finished_count}')
 
@@ -483,7 +480,7 @@ class ObsInventorySearchEngine(object):
 
                 raw_resp = cmd.get_raw_response()
 
-                search_config.get_date_range().increment(days=n_days, hours=n_hours)
+                search_config.get_date_range().increment(seconds=search_config.get_cycling_interval())
                 print(f'Current search path: {search_path}')
 
             if finished_count == len(self.search_configs):
