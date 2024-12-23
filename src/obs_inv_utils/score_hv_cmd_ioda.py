@@ -142,7 +142,7 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
             cmd_id,
             score_hv_cmds.HV_IODA_META,
             var_names,
-            harvest_response[0].num_vars,
+            convert_to_int(harvest_response[0].num_vars),
             convert_to_int(harvest_response[0].num_locs),
             convert_to_float(min_depth_response.min_depth),
             convert_to_float(max_depth_response.max_depth),
