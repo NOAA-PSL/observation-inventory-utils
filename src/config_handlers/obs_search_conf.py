@@ -93,6 +93,12 @@ class ObservationsConfig(ConfigInterface):
             return_type=dict
         )
 
+        cycling_interval = self.yaml_loader.get_value(
+            key='cycling_interval',
+            document=self.config_data,
+            return_type=int
+        )
+
         self.search_date_range = time_utils.get_date_range_from_dict(
             config_date_range)
 
@@ -106,12 +112,6 @@ class ObservationsConfig(ConfigInterface):
                     key='platform',
                     document=obs_search_config,
                     return_type=str
-                )
-
-                cycling_interval = self.yaml_loader.get_value(
-                    key='cycling_interval',
-                    document=obs_search_config,
-                    return_type=int
                 )
 
                 date_range = DateRange(
