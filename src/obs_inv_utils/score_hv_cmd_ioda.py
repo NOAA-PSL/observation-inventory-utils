@@ -135,9 +135,9 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
         min_data_date_response = min(harvest_response, key=lambda item: item.min_date_time)
         max_data_date_response = max(harvest_response, key=lambda item: item.max_date_time)
         filtered_min_depth = [item for item in harvest_response if item.min_depth is not None]
-        min_depth_response = min(harvest_response, key=lambda item: item.min_depth) if filtered_min_depth else None
+        min_depth_response = convert_to_float((min(harvest_response, key=lambda item: item.min_depth)).min_depth) if filtered_min_depth else None
         filtered_max_depth = [item for item in harvest_response if item.max_depth is not None]
-        max_depth_response = max(harvest_response, key=lambda item: item.max_depth) if filtered_max_depth else None
+        max_depth_response = convert_to_float((max(harvest_response, key=lambda item: item.max_depth)).max_depth) if filtered_max_depth else None
         new_agg_item = ObsMetaIodaAggData(
             ioda_file.obs_id,
             cmd_id,
@@ -145,8 +145,8 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
             var_names,
             convert_to_int(harvest_response[0].num_vars),
             convert_to_int(harvest_response[0].num_locs),
-            convert_to_float(min_depth_response.min_depth),
-            convert_to_float(max_depth_response.max_depth),
+            min_depth_response,
+            max_depth_response,
             harvest_response[0].has_PreQC,
             harvest_response[0].has_ObsError,
             harvest_response[0].sensor,
