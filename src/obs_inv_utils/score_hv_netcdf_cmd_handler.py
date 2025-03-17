@@ -149,13 +149,3 @@ class ObsIodaFileMetaHandler(object):
         cmd.post_harvest_results(ioda_file)
 
 
-        # cmd.post_cmd_result(ioda_file.obs_day)
-        # ioda_meta = cmd.parse_output(ioda_file)
-        # cmd.post_parsed_result(ioda_meta, ioda_file)
-
-        #make / get the harvester request dict
-        #submit to harvester
-        #parse output to table columns
-        #store in table 
-
-
