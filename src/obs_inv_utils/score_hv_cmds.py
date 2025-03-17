@@ -1,12 +1,19 @@
 from obs_inv_utils.score_hv_cmd_handler import ScoreHVCmd
 import score_hv_cmd_ioda
+import score_hv_cmd_wod_nc
 
 HV_IODA_META = 'ioda_meta_netcdf'
+HV_WOD_NC_META = 'wod_insitu_meta_netcdf'
 
 score_hv_cmds = {
     HV_IODA_META: ScoreHVCmd(
         HV_IODA_META, 
         score_hv_cmd_ioda.build_harvest_dict,
         score_hv_cmd_ioda.post_harvest_results
+    ),
+    HV_WOD_NC_META: ScoreHVCmd(
+        HV_WOD_NC_META,
+        score_hv_cmd_wod_nc.build_harvest_dict,
+        score_hv_cmd_wod_nc.post_harvest_results
     )
 }
