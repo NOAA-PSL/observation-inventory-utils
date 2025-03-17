@@ -5,8 +5,8 @@ from obs_inv_utils import inventory_table_factory as itf
 
 WOD_INSITU_META_NETCDF = 'wod_insitu_meta_netcdf'
 
-ObsMetaWODData = namedtuple(
-    'ObsMetaWODData',
+ObsMetaWodData = namedtuple(
+    'ObsMetaWodData',
     [
         'obs_id',
         'cmd_result_id',
@@ -24,8 +24,8 @@ ObsMetaWODData = namedtuple(
     ]
 )
 
-ObsMetaIodaAggData = namedtuple(
-    'ObsMetaIodaAggData',
+ObsMetaWodAggData = namedtuple(
+    'ObsMetaWodAggData',
     [
         'obs_id',
         'cmd_result_id',
@@ -64,10 +64,48 @@ def post_harvest_results(cmd_id, harvest_response, wod_file):
     obs_meta_data_agg_item = [] #if this is only going to be data from one file, there will be at most one agg item (since agg is a full file)
     
     #go through items in harvest response and build data insert 
-    #handle aggregation
+    for item in harvest_response:
+        new_item = ObsMetaWodData(
+            wod_file.obs_id, 
+            cmd_id,
+            score_hv_cmds.HV_WOD_NC_META,
+            item.variable_name,
+            item.var_count, 
+            item.min_depth,
+            item.max_depth, 
+            item.sensor,
+            item.casts,
+            item.filename,
+            item.min_date_time,
+            item.max_date_time,
+            wod_file.obs_day
+        )
 
+        obs_meta_data_items.append(new_item)
 
-    #insert to itf - single items, agg items 
+    #handle aggregation 
+    if len(harvest_response) > 1:
+        var_names = ", ".join(item.variable_name for item in harvest_response)
+        total_var_count = sum(item.var_count for item in harvest_response)
+        new_agg_item = ObsMetaWodAggData(
+            wod_file.obs_id,
+            cmd_id, 
+            score_hv_cmds.HV_WOD_NC_META,
+            var_names, 
+            harvest_response[0].num_vars,
+            total_var_count,
+            harvest_response[0].min_depth,
+            harvest_response[0].max_depth,
+            harvest_response[0].sensor,
+            harvest_response[0].casts,
+            harvest_response[0].filename,
+            harvest_response[0].min_date_time,
+            harvest_response[0].max_date_time,
+            wod_file.obs_day
+        )
 
-
+        obs_meta_data_agg_item.append(new_agg_item)
     
+    #once all items have been translated to work with columns, insert to correct tables 
+    itf.insert_obs_meta_hv_wod_netcdf_item(obs_meta_data_items)
+    itf.insert_obs_meta_hv_wod_netcdf_agg_item(obs_meta_data_agg_item)
