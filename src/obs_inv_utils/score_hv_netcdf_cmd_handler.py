@@ -67,24 +67,18 @@ def download_netcdf_file_from_s3(work_dir, netcdf_file):
 
     dest_filename = os.path.join(dest_path, netcdf_file['filename'])
     
-    print(f'dest_filename: {dest_filename}')
-
     # setup command arguments, [file s3 key, destination location,
     # and expected filesize
     args = [object_key, dest_filename, netcdf_file['file_size']]
 
     cmd = s3.AwsS3CommandHandler(s3.CMD_DOWNLOAD_S3_OBJ, args)
-    print(f'cmd: {cmd}')
-
     saved_filename = None
     if cmd.send():
         saved_filename = dest_filename
 
     # post result from command success or failure
     raw_resp = cmd.get_raw_response()
-    print(f'raw_resp')
-
-    print('posting command results for aws s3')
+    
     post_aws_s3_cmd_result(
         raw_resp,
         netcdf_file['obs_day']
@@ -118,8 +112,6 @@ class ObsIodaFileMetaHandler(object):
 
         work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
 
-        print(f'inventory_ioda_files: {inventory_ioda_files}')
-        print(f'scrub_files: {self.meta_config.scrub_files}')
         for idx, ioda_file in inventory_ioda_files.iterrows():
             file_downloaded = False
             print(f'ioda_file: {ioda_file}')
