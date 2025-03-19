@@ -70,11 +70,11 @@ def post_harvest_results(cmd_id, harvest_response, wod_file):
             cmd_id,
             score_hv_cmds.HV_WOD_NC_META,
             item.variable_name,
-            item.var_count, 
-            item.min_depth,
-            item.max_depth, 
+            convert_to_int(item.var_count), 
+            convert_to_float(item.min_depth),
+            convert_to_float(item.max_depth), 
             item.sensor,
-            item.casts,
+            convert_to_int(item.casts),
             item.filename,
             item.min_date_time,
             item.max_date_time,
@@ -92,12 +92,12 @@ def post_harvest_results(cmd_id, harvest_response, wod_file):
             cmd_id, 
             score_hv_cmds.HV_WOD_NC_META,
             var_names, 
-            harvest_response[0].num_vars,
-            total_var_count,
-            harvest_response[0].min_depth,
-            harvest_response[0].max_depth,
+            convert_to_int(harvest_response[0].num_vars),
+            convert_to_int(total_var_count),
+            convert_to_float(harvest_response[0].min_depth),
+            convert_to_float(harvest_response[0].max_depth),
             harvest_response[0].sensor,
-            harvest_response[0].casts,
+            convert_to_int(harvest_response[0].casts),
             harvest_response[0].filename,
             harvest_response[0].min_date_time,
             harvest_response[0].max_date_time,
@@ -109,3 +109,21 @@ def post_harvest_results(cmd_id, harvest_response, wod_file):
     #once all items have been translated to work with columns, insert to correct tables 
     itf.insert_obs_meta_hv_wod_netcdf_item(obs_meta_data_items)
     itf.insert_obs_meta_hv_wod_netcdf_agg_item(obs_meta_data_agg_item)
+
+def convert_to_int(value):
+    """Safely convert a value to an int."""
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return None
+
+def convert_to_float(value):
+    """Safely convert a value to a float."""
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return None
