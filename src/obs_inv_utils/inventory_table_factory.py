@@ -414,6 +414,8 @@ def create_obs_meta_hv_wod_netcdf_table():
               Column('var_count', Integer),
               Column('min_depth', Float),
               Column('max_depth', Float),
+              Column('min_file_depth', Float),
+              Column('max_file_depth', Float),
               Column('sensor', String),
               Column('casts', Integer),
               Column('filename', String),
@@ -739,6 +741,8 @@ class ObsMetaHvWodNetcdf(Base):
     var_count = Column(Integer())
     min_depth = Column(Float())
     max_depth = Column(Float())
+    min_file_depth = Column(Float())
+    max_file_depth = Column(Float())
     sensor = Column(String(63))
     casts = Column(Integer())
     filename = Column(String(63))
@@ -1180,6 +1184,8 @@ def insert_obs_meta_hv_wod_netcdf_item(obs_meta_items):
             'var_count': item.var_count,
             'min_depth': item.min_depth,
             'max_depth': item.max_depth,
+            'min_file_depth': item.min_file_depth,
+            'max_file_depth': item.max_file_depth,
             'sensor': item.sensor,
             'casts': item.casts,
             'filename': item.filename,
@@ -1194,17 +1200,17 @@ def insert_obs_meta_hv_wod_netcdf_item(obs_meta_items):
     if(database_type.lower() == 'mysql'):
         sql = """
             INSERT IGNORE INTO obs_meta_hv_wod_netcdf
-            (obs_id, cmd_result_id, cmd_str, variable, var_count, min_depth, max_depth,
+            (obs_id, cmd_result_id, cmd_str, variable, var_count, min_depth, max_depth, min_file_depth, max_file_depth,
             sensor, casts, filename, min_data_date, max_data_date, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :var_count, :min_depth, :max_depth,
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :var_count, :min_depth, :max_depth, :min_file_depth, :max_file_depth,
             :sensor, :casts, :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
     else:
         sql = """
             INSERT OR IGNORE INTO obs_meta_hv_wod_netcdf
-            (obs_id, cmd_result_id, cmd_str, variable, var_count, min_depth, max_depth,
+            (obs_id, cmd_result_id, cmd_str, variable, var_count, min_depth, max_depth, min_file_depth, max_file_depth,
             sensor, casts, filename, min_data_date, max_data_date, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :var_count, :min_depth, :max_depth,
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :var_count, :min_depth, :max_depth, :min_file_depth, :max_file_depth,
             :sensor, :casts, :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
 
