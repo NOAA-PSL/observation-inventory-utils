@@ -18,7 +18,7 @@ parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp t
 args = parser.parse_args()
 
 #parameters
-daterange=[date(1975,1,1), date(2025,1,1)]
+daterange=[date(1970,1,1), date(2026,1,1)]
 
 def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.var_count.astype('bool'),'|',color='black',markersize=5)
@@ -27,17 +27,11 @@ def select_sensor(sensor, db_frame):
     dftmp = db_frame.loc[db_frame['sensor']==sensor]
     return dftmp
 
-def get_sensor(row):
-    directory = row['parent_dir']
-    sensor = directory.split("/")[2]
-    return sensor
-
 
 #read data from sql database of obs counts
 db_frame = utils.get_wod_nc()
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
-db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 
 #loop and plot sensors
 unique_sensor = db_frame.sort_values('sensor', ascending=False).drop_duplicates('sensor')
