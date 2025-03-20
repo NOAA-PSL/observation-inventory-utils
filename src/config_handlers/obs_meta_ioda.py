@@ -43,9 +43,7 @@ class ObsMetaIodaConfig(ConfigInterface):
         self.config_data = self.yaml_loader.load()
         self.parse()
 
-    def parse(self):
-        print(f'type(self.config_data): {type(self.config_data)}')
-        
+    def parse(self):        
         self.s3_bucket = self.yaml_loader.get_value(
             key='s3_bucket',
             document=self.config_data,

@@ -1,6 +1,6 @@
 from obs_inv_utils.score_hv_cmd_handler import ScoreHVCmd
-import score_hv_cmd_ioda
-import score_hv_cmd_wod_nc
+from obs_inv_utils import score_hv_cmd_ioda
+from obs_inv_utils import score_hv_cmd_wod_nc
 
 HV_IODA_META = 'ioda_meta_netcdf'
 HV_WOD_NC_META = 'wod_insitu_meta_netcdf'
