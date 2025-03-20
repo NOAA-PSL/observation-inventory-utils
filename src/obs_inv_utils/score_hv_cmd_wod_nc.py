@@ -87,8 +87,8 @@ def post_harvest_results(cmd_id, harvest_response, wod_file):
 
         obs_meta_data_items.append(new_item)
 
-    #handle aggregation 
-    if len(harvest_response) > 1:
+    #handle aggregation, even if there's one item, we want to know totals for the file 
+    if len(harvest_response) > 0:
         var_names = ", ".join(item.variable_name for item in harvest_response)
         total_var_count = sum(item.var_count for item in harvest_response)
         new_agg_item = ObsMetaWodAggData(
