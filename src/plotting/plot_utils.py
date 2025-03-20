@@ -11,6 +11,7 @@ import numpy as np
 from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsBufr as omnb
 from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsPrepbufr as omnp 
 from obs_inv_utils.inventory_table_factory import ObsInventory as oi
+from obs_inv_utils.inventory_table_factory import ObsMetaHvWodNetcdf as omwn
 import obs_inv_utils.inventory_table_factory as itf
 from sqlalchemy.sql import func, or_
 
@@ -351,3 +352,35 @@ def get_distinct_prepbufr():
     session.close()
 
     return df
+
+def get_wod_nc():
+    session = itf.Session()
+    query = session.query(
+        omwn.variable,
+        omwn.var_count,
+        omwn.sensor,
+        omwn.obs_day
+    ).join(
+        oi,
+        omwn.obs_id == oi.ob_ids
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.variable,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day
+        }
+        for result in results
+    ]
+
+    df = pandas.DataFrame(result_dicts)
+
+    session.close()
+
+    return df 
