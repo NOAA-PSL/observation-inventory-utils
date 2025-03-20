@@ -46,7 +46,7 @@ db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 
 #loop and plot sensors
-unique_sensor_variable = db_frame[['sensor','variable']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'variable'], asecending=[False, False])
+unique_sensor_variable = db_frame[['sensor','variable']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'variable'], ascending=[False, False])
 step=0.05
 height=step*len(unique_sensor_variable)
 
