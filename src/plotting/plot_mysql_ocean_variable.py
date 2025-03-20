@@ -97,7 +97,7 @@ ax_dup.set_xlim(daterange)
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
 file_name = "wod_line_obs_inventory_sensor_var.png"
 if args.dev:
-    file_name = "wod_line_obs_inventory_sensor_var" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = "wod_line_obs_inventory_sensor_var_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
