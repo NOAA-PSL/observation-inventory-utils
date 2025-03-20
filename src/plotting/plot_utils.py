@@ -362,7 +362,7 @@ def get_wod_nc():
         omwn.obs_day
     ).join(
         oi,
-        omwn.obs_id == oi.obs_ids
+        omwn.obs_id == oi.obs_id
     ).filter(
         oi.s3_bucket == 'noaa-reanalyses-pds'
     )
