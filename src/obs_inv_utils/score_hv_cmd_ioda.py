@@ -130,7 +130,7 @@ def post_harvest_results(cmd_id, harvest_response, ioda_file):
 
         obs_meta_data_items.append(new_item)
 
-    if len(harvest_response) > 1:
+    if len(harvest_response) > 0:
         var_names = ", ".join(item.variable_name for item in harvest_response)
         min_data_date_response = min(harvest_response, key=lambda item: item.min_date_time)
         max_data_date_response = max(harvest_response, key=lambda item: item.max_date_time)
