@@ -359,7 +359,8 @@ def get_wod_nc():
         omwn.variable,
         omwn.var_count,
         omwn.sensor,
-        omwn.obs_day
+        omwn.obs_day,
+        oi.parent_dir
     ).join(
         oi,
         omwn.obs_id == oi.obs_id
@@ -374,7 +375,8 @@ def get_wod_nc():
             'variable': result.variable,
             'var_count': result.variable,
             'sensor': result.sensor,
-            'obs_day': result.obs_day
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir
         }
         for result in results
     ]
