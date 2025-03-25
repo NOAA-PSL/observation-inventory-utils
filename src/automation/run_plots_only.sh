@@ -4,7 +4,7 @@
 SATINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/satinfo
 OZINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/ozinfo
 OUTPUT_LOC=/contrib/$USER/home/inventory-figures
-WORK_DIR=/lustre/home/work/inventory-work
+WORK_DIR=/invdisk/inventory-work
 
 cd $(dirname $0)
 
