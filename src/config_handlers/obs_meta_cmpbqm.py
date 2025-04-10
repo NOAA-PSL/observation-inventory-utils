@@ -21,6 +21,7 @@ class ObsMetaCMPBQMConfig(ConfigInterface):
     prepbufr_files: list = field(default_factory=list, init=False)
     work_dir: str = field(default_factory=str, init=False)
     scrub_files: bool = field(default_factory=bool, init=False)
+    platform: str = field(default_factory=str, init=False) 
     date_range: DateRange = field(
         default_factory=DateRange, init=False)
 
@@ -45,7 +46,12 @@ class ObsMetaCMPBQMConfig(ConfigInterface):
 
     def parse(self):
         print(f'type(self.config_data): {type(self.config_data)}')
-        
+
+        self.platform = self.yaml_loader.get_value(
+            key='platform',
+            document=self.config_data,
+            return_type=str
+        )        
 
         self.s3_bucket = self.yaml_loader.get_value(
             key='s3_bucket',

@@ -15,6 +15,9 @@ from obs_inv_utils.aws_s3_interface import AwsS3CommandRawResponse
 from typing import Optional
 from dataclasses import dataclass, field
 from obs_inv_utils import inventory_table_factory as tbl_factory
+from obs_inv_utils import discover_interface as discover
+from obs_inv_utils.discover_interface import DiscoverCommandRawResponse
+import hashlib
 
 SECONDS_IN_A_DAY = 24*3600
 
@@ -88,6 +91,21 @@ AwsS3CmdResult = namedtuple(
     ],
 )
 
+
+# NASA Addition: CmdResult Object for discover_interface
+DiscoverCmdResult = namedtuple(
+    'HpssCmdResult',
+    [   
+        'command',
+        'arg0',
+        'raw_output',
+        'raw_error',
+        'error_code',
+        'obs_cycle_time',
+        'submitted_at',
+        'latency'
+    ],  
+)
 
 # filename parts definitions
 PREFIX = 0
@@ -210,6 +228,28 @@ def parse_filename_clean_bucket(filename):
 
     return filename_meta
 
+# discover filename parser
+def parse_filename_discover(filename):
+    """
+    # NASA values
+    PREFIX =  0
+    CYCLE_TAG  = 2
+    DATA_TYPE  = 3
+    """
+    parts = filename.split('.')
+    del parts[1] # clean bucket has one extra part. the rest are the same as the dirty bucket
+    cycle_tag = get_cycle_tag(parts)
+    filename_meta = FilenameMeta(
+        parts[PREFIX], 
+        cycle_tag,
+        get_data_type(parts),
+        get_cycle_time(cycle_tag),
+        get_data_format(filename),
+        get_combined_suffix(parts),
+        filename.endswith('.nr')
+    )
+
+    return filename_meta
 
 def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
     if not isinstance(contents, s3.AwsS3ObjectsListContents):
@@ -337,6 +377,51 @@ def process_inspect_tarball_resp(cmd_result_id, contents):
     tbl_factory.insert_obs_inv_items(tarball_files_meta)
 
 
+def process_discover_resp(cmd_result_id, contents):
+    if not isinstance(contents, discover.DiscoverListContents):
+        print('Not instance type discover.DiscoverListContents')
+        return None
+    
+    listed_files_meta = contents.files_meta
+    listed_files_meta = listed_files_meta[0]
+    files_meta = []
+
+    fn = os.path.basename(listed_files_meta.name)
+    full_path = os.path.join(contents.prefix,fn)
+
+    checkfilepath = pathlib.Path(full_path)
+    if checkfilepath.is_file():
+        etag = hashlib.md5(open(full_path,'rb').read()).hexdigest()
+
+    fn_meta = parse_filename_discover(fn)
+    files_meta.append(TarballFileMeta(
+            cmd_result_id,
+            fn,
+            contents.prefix + "/",
+            platforms.DISCOVER,
+            '', # leave empty because 'bucket' does not apply 
+            fn_meta.prefix,
+            fn_meta.cycle_tag,
+            fn_meta.data_type,
+            fn_meta.cycle_time,
+            contents.obs_cycle_time,
+            fn_meta.data_format,
+            fn_meta.suffix,
+            fn_meta.not_restricted_tag,
+            listed_files_meta.size,
+            '',
+            listed_files_meta.last_modified,
+            contents.submitted_at,
+            contents.latency,
+            datetime.utcnow(),
+            datetime.utcnow(),
+            etag
+    ))
+    print(f'files_meta: {files_meta}')
+    if len(files_meta) > 0:
+        tbl_factory.insert_obs_inv_items(files_meta)
+
+
 def default_datetime_converter(obj):
    if isinstance(obj, datetime):
       return obj.__str__()
@@ -390,6 +475,31 @@ def post_hpss_cmd_result(raw_response, obs_day):
     return cmd_result_id
 
 
+# post_discover_cmd_result adapted from post_hpss_cmd_result
+def post_discover_cmd_result(raw_response, obs_day):
+    if not isinstance(raw_response, DiscoverCommandRawResponse):
+        msg = 'raw_response must be of type DiscoverCommandRawResponse. It is'\
+              f' actually of type: {type(raw_response)}'
+        raise TypeError(msg)
+
+    cmd_result_data = tbl_factory.CmdResultData(
+        raw_response.command,
+        raw_response.args_0,
+        raw_response.output,
+        raw_response.error,
+        raw_response.return_code,
+        obs_day,
+        raw_response.submitted_at,
+        raw_response.latency,
+        datetime.utcnow()
+    )
+
+    print(f'Discover cmd_result: {cmd_result_data}')
+    cmd_result_id = tbl_factory.insert_cmd_result(cmd_result_data)
+
+    return cmd_result_id
+
+
 @dataclass
 class ObsInventorySearchEngine(object):
     obs_inv_conf: ObservationsConfig
@@ -434,6 +544,9 @@ class ObsInventorySearchEngine(object):
                         hpss.CMD_INSPECT_TARBALL, args)
                     n_hours = 0
                     n_days = 1
+                elif platform == platforms.DISCOVER:
+                    cmd = discover.DiscoverCommandHandler(
+                        discover.CMD_GET_DISCOVER_OBJ_LIST, args)
 
                 print(f'cmd: {cmd}, finished_count: {finished_count}')
 
@@ -452,6 +565,13 @@ class ObsInventorySearchEngine(object):
                         raw_resp,
                         search_config.get_date_range().current
                     )
+                elif platform == platforms.DISCOVER:
+                    print('posting command results for discover')
+                    self.cmd_post_id = post_discover_cmd_result(
+                        raw_resp,
+                        search_config.get_date_range().current
+                    )   
+
 
                 print(f'self.cmd_post_id: {self.cmd_post_id}')
 
@@ -472,6 +592,11 @@ class ObsInventorySearchEngine(object):
                         )
                     elif platform == platforms.HERA_HPSS:
                         file_meta = process_inspect_tarball_resp(
+                            self.cmd_post_id,
+                            contents
+                        )
+                    elif platform == platforms.DISCOVER:
+                        file_meta = process_discover_resp(
                             self.cmd_post_id,
                             contents
                         )
