@@ -214,53 +214,83 @@ def parse_filename_clean_bucket(filename):
     return filename_meta
 
 def parse_filename_regex(filename):
-    patterns = [
+    # patterns = [
 
-        # 1. Dot-separated standard format with t00z
+    #     # 1. Dot-separated standard format with t00z
+    #     re.compile(
+    #         r'^(?P<prefix>.+)\.'
+    #         r'(?P<date_time>\d{8})\.'
+    #         r'(?P<cycle_tag>t\d{2}z)\.'
+    #         r'(?P<suffix>.+?)\.'
+    #         r'(?P<data_format>[^.]+)'
+    #         r'(?:\.(?P<not_restricted_tag>nr))?$'
+    #     ),
+
+    #     # 2. Dot-separated format with T000000Z
+    #     re.compile(
+    #         r'^(?P<prefix>.+)\.'
+    #         r'(?P<date_time>\d{8})\.'
+    #         r'(?P<cycle_time>T\d{6}Z)\.'
+    #         r'(?P<data_format>[^.]+)'
+    #         r'(?:\.(?P<not_restricted_tag>nr))?$'
+    #     ),
+
+    #     # 3. Dot-separated with date + HHZ instead of t00z
+    #     re.compile(
+    #         r'^(?P<prefix>.+)\.'
+    #         r'(?P<date_time>\d{8})\.'
+    #         r'(?P<cycle_hour>\d{2})z\.'
+    #         r'(?P<data_format>[^.]+)'
+    #         r'(?:\.(?P<not_restricted_tag>nr))?$'
+    #     ),
+
+    #     # 4. Underscore-separated ISO-style date
+    #     re.compile(
+    #         r'^(?P<prefix>.+)_'
+    #         r'(?P<date_time>\d{4}-\d{2}-\d{2})T(?P<cycle_hour>\d{2})'
+    #         r'\.(?P<data_format>[^.]+)$'
+    #     ),
+        
+    #     #5. Suffix and greedy prefix for types like ioda
+    #     re.compile(
+    #         r'^(?P<prefix>.+)\.'                         # greedy prefix
+    #         r'(?P<date_time>\d{8})\.'                    # date_time
+    #         r'(?P<cycle_time>T\d{6}Z)\.'                 # cycle_time
+    #         r'(?P<suffix>.+?)\.'                         # suffix (non-greedy)
+    #         r'(?P<data_format>[^.]+)'                    # file extension
+    #         r'(?:\.(?P<not_restricted_tag>nr))?$'        # optional .nr
+    #     ),
+
+    # ]
+
+    patterns = [
+        # ISO-style cycle time with full date and suffix before data_format
         re.compile(
             r'^(?P<prefix>.+)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_time>T\d{6}Z)\.'
+            r'(?P<suffix>.+?)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
+        # Traditional bufr-style cycle tag (t00z)
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
             r'(?P<date_time>\d{8})\.'
             r'(?P<cycle_tag>t\d{2}z)\.'
             r'(?P<suffix>.+?)\.'
             r'(?P<data_format>[^.]+)'
             r'(?:\.(?P<not_restricted_tag>nr))?$'
         ),
-
-        # 2. Dot-separated format with T000000Z
+        # Format with cycle hour only (e.g., .00.)
         re.compile(
-            r'^(?P<prefix>.+)\.'
+            r'^(?P<prefix>.+?)\.'
             r'(?P<date_time>\d{8})\.'
-            r'(?P<cycle_time>T\d{6}Z)\.'
+            r'(?P<cycle_hour>\d{2})\.'
+            r'(?P<suffix>.+?)\.'
             r'(?P<data_format>[^.]+)'
             r'(?:\.(?P<not_restricted_tag>nr))?$'
         ),
-
-        # 3. Dot-separated with date + HHZ instead of t00z
-        re.compile(
-            r'^(?P<prefix>.+)\.'
-            r'(?P<date_time>\d{8})\.'
-            r'(?P<cycle_hour>\d{2})z\.'
-            r'(?P<data_format>[^.]+)'
-            r'(?:\.(?P<not_restricted_tag>nr))?$'
-        ),
-
-        # 4. Underscore-separated ISO-style date
-        re.compile(
-            r'^(?P<prefix>.+)_'
-            r'(?P<date_time>\d{4}-\d{2}-\d{2})T(?P<cycle_hour>\d{2})'
-            r'\.(?P<data_format>[^.]+)$'
-        ),
-        
-        #5. Suffix and greedy prefix for types like ioda
-        re.compile(
-            r'^(?P<prefix>.+)\.'                         # greedy prefix
-            r'(?P<date_time>\d{8})\.'                    # date_time
-            r'(?P<cycle_time>T\d{6}Z)\.'                 # cycle_time
-            r'(?P<suffix>.+?)\.'                         # suffix (non-greedy)
-            r'(?P<data_format>[^.]+)'                    # file extension
-            r'(?:\.(?P<not_restricted_tag>nr))?$'        # optional .nr
-        ),
-
     ]
 
     for pattern in patterns:
