@@ -15,6 +15,7 @@ from obs_inv_utils.aws_s3_interface import AwsS3CommandRawResponse
 from typing import Optional
 from dataclasses import dataclass, field
 from obs_inv_utils import inventory_table_factory as tbl_factory
+import re
 
 SECONDS_IN_A_DAY = 24*3600
 
