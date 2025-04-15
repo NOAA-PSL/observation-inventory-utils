@@ -250,6 +250,17 @@ def parse_filename_regex(filename):
             r'(?P<date_time>\d{4}-\d{2}-\d{2})T(?P<cycle_hour>\d{2})'
             r'\.(?P<data_format>[^.]+)$'
         ),
+        
+        #5. Suffix and greedy prefix for types like ioda
+        re.compile(
+            r'^(?P<prefix>.+)\.'                         # greedy prefix
+            r'(?P<date_time>\d{8})\.'                    # date_time
+            r'(?P<cycle_time>T\d{6}Z)\.'                 # cycle_time
+            r'(?P<suffix>.+?)\.'                         # suffix (non-greedy)
+            r'(?P<data_format>[^.]+)'                    # file extension
+            r'(?:\.(?P<not_restricted_tag>nr))?$'        # optional .nr
+        ),
+
     ]
 
     for pattern in patterns:
