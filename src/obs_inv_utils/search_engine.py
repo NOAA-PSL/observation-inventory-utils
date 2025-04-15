@@ -282,6 +282,14 @@ def parse_filename_regex(filename):
             r'(?P<data_format>[^.]+)'
             r'(?:\.(?P<not_restricted_tag>nr))?$'
         ),
+        #Cycle tag with no suffix 
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_tag>t\d{2}z)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
         # Format with cycle hour only (e.g., .00.)
         re.compile(
             r'^(?P<prefix>.+?)\.'
