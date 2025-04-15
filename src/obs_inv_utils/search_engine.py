@@ -218,7 +218,7 @@ def parse_filename_regex(filename):
 
         # 1. Dot-separated standard format with t00z
         re.compile(
-            r'^(?P<prefix>.+?)\.'
+            r'^(?P<prefix>.+)\.'
             r'(?P<date_time>\d{8})\.'
             r'(?P<cycle_tag>t\d{2}z)\.'
             r'(?P<suffix>.+?)\.'
@@ -228,7 +228,7 @@ def parse_filename_regex(filename):
 
         # 2. Dot-separated format with T000000Z
         re.compile(
-            r'^(?P<prefix>.+?)\.'
+            r'^(?P<prefix>.+)\.'
             r'(?P<date_time>\d{8})\.'
             r'(?P<cycle_time>T\d{6}Z)\.'
             r'(?P<data_format>[^.]+)'
@@ -237,7 +237,7 @@ def parse_filename_regex(filename):
 
         # 3. Dot-separated with date + HHZ instead of t00z
         re.compile(
-            r'^(?P<prefix>.+?)\.'
+            r'^(?P<prefix>.+)\.'
             r'(?P<date_time>\d{8})\.'
             r'(?P<cycle_hour>\d{2})z\.'
             r'(?P<data_format>[^.]+)'
@@ -246,7 +246,7 @@ def parse_filename_regex(filename):
 
         # 4. Underscore-separated ISO-style date
         re.compile(
-            r'^(?P<prefix>.+?)_'
+            r'^(?P<prefix>.+)_'
             r'(?P<date_time>\d{4}-\d{2}-\d{2})T(?P<cycle_hour>\d{2})'
             r'\.(?P<data_format>[^.]+)$'
         ),
