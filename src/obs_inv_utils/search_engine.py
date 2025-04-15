@@ -291,6 +291,12 @@ def parse_filename_regex(filename):
             r'(?P<data_format>[^.]+)'
             r'(?:\.(?P<not_restricted_tag>nr))?$'
         ),
+        # Underscore-separated ISO-style date
+        re.compile(
+            r'^(?P<prefix>.+)_'
+            r'(?P<date_time>\d{4}-\d{2}-\d{2})T(?P<cycle_hour>\d{2})'
+            r'\.(?P<data_format>[^.]+)$'
+        ),
     ]
 
     for pattern in patterns:
