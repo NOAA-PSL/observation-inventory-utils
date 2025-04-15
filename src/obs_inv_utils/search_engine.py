@@ -212,6 +212,89 @@ def parse_filename_clean_bucket(filename):
 
     return filename_meta
 
+def parse_filename_regex(filename):
+    patterns = [
+
+        # 1. Dot-separated standard format with t00z
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_tag>t\d{2}z)\.'
+            r'(?P<suffix>.+?)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
+
+        # 2. Dot-separated format with T000000Z
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_time>T\d{6}Z)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
+
+        # 3. Dot-separated with date + HHZ instead of t00z
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_hour>\d{2})z\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
+
+        # 4. Underscore-separated ISO-style date
+        re.compile(
+            r'^(?P<prefix>.+?)_'
+            r'(?P<date_time>\d{4}-\d{2}-\d{2})T(?P<cycle_hour>\d{2})'
+            r'\.(?P<data_format>[^.]+)$'
+        ),
+    ]
+
+    for pattern in patterns:
+        match = pattern.match(filename)
+        if match:
+            parts = match.groupdict()
+
+            prefix = parts.get("prefix")
+            cycle_tag = parts.get("cycle_tag")
+            suffix = parts.get("suffix", "")
+            data_format = parts.get("data_format")
+            not_restricted = parts.get("not_restricted_tag") == "nr"
+
+            # Derive cycle_time in seconds
+            if parts.get("cycle_time"):  # T000000Z
+                try:
+                    t = datetime.strptime(parts["cycle_time"], "T%H%M%SZ")
+                    cycle_time = t.hour * 3600 + t.minute * 60 + t.second
+                except ValueError:
+                    cycle_time = None
+            elif cycle_tag:  # t00z
+                try:
+                    cycle_time = int(cycle_tag[1:3]) * 3600
+                except:
+                    cycle_time = None
+            elif parts.get("cycle_hour"):  # 00z or _T00
+                cycle_time = int(parts["cycle_hour"]) * 3600
+                cycle_tag = f"t{parts['cycle_hour']}z"
+            else:
+                cycle_time = None
+
+            # Try to extract a "data_type" from suffix (leftmost word)
+            data_type = suffix.split('.')[0] if suffix else None
+
+            return FilenameMeta(
+                prefix=prefix,
+                cycle_tag=cycle_tag,
+                data_type=data_type,
+                cycle_time=cycle_time,
+                data_format=data_format,
+                suffix=suffix,
+                not_restricted_tag=not_restricted
+            )
+
+    return None  # No match
+
 
 def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
     if not isinstance(contents, s3.AwsS3ObjectsListContents):
@@ -266,7 +349,9 @@ def process_aws_s3_clean_resp(cmd_result_id, contents):
     print(f'inside process_aws_s3_list_objects - contents: {contents}')
     fn = os.path.basename(contents.prefix)
     print(f'filename: {fn}')
-    fn_meta = parse_filename_clean_bucket(fn)
+    fn_meta = parse_filename_regex(fn)
+    if fn_meta is None: #if the regular expression didn't match, default to old behavior
+        fn_meta = parse_filename_clean_bucket(fn)
     print(f'filename meta: {fn_meta}')
 
     listed_object = listed_objects[0]
