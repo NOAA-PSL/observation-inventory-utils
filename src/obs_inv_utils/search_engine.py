@@ -305,17 +305,18 @@ def parse_filename_regex(filename):
             not_restricted = parts.get("not_restricted_tag") == "nr"
 
             # Derive cycle_time in seconds
-            if parts.get("cycle_time"):  # T000000Z
-                try:
-                    t = datetime.strptime(parts["cycle_time"], "T%H%M%SZ")
-                    cycle_time = t.hour * 3600 + t.minute * 60 + t.second
-                except ValueError:
-                    cycle_time = None
-            elif cycle_tag:  # t00z
+            if cycle_tag: 
                 try:
                     cycle_time = int(cycle_tag[1:3]) * 3600
                 except:
                     cycle_time = None
+            elif parts.get("cycle_time"):  # T000000Z
+                try:
+                    t = datetime.strptime(parts["cycle_time"], "T%H%M%SZ")
+                    cycle_tag = parts["cycle_time"]
+                    cycle_time = t.hour * 3600 + t.minute * 60 + t.second
+                except ValueError:
+                    cycle_time = None  
             elif parts.get("cycle_hour"):  # 00z or _T00
                 cycle_time = int(parts["cycle_hour"]) * 3600
                 cycle_tag = f"t{parts['cycle_hour']}z"
