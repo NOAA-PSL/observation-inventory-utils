@@ -308,7 +308,10 @@ def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
     for listed_object in listed_objects:
         fn = listed_object.name
         print(f'filename: {fn}')
-        fn_meta = parse_filename(fn)
+        fn_meta = parse_filename_regex(fn)
+        if fn_meta is None:
+            print('regular expression file name did not match, reverting to default behavior')
+            fn_meta = parse_filename(fn)
         print(f'filename meta: {fn_meta}')
 
         file_meta = TarballFileMeta(
@@ -352,6 +355,7 @@ def process_aws_s3_clean_resp(cmd_result_id, contents):
     print(f'filename: {fn}')
     fn_meta = parse_filename_regex(fn)
     if fn_meta is None: #if the regular expression didn't match, default to old behavior
+        print('regular expression file name did not match, reverting to default behavior')
         fn_meta = parse_filename_clean_bucket(fn)
     print(f'filename meta: {fn_meta}')
 
