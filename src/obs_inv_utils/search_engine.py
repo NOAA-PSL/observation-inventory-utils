@@ -224,20 +224,20 @@ def parse_filename_regex(filename):
             r'(?P<data_format>[^.]+)'
             r'(?:\.(?P<not_restricted_tag>nr))?$'
         ),
+        #Cycle tag with no suffix 
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_tag>t\d{2}z)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
         # Traditional bufr-style cycle tag (t00z)
         re.compile(
             r'^(?P<prefix>.+?)\.'
             r'(?P<date_time>\d{8})\.'
             r'(?P<cycle_tag>t\d{2}z)\.'
             r'(?P<suffix>.+?)\.'
-            r'(?P<data_format>[^.]+)'
-            r'(?:\.(?P<not_restricted_tag>nr))?$'
-        ),
-        #Cycle tag with no suffix 
-        re.compile(
-            r'^(?P<prefix>.+?)\.'
-            r'(?P<date_time>\d{8})\.'
-            r'(?P<cycle_tag>t\d{2}z)\.'
             r'(?P<data_format>[^.]+)'
             r'(?:\.(?P<not_restricted_tag>nr))?$'
         ),
