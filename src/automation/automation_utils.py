@@ -7,6 +7,8 @@ from collections import namedtuple
 NCEPLIBS_SINV = 'sinv'
 NCEPLIBS_CMPBQM = 'cmpbqm'
 
+HV_IODA_META = 'ioda_meta_netcdf'
+
 CLEAN_PLATFORM = 'aws_s3_clean'
 REANALYSIS_BUCKET = 'noaa-reanlyses-pds'
 
@@ -17,6 +19,8 @@ DATESTR_FORMAT = '%Y%m%dT%H%M%SZ'
 ESCAPED_DATESTR_FORMAT = '%%Y%%m%%dT%%H%%M%%SZ'
 
 CYCLING_6H = '21600'
+CYCLING_DAILY = '86400'
+CYCLING_HOURLY = '3600'
 
 InventoryInfo = namedtuple(
     'InventoryInfo',
@@ -28,7 +32,7 @@ InventoryInfo = namedtuple(
         'cycling_interval',
         's3_bucket',
         's3_prefix',
-        'bufr_files',
-        'nceplibs_cmd'
+        'files',
+        'inv_cmd'
     ]
 )

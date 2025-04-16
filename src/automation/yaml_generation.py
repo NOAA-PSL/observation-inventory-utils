@@ -60,7 +60,7 @@ def generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time
             'start': start,
             'end': end
         },
-        'bufr_files':[inventory_info.bufr_files],
+        'bufr_files':[inventory_info.files],
         'work_dir': work_dir,
         'scrub_files': True
     }
@@ -89,7 +89,7 @@ def generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_ti
             'start': start,
             'end': end
         },
-        'prepbufr_files':[inventory_info.bufr_files],
+        'prepbufr_files':[inventory_info.files],
         'work_dir': work_dir,
         'scrub_files': True
     }
