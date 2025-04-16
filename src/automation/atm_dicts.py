@@ -632,6 +632,18 @@ saphir_saphir = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
+seviri_sevasr = InventoryInfo(
+    obs_name='seviri_sevasr',
+    key='observations/reanalysis/seviri/sevasr/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.sevasr.tm00.bufr_d',
+    start='20220301T000000Z',
+    s3_prefix='observations/reanalysis/seviri/sevasr/%Y/%m/bufr/',
+    bufr_files='gdas.%z.sevasr.tm00.bufr_d',
+    nceplibs_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 seviri_sevcsr = InventoryInfo(
     obs_name='seviri_sevcsr',
     key='observations/reanalysis/seviri/sevcsr/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.sevcsr.tm00.bufr_d',
@@ -723,7 +735,7 @@ atm_infos = [airs_airsev, airs_aqua, amsr2_nasa, amsre_nasa, amsua_1bamua, amsua
              conv_prepbufr_acft_profiles, conv_prepbufr, cris_cris, cris_crisf4, geo_ahicsr, geo_geoimr, geo_goesfv, geo_goesnd, geo_gsrasr, geo_gsrcsr,
              gmi_nasa_gmiv7, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4, iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_cfsr, 
              ozone_nasa_sbuv_v87, ozone_ncep_gome, ozone_ncep_mls, ozone_ncep_omi, ozone_ncep_ompslp,
-             ozone_ncep_ompsn8, ozone_ncep_ompst8, saphir_saphir, seviri_sevcsr,
+             ozone_ncep_ompsn8, ozone_ncep_ompst8, saphir_saphir, seviri_sevasr, seviri_sevcsr,
              ssmi_ssmit, ssmis_ssmisu, ssu_1bssu, trmm_nasa_tmi]
 
 atm_private_infos = [amv_merged, gps_eumetsat, ssmi_eumetsat, ssmis_eumetsat]
