@@ -16,7 +16,7 @@ python3 auto_inventory.py -cat list -n_jobs 80 -work_dir $WORK_DIR --list airs_a
     amsub_1bamub amv_satwnd atms_atms avhrr_avcsam avhrr_avcspm cris_cris cris_crisf4 geo_ahicsr geo_geoimr \
     geo_goesfv geo_goesnd geo_gsrasr geo_gsrcsr gmi_nasa_gmiv7 gps_gpsro hirs_1bhrs3 hirs_1bhrs4 \
     iasi_mtiasi mhs_1bmhs ozone_nasa_sbuv_v87 ozone_ncep_gome ozone_ncep_mls ozone_ncep_omi ozone_ncep_ompslp \
-    ozone_ncep_ompsn8 ozone_ncep_ompst8 saphir_saphir seviri_sevcsr \
+    ozone_ncep_ompsn8 ozone_ncep_ompst8 saphir_saphir seviri_sevasr seviri_sevcsr \
     ssmi_ssmit ssmis_ssmisu trmm_nasa_tmi amsr2_nasa amsre_nasa avhrr_avcspm_n16 \
     conv_convbufr_adpsfc conv_convbufr_adpupa conv_convbufr_aircar conv_convbufr_aircft conv_convbufr_ascatt \
     conv_convbufr_ascatw conv_convbufr_hdob conv_convbufr_proflr conv_convbufr_rassda conv_convbufr_vadwnd &
