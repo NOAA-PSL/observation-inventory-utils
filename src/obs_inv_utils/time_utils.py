@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from dataclasses import dataclass
 
@@ -6,7 +6,7 @@ from dataclasses import dataclass
 SECONDS_IN_A_DAY = 24 * 3600
 
 DEFAULT_START_TIME = datetime(year=1990, month=1, day=1)
-DEFAULT_END_TIME = datetime.utcnow()
+DEFAULT_END_TIME = datetime.now(timezone.utc)
 DEFAULT_DATE_STR = '%Y%m%dT%H%M%SZ'
 DEFAULT_CYCLE_INTERVALS = [0, 21600, 43200, 64800]
 
@@ -66,7 +66,7 @@ def get_date_range_from_dict(date_range):
 
     datestr = date_range.get('datestr')
     try:
-        test_formatted_date = datetime.utcnow().strftime(datestr)
+        test_formatted_date = datetime.now(timezone.utc).strftime(datestr)
     except Exception as e:
         msg = f'Invalid date format string: {date_range}, valid example: ' \
               f'{DEFAULT_DATE_STR}, error: {e}'

@@ -2,7 +2,7 @@ from collections import namedtuple
 import json
 import os
 import pathlib
-from datetime import datetime
+from datetime import datetime, timezone
 from obs_inv_utils import hpss_io_interface as hpss
 from obs_inv_utils import obs_storage_platforms as platforms
 from config_handlers.obs_search_conf import ObservationsConfig, ObsSearchConfig
@@ -340,8 +340,8 @@ def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
             listed_object.last_modified,
             contents.submitted_at,
             contents.latency,
-            datetime.utcnow(),
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
+            datetime.now(timezone.utc),
             listed_object.etag
         )
         files_meta.append(file_meta)
@@ -386,8 +386,8 @@ def process_aws_s3_clean_resp(cmd_result_id, contents):
             listed_object.last_modified,
             contents.submitted_at,
             contents.latency,
-            datetime.utcnow(),
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
+            datetime.now(timezone.utc),
             listed_object.etag
     ))
 
@@ -427,8 +427,8 @@ def process_inspect_tarball_resp(cmd_result_id, contents):
             inspected_file.last_modified,
             contents.submitted_at,
             contents.latency,
-            datetime.utcnow(),
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
+            datetime.now(timezone.utc),
             ''
         )
         tarball_files_meta.append(tarball_file_meta)
@@ -458,7 +458,7 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
         obs_cycle_time,
         raw_response.submitted_at,
         raw_response.latency,
-        datetime.utcnow()
+        datetime.now(timezone.utc)
     )
 
     cmd_result_id = tbl_factory.insert_cmd_result(cmd_result_data)
@@ -480,7 +480,7 @@ def post_hpss_cmd_result(raw_response, obs_day):
         obs_day,
         raw_response.submitted_at,
         raw_response.latency,
-        datetime.utcnow()
+        datetime.now(timezone.utc)
     )
 
     print(f'HPSS cmd_result: {cmd_result_data}')

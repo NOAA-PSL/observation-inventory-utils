@@ -1,6 +1,6 @@
 from typing import Optional
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -46,7 +46,7 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
         obs_cycle_time,
         raw_response.submitted_at,
         raw_response.latency,
-        datetime.utcnow()
+        datetime.now(timezone.utc)
     )
 
     itf.insert_cmd_result(cmd_result_data)

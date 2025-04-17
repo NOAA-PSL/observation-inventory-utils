@@ -1,6 +1,6 @@
 import os
 import sqlalchemy as db
-from datetime import datetime
+from datetime import datetime, timezone
 from collections import namedtuple
 from obs_inv_utils import search_engine as se
 from sqlalchemy import Table, Column, MetaData, text
@@ -715,7 +715,7 @@ def insert_cmd_result(cmd_result_data):
         obs_day=cmd_result_data.obs_day,
         submitted_at=cmd_result_data.submitted_at,
         latency=cmd_result_data.latency,
-        inserted_at=datetime.utcnow()
+        inserted_at=datetime.now(timezone.utc)
     )
 
     session = Session()
@@ -747,7 +747,7 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
                 'filename': item.filename,
                 'file_size': item.file_size,
                 'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-                'inserted_at': datetime.utcnow()
+                'inserted_at': datetime.now(timezone.utc)
             }
         rows.append(row)
 
@@ -805,7 +805,7 @@ def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
             'filename': item.filename,
             'file_size': item.file_size,
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-            'inserted_at': datetime.utcnow()
+            'inserted_at': datetime.now(timezone.utc)
         }
         rows.append(row)
 
@@ -859,7 +859,7 @@ def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
             'filename': item.filename,
             'file_size': item.file_size,
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-            'inserted_at': datetime.utcnow()
+            'inserted_at': datetime.now(timezone.utc)
         }
         rows.append(row)
 
@@ -914,7 +914,7 @@ def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items):
             'min_data_date': item.min_data_date,
             'max_data_date': item.max_data_date,
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-            'inserted_at': datetime.utcnow()
+            'inserted_at': datetime.now(timezone.utc)
         }
         rows.append(row)
 
@@ -978,7 +978,7 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
             'min_data_date': item.min_data_date,
             'max_data_date': item.max_data_date,
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-            'inserted_at': datetime.utcnow()
+            'inserted_at': datetime.now(timezone.utc)
         }
         rows.append(row)
 
