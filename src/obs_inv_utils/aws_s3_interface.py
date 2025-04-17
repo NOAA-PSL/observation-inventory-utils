@@ -4,7 +4,7 @@ from pathlib import Path
 from collections import namedtuple, OrderedDict
 import attr
 import boto3
-from datetime import datetime
+from datetime import datetime, timezone
 from botocore.config import Config
 from botocore import UNSIGNED
 
@@ -275,9 +275,9 @@ class AwsS3CommandHandler(object):
 
     def send(self):
         try:
-            self.submitted_at = datetime.utcnow()
+            self.submitted_at = datetime.now(timezone.utc)
             response = self.cmd_obj.command(self.client, **self.kwargs)
-            self.finished_at = datetime.utcnow()
+            self.finished_at = datetime.now(timezone.utc)
         except Exception as e:
             msg = f'Error after sending command {self.command}, error: {e}.'
             raise ValueError(msg)
