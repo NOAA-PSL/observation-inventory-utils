@@ -6,7 +6,7 @@ conda activate obs-inventory-env
 module load gnu
 module load intel/2023.2.0
 module load impi/2023.2.0
-export PATH=/contrib/inv-stack/ncep/NCEPLIBS-bufr-12.1.0/build/utils:$PATH 
+export PATH=/invdisk/nceplibs-stack/ncep/NCEPLIBS-bufr-12.1.0/build/utils:$PATH 
 
 OBS_INV_HOME_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export PYTHONPATH=$OBS_INV_HOME_DIR/src
