@@ -18,9 +18,9 @@ PRIVATE_EUMETSAT_BUCKET = 'nnja-private-eumetsat'
 DATESTR_FORMAT = '%Y%m%dT%H%M%SZ'
 ESCAPED_DATESTR_FORMAT = '%%Y%%m%%dT%%H%%M%%SZ'
 
-CYCLING_6H = '21600'
-CYCLING_DAILY = '86400'
-CYCLING_HOURLY = '3600'
+CYCLING_6H = 21600
+CYCLING_DAILY = 86400
+CYCLING_HOURLY = 3600
 
 InventoryInfo = namedtuple(
     'InventoryInfo',
