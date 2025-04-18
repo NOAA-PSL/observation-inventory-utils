@@ -82,8 +82,6 @@ def get_start_end_time(inventory_info):
     #additional cycling options will need to be added as functionality expands 
     if inventory_info.cycling_interval == au.CYCLING_6H:
         frequency = '6H'
-    elif inventory_info.cycling_interval == au.CYCLING_DAILY:
-        frequency = '24H'
     elif inventory_info.cycling_interval == au.CYCLING_HOURLY:
         frequency = 'H'
     else: #default to round to closest hour
