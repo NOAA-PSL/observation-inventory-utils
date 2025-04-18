@@ -53,13 +53,13 @@ if args.category == 'ocean':
 if args.category == 'ice':
     to_inventory = ice_dicts.ice_infos
 if args.category == 'all':
-    to_inventory = atm_dicts.atm_infos | ocn_dicts.ocn_infos | ice_dicts.ice_infos
+    to_inventory = atm_dicts.atm_infos + ocn_dicts.ocn_infos + ice_dicts.ice_infos
 if args.category == 'list':
     try:
         to_inventory_atm = [x for x in atm_dicts.atm_infos if any(x.obs_name == i for i in args.var_list)]
         to_inventory_ocean = [x for x in ocn_dicts.ocn_infos if any(x.obs_name == i for i in args.var_list)]
         to_inventory_ice = [x for x in ice_dicts.ice_infos if any(x.obs_name == i for i in args.var_list)]
-        to_inventory = to_inventory_atm | to_inventory_ocean | to_inventory_ice
+        to_inventory = to_inventory_atm + to_inventory_ocean + to_inventory_ice
     except Exception as ex:
         print("An error occurred getting list values to inventory")
         print(ex)
