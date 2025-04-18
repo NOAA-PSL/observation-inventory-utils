@@ -9,7 +9,8 @@ icec_emc_dmsp_v2 = InventoryInfo(
     files='icec.emc.ssmi_l1b_dmsp.%z.iodav2.nc',
     inv_cmd=au.HV_IODA_META,
     cycling_interval=au.CYCLING_DAILY,
-    platform=au.CLEAN_PLATFORM
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
 )
 
 icec_emc_dmsp_v3 = InventoryInfo(
@@ -20,7 +21,8 @@ icec_emc_dmsp_v3 = InventoryInfo(
     files='icec.emc.ssmi_l1b_dmsp.%z.iodav3.nc',
     inv_cmd=au.HV_IODA_META,
     cycling_interval=au.CYCLING_DAILY,
-    platform=au.CLEAN_PLATFORM
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
 )
 
 icec_nsidc_nh_v2 = InventoryInfo(
@@ -31,7 +33,8 @@ icec_nsidc_nh_v2 = InventoryInfo(
     files='icec.nsidc.nh.%z.iodav2.nc',
     inv_cmd=au.HV_IODA_META,
     cycling_interval=au.CYCLING_DAILY,
-    platform=au.CLEAN_PLATFORM
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
 )
 
 icec_nsidc_nh_v3 = InventoryInfo(
@@ -42,7 +45,8 @@ icec_nsidc_nh_v3 = InventoryInfo(
     files='icec.nsidc.nh.%z.iodav3.nc',
     inv_cmd=au.HV_IODA_META,
     cycling_interval=au.CYCLING_DAILY,
-    platform=au.CLEAN_PLATFORM
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
 )
 
 icec_nsidc_sh_v2 = InventoryInfo(
@@ -53,7 +57,8 @@ icec_nsidc_sh_v2 = InventoryInfo(
     files='icec.nsidc.sh.%z.iodav2.nc',
     inv_cmd=au.HV_IODA_META,
     cycling_interval=au.CYCLING_DAILY,
-    platform=au.CLEAN_PLATFORM
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
 )
 
 icec_nsidc_sh_v3 = InventoryInfo(
@@ -64,7 +69,8 @@ icec_nsidc_sh_v3 = InventoryInfo(
     files='icec.nsidc.sh.%z.iodav3.nc',
     inv_cmd=au.HV_IODA_META,
     cycling_interval=au.CYCLING_DAILY,
-    platform=au.CLEAN_PLATFORM
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
 )
 
 icefb_esa_cryosat2_v2 = InventoryInfo(
@@ -75,7 +81,8 @@ icefb_esa_cryosat2_v2 = InventoryInfo(
     files='icefb.esa.l2_cryosat2.%z.iodav2.nc',
     inv_cmd=au.HV_IODA_META,
     cycling_interval=au.CYCLING_DAILY,
-    platform=au.CLEAN_PLATFORM
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
 )
 
 icefb_esa_cryosat2_v3 = InventoryInfo(
@@ -86,7 +93,8 @@ icefb_esa_cryosat2_v3 = InventoryInfo(
     files='icefb.esa.l2_cryosat2.%z.iodav3.nc',
     inv_cmd=au.HV_IODA_META,
     cycling_interval=au.CYCLING_DAILY,
-    platform=au.CLEAN_PLATFORM
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
 )
 
 ice_infos = [icec_emc_dmsp_v2, icec_emc_dmsp_v3, icec_nsidc_nh_v2, icec_nsidc_nh_v3, icec_nsidc_sh_v2, icec_nsidc_sh_v3, icefb_esa_cryosat2_v2,
