@@ -19,11 +19,14 @@ python3 auto_inventory.py -cat list -n_jobs 80 -work_dir $WORK_DIR --list airs_a
     ozone_ncep_ompsn8 ozone_ncep_ompst8 saphir_saphir seviri_sevasr seviri_sevcsr \
     ssmi_ssmit ssmis_ssmisu trmm_nasa_tmi amsr2_nasa amsre_nasa avhrr_avcspm_n16 \
     conv_convbufr_adpsfc conv_convbufr_adpupa conv_convbufr_aircar conv_convbufr_aircft conv_convbufr_ascatt \
-    conv_convbufr_ascatw conv_convbufr_hdob conv_convbufr_proflr conv_convbufr_rassda conv_convbufr_vadwnd &
+    conv_convbufr_ascatw conv_convbufr_hdob conv_convbufr_proflr conv_convbufr_rassda conv_convbufr_vadwnd \
+    conv_convbufr_goesnd conv_convbufr_satwnd conv_convbufr_sfcshp conv_convbufr_wdsatr &
 python3 auto_inventory.py -cat list -n_jobs 8 -ago 8400 -end 20020101T000000Z -work_dir $WORK_DIR --list ssu_1bssu ozone_cfsr msu_1bmsu hirs_1bhrs2 \
     conv_prepbufr_acft_profiles conv_prepbufr & 
 python3 auto_inventory.py -cat list -n_jobs 8 -ago 8400 -work_dir $WORK_DIR --list ssu_1bssu ozone_cfsr msu_1bmsu hirs_1bhrs2 \
-    conv_prepbufr_acft_profiles conv_prepbufr   
+    conv_prepbufr_acft_profiles conv_prepbufr &
+python3 auto_inventory.py -cat ocean -n_jobs 50 -work_dir $WORK_DIR & 
+python3 auto_inventory.py -cat ice -n_jobs 8 -work_dir $WORK_DIR  
 
 #run all plots in parallel
 python3 ../plotting/plot_mysql_dir_sensor_sat.py --sidb $SATINFO_DIR -o $OUTPUT_LOC
