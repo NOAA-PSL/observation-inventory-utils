@@ -373,7 +373,7 @@ def get_wod_nc():
     result_dicts = [
         {
             'variable': result.variable,
-            'var_count': result.variable,
+            'var_count': result.var_count,
             'sensor': result.sensor,
             'obs_day': result.obs_day,
             'parent_dir': result.parent_dir
