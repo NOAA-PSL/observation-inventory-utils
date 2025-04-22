@@ -138,7 +138,7 @@ def get_filesize_timeline_data(min_instances):
     return df
 
 
-def get_bufr_files_data(filenames, start, end):
+def get_files_data(filenames, start, end):
 
     insp = inspect(engine)
     table_exists = insp.has_table(itf.OBS_INVENTORY_TABLE)

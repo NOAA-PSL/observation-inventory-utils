@@ -1,0 +1,143 @@
+from typing import Optional
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import shutil
+import uuid
+
+import pandas as pd
+from pandas import DataFrame
+import pathlib
+import numpy as np
+
+from config_handlers.obs_meta_ioda import ObsMetaIodaConfig
+from obs_inv_utils import obs_inv_queries as oiq
+from obs_inv_utils import aws_s3_interface as s3
+from obs_inv_utils import time_utils
+from obs_inv_utils.time_utils import DateRange
+from obs_inv_utils import inventory_table_factory as itf
+
+from obs_inv_utils import score_hv_cmds
+from obs_inv_utils import score_hv_cmd_handler as cmhd
+from obs_inv_utils import score_hv_cmds as hv_cmds
+
+CALLING_DIR = pathlib.Path(__file__).parent.resolve()
+TMP_OBS_DATA_DIR = 'tmp_obs_data'
+
+def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
+    if not isinstance(raw_response, s3.AwsS3CommandRawResponse):
+        msg = 'raw_response must be of type AwsS3CommandRawResponse. It is'\
+              f' actually of type: {type(raw_response)}'
+        raise TypeError(msg)
+
+    output_str = json.dumps(
+        raw_response.output,
+        default=time_utils.default_datetime_converter
+    )
+
+    cmd_result_data = itf.CmdResultData(
+        raw_response.command,
+        raw_response.args_0,
+        output_str,
+        '',
+        raw_response.return_code,
+        obs_cycle_time,
+        raw_response.submitted_at,
+        raw_response.latency,
+        datetime.now(timezone.utc)
+    )
+
+    itf.insert_cmd_result(cmd_result_data)
+
+def download_netcdf_file_from_s3(work_dir, netcdf_file):
+    object_key = netcdf_file['full_path']
+
+    obs_day = datetime.strftime(netcdf_file['obs_day'], '%Y%m%d')
+
+    dest_path = os.path.join(
+        work_dir, obs_day, netcdf_file['filename'])
+
+    try:
+        Path(dest_path).mkdir(parents=True, exist_ok=True)
+    except Exception as err:
+        msg = f'\'work_dir\' is not a directory - err: {err}'
+        raise ValueError(msg) from err
+
+    dest_filename = os.path.join(dest_path, netcdf_file['filename'])
+    
+    # setup command arguments, [file s3 key, destination location,
+    # and expected filesize
+    args = [object_key, dest_filename, netcdf_file['file_size']]
+
+    cmd = s3.AwsS3CommandHandler(s3.CMD_DOWNLOAD_S3_OBJ, args)
+    saved_filename = None
+    if cmd.send():
+        saved_filename = dest_filename
+
+    # post result from command success or failure
+    raw_resp = cmd.get_raw_response()
+    
+    post_aws_s3_cmd_result(
+        raw_resp,
+        netcdf_file['obs_day']
+    )
+
+    return saved_filename
+
+@dataclass
+class ObsIodaFileMetaHandler(object):
+    meta_config: ObsMetaIodaConfig
+    ioda_files: list = field(default_factory=list, init=False)
+    date_range: DateRange = field(init=False)
+
+    def __post_init__(self):
+        self.date_range = self.meta_config.get_date_range()
+        self.ioda_files = self.meta_config.get_ioda_file_list()
+
+    def __repr__(self):
+        return f'meta_config: {self.meta_config}, ' \
+            f'ioda_files: {self.ioda_files}, ' \
+            f'date_range: {self.date_range}'
+    
+    def get_ioda_file_meta(self, cmd_type):
+        inventory_ioda_files = oiq.get_files_data(
+            self.ioda_files,
+            self.date_range.start,
+            self.date_range.end
+        )
+
+        temp_uuid = str(uuid.uuid4())
+
+        work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
+
+        for idx, ioda_file in inventory_ioda_files.iterrows():
+            file_downloaded = False
+            print(f'ioda_file: {ioda_file}')
+
+            saved_filename = download_netcdf_file_from_s3(work_dir, ioda_file)
+
+            if saved_filename is None:
+                continue
+
+            self.get_obs_meta_with_hv_ioda(saved_filename, ioda_file)
+
+            # clean up files
+            if self.meta_config.scrub_files:
+                shutil.rmtree( work_dir )
+
+
+    def get_obs_meta_with_hv_ioda(self, filename, ioda_file):
+        args = {'filename': filename}
+        cmd = cmhd.ScoreHVCmdHandler(
+            hv_cmds.HV_IODA_META,
+            hv_cmds.score_hv_cmds,
+            args
+        )
+
+        cmd.harvest()
+        cmd.post_cmd_result(ioda_file.obs_day)
+        cmd.post_harvest_results(ioda_file)
+
+

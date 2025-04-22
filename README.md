@@ -185,6 +185,71 @@ CREATE TABLE obs_meta_nceplibs_prepbufr (
 	FOREIGN KEY(cmd_result_id) REFERENCES cmd_results (cmd_result_id)
 ```
 
+```sh
+obs_meta_hv_ioda_netcdf
+
+CREATE TABLE obs_meta_hv_ioda_netcdf (
+  meta_id INTEGER NOT NULL,
+  obs_id INTEGER NOT NULL,
+  cmd_result_id INTEGER NOT NULL,
+  cmd_str VARCHAR,
+  variable VARCHAR,
+  num_locs INTEGER, 
+  min_depth FLOAT,
+  max_depth FLOAT,
+  hasPreQC BOOLEAN,
+  hasObsError BOOLEAN,
+  sensor VARCHAR,
+  platform VARCHAR,
+  ioda_layout VARCHAR,
+  processing_level VARCHAR,
+  thinning FLOAT,
+  ioda_version VARCHAR,
+  filename VARCHAR,
+  file_date DATETIME,
+  min_data_date DATETIME,
+  max_data_date DATETIME,
+  obs_day DATETIME,
+  inserted_at DATETIME
+  PRIMARY KEY (meta_id),
+  FOREIGN KEY(obs_id) REFERENCES obs_inventory (obs_id), 
+	FOREIGN KEY(cmd_result_id) REFERENCES cmd_results (cmd_result_id)
+)
+```
+
+```sh
+obs_meta_hv_ioda_netcdf_aggregate
+
+CREATE TABLE obs_meta_hv_ioda_netcdf_aggregate (
+  meta_id INTEGER NOT NULL,
+  obs_id INTEGER NOT NULL,
+  cmd_result_id INTEGER NOT NULL,
+  cmd_str VARCHAR,
+  variable_names VARCHAR,
+  num_vars INTEGER,
+  num_locs INTEGER, 
+  min_depth FLOAT,
+  max_depth FLOAT,
+  hasPreQC BOOLEAN,
+  hasObsError BOOLEAN,
+  sensor VARCHAR,
+  platform VARCHAR,
+  ioda_layout VARCHAR,
+  processing_level VARCHAR,
+  thinning FLOAT,
+  ioda_version VARCHAR,
+  filename VARCHAR,
+  file_date DATETIME,
+  min_data_date DATETIME,
+  max_data_date DATETIME,
+  obs_day DATETIME,
+  inserted_at DATETIME
+  PRIMARY KEY (meta_id),
+  FOREIGN KEY(obs_id) REFERENCES obs_inventory (obs_id), 
+	FOREIGN KEY(cmd_result_id) REFERENCES cmd_results (cmd_result_id)
+)
+```
+
 Information regarding the values in the columns for the prepbufr tables can be found from the EMC documentation for [typ](https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_2.htm)
 and [quality markers](https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm)
 
