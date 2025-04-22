@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 SECONDS_IN_A_DAY = 24 * 3600
 
-DEFAULT_START_TIME = datetime(year=1990, month=1, day=1)
+DEFAULT_START_TIME = datetime(year=1990, month=1, day=1, tzinfo=timezone.utc)
 DEFAULT_END_TIME = datetime.now(timezone.utc)
 DEFAULT_DATE_STR = '%Y%m%dT%H%M%SZ'
 DEFAULT_CYCLE_INTERVALS = [0, 21600, 43200, 64800]

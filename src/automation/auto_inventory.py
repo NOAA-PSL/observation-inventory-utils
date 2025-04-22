@@ -6,6 +6,8 @@ Runs in parallel on given number of CPUs.
 '''
 import automation_utils as au
 import atm_dicts
+import ocn_dicts
+import ice_dicts
 import yaml_generation as yg
 
 import argparse
@@ -18,11 +20,11 @@ from pandas import Timestamp
 
 #argparse section
 parser = argparse.ArgumentParser()
-parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere', 'list'], default="atmosphere", type=str)
+parser.add_argument("-cat", dest="category", help="Category of variables to inventory. Valid options: atmosphere", choices=['atmosphere', 'ocean', 'ice', 'all', 'list'], default="atmosphere", type=str)
 parser.add_argument("-end", dest="end_date", help=f"End date to use for run. Format expected {au.ESCAPED_DATESTR_FORMAT}. If not provided, uses the current time.", type=str)
 parser.add_argument("-ago", dest="days_ago", help="Number of days before today or a given end_date (defined by the -end argument) over which to run the inventory. If provided, must be positive integer. If not provided, it will run the full extent of the inventory.", default=0, type=int)
 parser.add_argument("-n_jobs", dest="n_jobs", help="Number of parallel jobs to run.", default=18, type=int)
-parser.add_argument("-work_dir", dest="work_dir", help="Location of work directory for nceplibs calls. Defaults to the current directory.", default="./", type=str)
+parser.add_argument("-work_dir", dest="work_dir", help="Location of work directory for meta inventory calls. Defaults to the current directory.", default="./", type=str)
 parser.add_argument("--list", dest="var_list", help="List of the variables to inventory with spaces between each, will only be used if -cat is list", type=str, nargs='+')
 args = parser.parse_args()
 
@@ -46,9 +48,18 @@ if args.days_ago < 0:
 to_inventory = []
 if args.category == 'atmosphere':
     to_inventory = atm_dicts.atm_infos
+if args.category == 'ocean':
+    to_inventory = ocn_dicts.ocn_infos
+if args.category == 'ice':
+    to_inventory = ice_dicts.ice_infos
+if args.category == 'all':
+    to_inventory = atm_dicts.atm_infos + ocn_dicts.ocn_infos + ice_dicts.ice_infos
 if args.category == 'list':
     try:
-        to_inventory = [x for x in atm_dicts.atm_infos if any(x.obs_name == i for i in args.var_list)]
+        to_inventory_atm = [x for x in atm_dicts.atm_infos if any(x.obs_name == i for i in args.var_list)]
+        to_inventory_ocean = [x for x in ocn_dicts.ocn_infos if any(x.obs_name == i for i in args.var_list)]
+        to_inventory_ice = [x for x in ice_dicts.ice_infos if any(x.obs_name == i for i in args.var_list)]
+        to_inventory = to_inventory_atm + to_inventory_ocean + to_inventory_ice
     except Exception as ex:
         print("An error occurred getting list values to inventory")
         print(ex)
@@ -71,6 +82,8 @@ def get_start_end_time(inventory_info):
     #additional cycling options will need to be added as functionality expands 
     if inventory_info.cycling_interval == au.CYCLING_6H:
         frequency = '6H'
+    elif inventory_info.cycling_interval == au.CYCLING_HOURLY:
+        frequency = 'H'
     else: #default to round to closest hour
         frequency = 'H'
 
@@ -98,29 +111,33 @@ def run_obs_inventory(inventory_info):
     cli.get_obs_inventory_base(yaml_file)
     os.remove(yaml_file)
 
-#call appropriate nceplibs cli command 
-def run_nceplibs(inventory_info):
+#call appropriate meta inventory cli command 
+def run_inv_cmd(inventory_info):
     start_time, end_time = get_start_end_time(inventory_info)
     
     #run correct command as given in dict 
-    if inventory_info.nceplibs_cmd == au.NCEPLIBS_SINV:
+    if inventory_info.inv_cmd == au.NCEPLIBS_SINV:
         yaml_file = yg.generate_nceplibs_sinv_inventory_config(inventory_info, start_time, end_time, args.work_dir)
         cli.get_obs_count_meta_sinv_base(yaml_file)
         os.remove(yaml_file)
-    elif inventory_info.nceplibs_cmd == au.NCEPLIBS_CMPBQM:
+    elif inventory_info.inv_cmd == au.NCEPLIBS_CMPBQM:
         yaml_file = yg.generate_nceplibs_cmpbqm_inventory_config(inventory_info, start_time, end_time, args.work_dir)
         cli.get_obs_count_meta_cmpbqm_base(yaml_file)
         os.remove(yaml_file)
+    elif inventory_info.inv_cmd == au.HV_IODA_META:
+        yaml_file = yg.generate_hv_ioda_inventory_config(inventory_info, start_time, end_time, args.work_dir)
+        cli.get_obs_count_meta_ioda_hv_base(yaml_file)
+        os.remove(yaml_file)
     else:
-        print(f'No valid commmand found for nceplibs_cmd in {inventory_info.obs_name} inventory info with value: ' + inventory_info.nceplibs_cmd)
+        print(f'No valid commmand found for inv_cmd in {inventory_info.obs_name} inventory info with value: ' + inventory_info.inv_cmd)
 
 #function to use for parallel call for each variable 
 def run_full_inventory(inventory_info):
-    print('Beginning inventory for ' + inventory_info.obs_name)
+    print(f'Beginning inventory for {inventory_info.obs_name}')
     run_obs_inventory(inventory_info)
-    print('Obs inventory complete, now running nceplibs for ' + inventory_info.obs_name)
-    run_nceplibs(inventory_info)
-    print('NCEPlibs call complete for ' + inventory_info.obs_name)
+    print(f'Obs inventory complete, now running meta call {inventory_info.inv_cmd} for {inventory_info.obs_name}')
+    run_inv_cmd(inventory_info)
+    print(f'Meta inventory {inventory_info.inv_cmd} call complete for ' + inventory_info.obs_name)
 
 #for each item in the category list run parallel
 #call the run obs inventory and run nceplibs from above
