@@ -1,5 +1,7 @@
 #!/bin/bash -l
-# This script is for running an automation of the standard set of plots
+# This script is for running the automated inventory for 
+# the past 3 days to get updates for lagged data and plotting
+# the new data.
 
 SATINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/satinfo
 OZINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/ozinfo
@@ -9,6 +11,9 @@ WORK_DIR=/invdisk/inventory-work
 cd $(dirname $0)
 
 source ../../obs_inv_utils_pw_inv_cluster.sh
+
+#run inventory 
+python3 auto_inventory.py -cat all -ago 16 -n_jobs 170 -work_dir $WORK_DIR
 
 #run plots individually to prevent connection / memory problems 
 python3 ../plotting/plot_mysql_dir_sensor_sat.py --sidb $SATINFO_DIR -o $OUTPUT_LOC 

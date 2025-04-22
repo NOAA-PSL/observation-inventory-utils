@@ -2,7 +2,7 @@ import re
 import attr
 from collections import namedtuple, OrderedDict
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from dataclasses import dataclass, field
 
@@ -68,9 +68,9 @@ class SubprocessCmdHandler(object):
         )
 
         try:
-            self.submitted_at = datetime.utcnow()
+            self.submitted_at = datetime.now(timezone.utc)
             out, err = proc.communicate()
-            self.finished_at = datetime.utcnow()
+            self.finished_at = datetime.now(timezone.utc)
             print(f'return_code: {proc.returncode}, out: {out}, err: {err}')
         except FileNotFoundError as e:
             msg = f'Command: {cmd_str} was not recognized. '\
@@ -135,7 +135,7 @@ class SubprocessCmdHandler(object):
             obs_datetime,
             self.raw_resp.submitted_at,
             self.raw_resp.latency,
-            datetime.utcnow()
+            datetime.now(timezone.utc)
         )
 
         self.cmd_id = tbl_factory.insert_cmd_result(cmd_result_data)
