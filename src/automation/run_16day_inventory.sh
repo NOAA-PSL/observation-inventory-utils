@@ -13,7 +13,9 @@ cd $(dirname $0)
 source ../../obs_inv_utils_pw_inv_cluster.sh
 
 #run inventory 
-python3 auto_inventory.py -cat atmosphere -ago 16 -n_jobs 150 -work_dir $WORK_DIR 
+python3 auto_inventory.py -cat atmosphere -ago 16 -n_jobs 150 -work_dir $WORK_DIR &
+python3 auto_inventory.py -cat ocean -ago 16 -n_jobs 50 -work_dir $WORK_DIR & 
+python3 auto_inventory.py -cat ice -ago 16 -n_jobs 8 -work_dir $WORK_DIR 
 
 #run plots individually to prevent connection / memory problems 
 python3 ../plotting/plot_mysql_dir_sensor_sat.py --sidb $SATINFO_DIR -o $OUTPUT_LOC 

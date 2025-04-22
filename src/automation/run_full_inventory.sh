@@ -23,7 +23,9 @@ python3 auto_inventory.py -cat list -n_jobs 80 -work_dir $WORK_DIR --list airs_a
 python3 auto_inventory.py -cat list -n_jobs 8 -ago 8400 -end 20020101T000000Z -work_dir $WORK_DIR --list ssu_1bssu ozone_cfsr msu_1bmsu hirs_1bhrs2 \
     conv_prepbufr_acft_profiles conv_prepbufr & 
 python3 auto_inventory.py -cat list -n_jobs 8 -ago 8400 -work_dir $WORK_DIR --list ssu_1bssu ozone_cfsr msu_1bmsu hirs_1bhrs2 \
-    conv_prepbufr_acft_profiles conv_prepbufr   
+    conv_prepbufr_acft_profiles conv_prepbufr &
+python3 auto_inventory.py -cat ocean -n_jobs 50 -work_dir $WORK_DIR & 
+python3 auto_inventory.py -cat ice -n_jobs 8 -work_dir $WORK_DIR  
 
 #run all plots in parallel
 python3 ../plotting/plot_mysql_dir_sensor_sat.py --sidb $SATINFO_DIR -o $OUTPUT_LOC
