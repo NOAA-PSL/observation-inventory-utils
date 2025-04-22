@@ -10,6 +10,7 @@ import glob
 import numpy as np
 from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsBufr as omnb
 from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsPrepbufr as omnp 
+from obs_inv_utils.inventory_table_factory import ObsMetaHvIodaNetcdf as omhin
 from obs_inv_utils.inventory_table_factory import ObsInventory as oi
 import obs_inv_utils.inventory_table_factory as itf
 from sqlalchemy.sql import func, or_
@@ -351,3 +352,38 @@ def get_distinct_prepbufr():
     session.close()
 
     return df
+
+
+def get_ioda_nc():
+    session = itf.Session()
+    query = session.query(
+        omhin.variable,
+        omhin.num_locs,
+        omhin.sensor,
+        omhin.obs_day,
+        oi.parent_dir
+    ).join(
+        oi,
+        omhin.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.num_locs,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir
+        }
+        for result in results
+    ]
+
+    df = pandas.DataFrame(result_dicts)
+
+    session.close()
+
+    return df 
