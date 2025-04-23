@@ -65,6 +65,8 @@ def get_source_dir(row):
 print('connecting to mysql db') 
 db_frame = utils.get_bufr_meta()
 print("Data pulled from mysql database")
+print(len(db_frame))
+print("that's the number")
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
