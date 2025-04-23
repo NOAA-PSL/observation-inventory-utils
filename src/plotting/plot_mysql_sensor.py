@@ -35,7 +35,7 @@ def get_sensor(row):
 
 #read data from sql database of obs counts
 print('getting data from database')
-db_frame1 = utils.get_distinct_bufr()
+db_frame1 = utils.get_bufr_meta()
 print('bufr done, getting prepbufr')
 db_frame2 = utils.get_distinct_prepbufr()
 print('prepbufr done')

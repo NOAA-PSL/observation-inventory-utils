@@ -199,6 +199,52 @@ def get_distinct_bufr():
 
     return df
 
+def get_bufr_meta():
+    session = itf.Session()
+    query = session.query(
+        omnb.obs_id, 
+        omnb.filename, 
+        omnb.sat_id, 
+        omnb.sat_id_name, 
+        omnb.obs_count, 
+        omnb.obs_day, 
+        omnb.file_size, 
+        oi.parent_dir, 
+        oi.s3_bucket
+    ).join(
+        oi,
+        omnb.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [
+        {
+            'obs_id': result.obs_id,
+            'filename': result.filename,
+            'sat_id': result.sat_id,
+            'sat_id_name': result.sat_id_name,
+            'obs_count': result.obs_count,
+            'obs_day': result.obs_day,
+            'file_size': result.file_size,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
+
 def get_distinct_bufr_by_sensors(sensor_list):
     session = itf.Session()
 
