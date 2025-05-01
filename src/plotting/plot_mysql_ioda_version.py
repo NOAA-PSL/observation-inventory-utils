@@ -54,7 +54,7 @@ height=step*len(unique_sensor_dir_version)
 #make list of sensor labels
 sensor_dir_ver_labels = []
 for index, row in unique_sensor_dir_version.iterrows():
-    sensor_dir_ver_labels.append(row.sensor) + " " + sensor_dir_ver_labels.append(row.ioda_version)
+    sensor_dir_ver_labels.append(row.sensor + " " + row.ioda_version)
 
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
