@@ -65,7 +65,6 @@ plt.ylabel('Sensor')
 
 directory_labels = []
 counter=0
-# for index, row in unique_sat_id.iterrows():
 for index, row in unique_sensor_dir.iterrows():
     pandas.options.mode.chained_assignment = None
     dftmp = select_sensor_dir(row['sensor'], row['source_dir'], db_frame)
