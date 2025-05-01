@@ -361,6 +361,7 @@ def get_ioda_nc():
         omhin.num_locs,
         omhin.sensor,
         omhin.obs_day,
+        omhin.ioda_version,
         oi.parent_dir
     ).join(
         oi,
@@ -377,6 +378,7 @@ def get_ioda_nc():
             'var_count': result.num_locs,
             'sensor': result.sensor,
             'obs_day': result.obs_day,
+            'ioda_version': result.ioda_version,
             'parent_dir': result.parent_dir
         }
         for result in results
