@@ -195,10 +195,10 @@ adt_nesdis_topex_poseidon_v3 = InventoryInfo(
 
 insitu_ncei_wod_v2 = InventoryInfo(
     obs_name='insitu_ncei_wod_v2',
-    key='observations/reanalysis/insitu/ncei/wod/%Y/%m/24h/iodav2/wod.ncei.insitu.%Y%m%d.T%H%M%S.iodav2.nc',
+    key='observations/reanalysis/insitu/ncei/wod/%Y/%m/24h/iodav2/wod.ncei.insitu.%Y%m%d.T%H%M%SZ.iodav2.nc',
     start='19700101T120000Z',
     s3_prefix='observations/reanalysis/insitu/ncei/wod/%Y/%m/24h/iodav2/',
-    files='wod.ncei.insitu.%.iodav2.nc',
+    files='wod.ncei.insitu.%z.iodav2.nc',
     inv_cmd=au.HV_IODA_META,
     platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_DAILY,
@@ -207,10 +207,10 @@ insitu_ncei_wod_v2 = InventoryInfo(
 
 insitu_ncei_wod_v3 = InventoryInfo(
     obs_name='insitu_ncei_wod_v3',
-    key='observations/reanalysis/insitu/ncei/wod/%Y/%m/24h/iodav3/wod.ncei.insitu.%Y%m%d.T%H%M%S.iodav3.nc',
+    key='observations/reanalysis/insitu/ncei/wod/%Y/%m/24h/iodav3/wod.ncei.insitu.%Y%m%d.T%H%M%SZ.iodav3.nc',
     start='19700101T120000Z',
     s3_prefix='observations/reanalysis/insitu/ncei/wod/%Y/%m/24h/iodav3/',
-    files='wod.ncei.insitu.%.iodav3.nc',
+    files='wod.ncei.insitu.%z.iodav3.nc',
     inv_cmd=au.HV_IODA_META,
     platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_DAILY,
