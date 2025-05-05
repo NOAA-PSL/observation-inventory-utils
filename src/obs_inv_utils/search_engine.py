@@ -7,8 +7,7 @@ from collections import namedtuple
 import json
 import os
 import pathlib
-from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from obs_inv_utils import hpss_io_interface as hpss
 from obs_inv_utils import obs_storage_platforms as platforms
 from config_handlers.obs_search_conf import ObservationsConfig, ObsSearchConfig
@@ -25,6 +24,7 @@ from obs_inv_utils import discover_interface as discover
 from obs_inv_utils.discover_interface import DiscoverCommandRawResponse
 import hashlib
 
+import re
 
 SECONDS_IN_A_DAY = 24*3600
 
@@ -65,6 +65,7 @@ TarballFileMeta = namedtuple(
         'submitted_at',
         'latency',
         'inserted_at',
+        'valid_at',
         'etag'
     ],
 )
@@ -127,12 +128,14 @@ OBS_FORMAT_BUFR = 'bufr'
 OBS_FORMAT_BUFR_D = 'bufr_d'
 OBS_FORMAT_GRB = 'grb'
 OBS_FORMAT_GRIB2 = 'grib2'
+OBS_FORMAT_NC = 'nc'
 OBS_FORMAT_UNKNOWN = 'unknown'
 OBS_FORMATS = [
     OBS_FORMAT_BUFR,
     OBS_FORMAT_BUFR_D,
     OBS_FORMAT_GRB,
-    OBS_FORMAT_GRIB2
+    OBS_FORMAT_GRIB2,
+    OBS_FORMAT_NC
 ]
 
 ADDITIONAL_GRIB2_FORMAT_EXTENSIONS = ['1536', '576']
@@ -244,6 +247,96 @@ def parse_filename_clean_bucket(filename):
 
     return filename_meta
 
+def parse_filename_regex(filename):
+    patterns = [
+        # ISO-style cycle time with full date and suffix before data_format
+        re.compile(
+            r'^(?P<prefix>.+)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_time>T\d{6}Z)\.'
+            r'(?P<suffix>.+?)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
+        #Cycle tag with no suffix 
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_tag>t\d{2}z)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
+        # Traditional bufr-style cycle tag (t00z)
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_tag>t\d{2}z)\.'
+            r'(?P<suffix>.+?)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
+        # Format with cycle hour only (e.g., .00.)
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
+            r'(?P<date_time>\d{8})\.'
+            r'(?P<cycle_hour>\d{2})\.'
+            r'(?P<suffix>.+?)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        ),
+        # Underscore-separated ISO-style date
+        re.compile(
+            r'^(?P<prefix>.+)_'
+            r'(?P<date_time>\d{4}-\d{2}-\d{2})T(?P<cycle_hour>\d{2})'
+            r'\.(?P<data_format>[^.]+)$'
+        ),
+    ]
+
+    for pattern in patterns:
+        match = pattern.match(filename)
+        if match:
+            parts = match.groupdict()
+
+            prefix = parts.get("prefix")
+            cycle_tag = parts.get("cycle_tag")
+            suffix = parts.get("suffix", "")
+            data_format = parts.get("data_format")
+            not_restricted = parts.get("not_restricted_tag") == "nr"
+
+            # Derive cycle_time in seconds
+            if cycle_tag: 
+                try:
+                    cycle_time = int(cycle_tag[1:3]) * 3600
+                except:
+                    cycle_time = None
+            elif parts.get("cycle_time"):  # T000000Z
+                try:
+                    t = datetime.strptime(parts["cycle_time"], "T%H%M%SZ")
+                    cycle_tag = parts["cycle_time"]
+                    cycle_time = t.hour * 3600 + t.minute * 60 + t.second
+                except ValueError:
+                    cycle_time = None  
+            elif parts.get("cycle_hour"):  # 00z or _T00
+                cycle_time = int(parts["cycle_hour"]) * 3600
+                cycle_tag = f"t{parts['cycle_hour']}z"
+            else:
+                cycle_time = None
+
+            # Try to extract a "data_type" from suffix (leftmost word)
+            data_type = suffix.split('.')[0] if suffix else None
+
+            return FilenameMeta(
+                prefix=prefix,
+                cycle_tag=cycle_tag,
+                data_type=data_type,
+                cycle_time=cycle_time,
+                data_format=data_format,
+                suffix=suffix,
+                not_restricted_tag=not_restricted
+            )
+
+    return None  # No match
+
 
 def parse_filename_discover(filename):
     # NASA values
@@ -277,7 +370,10 @@ def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
     for listed_object in listed_objects:
         fn = listed_object.name
         print(f'filename: {fn}')
-        fn_meta = parse_filename(fn)
+        fn_meta = parse_filename_regex(fn)
+        if fn_meta is None:
+            print('regular expression file name did not match, reverting to default behavior')
+            fn_meta = parse_filename(fn)
         print(f'filename meta: {fn_meta}')
 
         file_meta = TarballFileMeta(
@@ -299,7 +395,8 @@ def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
             listed_object.last_modified,
             contents.submitted_at,
             contents.latency,
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
+            datetime.now(timezone.utc),
             listed_object.etag
         )
         files_meta.append(file_meta)
@@ -318,7 +415,10 @@ def process_aws_s3_clean_resp(cmd_result_id, contents):
     print(f'inside process_aws_s3_list_objects - contents: {contents}')
     fn = os.path.basename(contents.prefix)
     print(f'filename: {fn}')
-    fn_meta = parse_filename_clean_bucket(fn)
+    fn_meta = parse_filename_regex(fn)
+    if fn_meta is None: #if the regular expression didn't match, default to old behavior
+        print('regular expression file name did not match, reverting to default behavior')
+        fn_meta = parse_filename_clean_bucket(fn)
     print(f'filename meta: {fn_meta}')
 
     listed_object = listed_objects[0]
@@ -341,7 +441,8 @@ def process_aws_s3_clean_resp(cmd_result_id, contents):
             listed_object.last_modified,
             contents.submitted_at,
             contents.latency,
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
+            datetime.now(timezone.utc),
             listed_object.etag
     ))
 
@@ -381,7 +482,8 @@ def process_inspect_tarball_resp(cmd_result_id, contents):
             inspected_file.last_modified,
             contents.submitted_at,
             contents.latency,
-            datetime.utcnow(),
+            datetime.now(timezone.utc),
+            datetime.now(timezone.utc),
             ''
         )
         tarball_files_meta.append(tarball_file_meta)
@@ -452,7 +554,7 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
         obs_cycle_time,
         raw_response.submitted_at,
         raw_response.latency,
-        datetime.utcnow()
+        datetime.now(timezone.utc)
     )
 
     cmd_result_id = tbl_factory.insert_cmd_result(cmd_result_data)
@@ -474,7 +576,7 @@ def post_hpss_cmd_result(raw_response, obs_day):
         obs_day,
         raw_response.submitted_at,
         raw_response.latency,
-        datetime.utcnow()
+        datetime.now(timezone.utc)
     )
 
     print(f'HPSS cmd_result: {cmd_result_data}')
@@ -542,27 +644,18 @@ class ObsInventorySearchEngine(object):
                 print(f'args: {args}, search_path: {search_path}')
                 platform = search_config.get_storage_platform()
                 if platform == platforms.AWS_S3 or platform == platforms.AWS_S3_CLEAN:
-                    # NOAA values
-                    PREFIX = 0
-                    CYCLE_TAG = 1 #1
-                    DATA_TYPE = 2 #2 
-                elif platform == platforms.DISCOVER:
-                    # NASA values
-                    PREFIX = PREFIX_DISCOVER = 0
-                    CYCLE_TAG = CYCLE_TAG_DISCOVER = 2
-                    DATA_TYPE = DATA_TYPE_DISCOVER = 3
-
-                n_hours = 6
-                n_days = 0
-                if platform == platforms.AWS_S3 or platform == platforms.AWS_S3_CLEAN:
                     cmd = s3.AwsS3CommandHandler(
                         s3.CMD_GET_S3_OBJ_LIST, args)
                 elif platform == platforms.HERA_HPSS:
                     cmd = hpss.HpssCommandHandler(
                         hpss.CMD_INSPECT_TARBALL, args)
+                elif platform == platforms.DISCOVER:
+                    # NASA values
+                    PREFIX = PREFIX_DISCOVER = 0
+                    CYCLE_TAG = CYCLE_TAG_DISCOVER = 2
+                    DATA_TYPE = DATA_TYPE_DISCOVER = 3
                     n_hours = 0
                     n_days = 1
-                elif platform == platforms.DISCOVER:
                     cmd = discover.DiscoverCommandHandler(
                         discover.CMD_GET_DISCOVER_OBJ_LIST, args)
 
@@ -623,7 +716,7 @@ class ObsInventorySearchEngine(object):
 
                 raw_resp = cmd.get_raw_response()
 
-                search_config.get_date_range().increment(days=n_days, hours=n_hours)
+                search_config.get_date_range().increment(seconds=search_config.get_cycling_interval())
                 print(f'Current search path: {search_path}')
 
             if finished_count == len(self.search_configs):

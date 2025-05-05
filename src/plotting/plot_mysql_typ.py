@@ -18,7 +18,7 @@ parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp t
 args = parser.parse_args()
 
 #parameters
-daterange=[date(1975,1,1), date(2025,1,1)]
+daterange=[date(1975,1,1), date(2026,1,1)]
 
 def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.tot.astype('bool'),'|',color='black',markersize=5)
@@ -34,15 +34,7 @@ def get_sensor(row):
 
 
 #read data from sql database of obs counts
-print('connecting to mysql db')
-mysql_conn = itf.engine.connect()
-
-#PREPBUFR FILE INFO 
-sql2 = f"""select m.*, o.parent_dir from obs_meta_nceplibs_prepbufr as m inner join obs_inventory as o on m.obs_id = o.obs_id where o.s3_bucket = \'noaa-reanalyses-pds\'"""
-data2 = pandas.read_sql(sql2, mysql_conn)
-db_frame = data2.sort_values('inserted_at').drop_duplicates(['filename', 'obs_day', 'variable', 'file_size', 'typ'], keep='last')
-
-# db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
+db_frame = utils.get_distinct_prepbufr()
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
@@ -97,4 +89,4 @@ if args.dev:
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
-mysql_conn.close()
+

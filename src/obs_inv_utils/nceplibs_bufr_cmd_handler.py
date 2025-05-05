@@ -1,6 +1,6 @@
 from typing import Optional
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -48,7 +48,7 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
         obs_cycle_time,
         raw_response.submitted_at,
         raw_response.latency,
-        datetime.utcnow()
+        datetime.now(timezone.utc)
     )
 
     itf.insert_cmd_result(cmd_result_data)
@@ -137,7 +137,7 @@ class ObsBufrFileMetaHandler(object):
 
     def get_bufr_file_meta(self, cmd_type):
 
-        inventory_bufr_files = oiq.get_bufr_files_data(
+        inventory_bufr_files = oiq.get_files_data(
             self.bufr_files,
             self.date_range.start,
             self.date_range.end
@@ -272,7 +272,7 @@ class ObsPrepBufrFileMetaHandler(object):
 
     def get_prepbufr_file_meta(self, cmd_type):
 
-        inventory_prepbufr_files = oiq.get_bufr_files_data(
+        inventory_prepbufr_files = oiq.get_files_data(
             self.prepbufr_files,
             self.date_range.start,
             self.date_range.end
