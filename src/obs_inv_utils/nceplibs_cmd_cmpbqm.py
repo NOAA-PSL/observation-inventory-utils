@@ -104,7 +104,7 @@ def parse_output(output, prepbufr_file):
                 break
 
             # skip lines which are all ----
-            if cleaned_line[0] is '-':
+            if cleaned_line[0] == '-':
                 continue
 
             #skip lines with 'DATA' in it since this is just a header

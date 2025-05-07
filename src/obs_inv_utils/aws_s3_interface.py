@@ -150,7 +150,6 @@ def get_objects_list_args_valid(args):
         msg = f'Args must be in the form of a list, args: {args}'
         raise TypeError(msg)
     cmd = aws_s3_cmds[CMD_GET_S3_OBJ_LIST].command
-    print(f'{nl}{nl}In inspect tarball args valid: cmd: {cmd}{nl}{nl}')
     if (len(args) > 1 or len(args) == 0):
         msg = f'Command "{cmd}" accepts exactly 1 argument, received ' \
               f'{len(args)}.'

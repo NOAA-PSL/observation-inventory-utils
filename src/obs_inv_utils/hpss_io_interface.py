@@ -61,7 +61,6 @@ def inspect_tarball_args_valid(args):
         msg = f'Args must be in the form of a list, args: {args}'
         raise TypeError(msg)
     cmd = hpss_cmds[CMD_INSPECT_TARBALL].command
-    print(f'{nl}{nl}In inspect tarball args valid: cmd: {cmd}{nl}{nl}')
     if (len(args) > 1 or len(args) == 0):
         msg = f'Command "{cmd}" accepts exactly 1 argument, received ' \
               f'{len(args)}.'
@@ -95,7 +94,6 @@ def inspect_tarball_parser(response, obs_day):
     parent_dir = ''
     files_meta = list()
     for output_line in output:
-        print(f'out_line: {output_line}')
         components = output_line.split()
         if len(components) < EXPECTED_COMPONENTS_HTAR_TVF_FILE_OBJ:
             continue

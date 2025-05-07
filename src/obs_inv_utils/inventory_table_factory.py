@@ -721,7 +721,6 @@ def insert_cmd_result(cmd_result_data):
     session = Session()
     session.add(tbl_item)
     session.commit()
-    print(f'cmd_result id: {tbl_item.cmd_result_id}')
     cmd_id = tbl_item.cmd_result_id
     session.close()
     return cmd_id
