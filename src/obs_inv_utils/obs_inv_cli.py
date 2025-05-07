@@ -58,14 +58,12 @@ def plot_files_filesize_vs_time(min_instances):
 def plot_groups_filesize_timeseries(config_yaml):
     config = ObsGroupFileSizePlotConfig(config_yaml)
     config.load()
-    # print(repr(config))
     obgr = pg.ObsGroupFilesizeTimeline(config)
     obgr.plot_obsgroups_fs_timeline()
 
 def get_obs_count_meta_sinv_base(config_yaml):
     config = ObsMetaSinvConfig(config_yaml)
     config.load()
-    print(repr(config))
     mh = ObsBufrFileMetaHandler(config)
     mh.get_bufr_file_meta(obs_meta_sinv.NCEPLIBS_BUFR_SINV)
 
@@ -77,7 +75,6 @@ def get_obs_count_meta_sinv(config_yaml):
 def get_obs_count_meta_cmpbqm_base(config_yaml):
     config = ObsMetaCMPBQMConfig(config_yaml)
     config.load()
-    print(repr(config))
     mh = ObsPrepBufrFileMetaHandler(config)
     mh.get_prepbufr_file_meta(obs_meta_cmpbqm.NCEPLIBS_PREPBUFR_CMPBQM)
 
@@ -89,7 +86,6 @@ def get_obs_count_meta_cmpbqm(config_yaml):
 def get_obs_count_meta_ioda_hv_base(config_yaml):
     config = ObsMetaIodaConfig(config_yaml)
     config.load()
-    print(repr(config))
     mh = ObsIodaFileMetaHandler(config)
     mh.get_ioda_file_meta(obs_meta_ioda.HV_IODA_META)
 

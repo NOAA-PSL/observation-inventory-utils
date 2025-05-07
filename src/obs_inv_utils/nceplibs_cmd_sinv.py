@@ -88,10 +88,8 @@ def get_line_type(line):
     return FILLER_LINE
   
 def parse_output(output, bufr_file):
-    print(f"output: {output}")
     # split the output into an array of lines
     output_lines = output.split('\n')
-    print(f'output_lines: {output_lines}')
     lines_meta = []
     obs_cnt_sum = 0
     for line in output_lines:

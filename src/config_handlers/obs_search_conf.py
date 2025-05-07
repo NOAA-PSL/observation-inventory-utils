@@ -53,7 +53,6 @@ class ObsSearchConfig(object):
         path = time_utils.get_datetime_str(
             current, self.search_config.get(SEARCH_PATH_KEY)
         )
-        print(f'path: {path}')
         return path
 
 
@@ -76,7 +75,6 @@ class ObservationsConfig(ConfigInterface):
     def load(self):
         self.config_data = self.yaml_loader.load()
         self.parse()
-        print(f'config_data: {self.config_data}')
 
     def parse(self):
         
@@ -102,12 +100,8 @@ class ObservationsConfig(ConfigInterface):
         self.search_date_range = time_utils.get_date_range_from_dict(
             config_date_range)
 
-        print(f'search_date_range: {self.search_date_range}')
-
         try:
             for obs_search_config in obs_search_configs:
-                print(f'obs_search_config: {obs_search_config}')
-
                 storage_platform = self.yaml_loader.get_value(
                     key='platform',
                     document=obs_search_config,
@@ -127,7 +121,6 @@ class ObservationsConfig(ConfigInterface):
                 )
                 search_key = obs_search_config['key']
                 hash_key = f'{storage_platform}-{search_key}'
-                print(f'hash_key: {hash_key}')
                 self.obs_search_configs[hash_key] = obs_search_config_obj
 
         except Exception as e:

@@ -68,14 +68,11 @@ def download_bufr_file_from_s3(work_dir, bufr_file):
 
     dest_filename = os.path.join(dest_path, bufr_file['filename'])
     
-    print(f'dest_filename: {dest_filename}')
-
     # setup command arguments, [file s3 key, destination location,
     # and expected filesize
     args = [object_key, dest_filename, bufr_file['file_size']]
 
     cmd = s3.AwsS3CommandHandler(s3.CMD_DOWNLOAD_S3_OBJ, args)
-    print(f'cmd: {cmd}')
 
     saved_filename = None
     if cmd.send():
@@ -83,9 +80,7 @@ def download_bufr_file_from_s3(work_dir, bufr_file):
 
     # post result from command success or failure
     raw_resp = cmd.get_raw_response()
-    print(f'raw_resp')
 
-    print('posting command results for aws s3')
     post_aws_s3_cmd_result(
         raw_resp,
         bufr_file['obs_day']
@@ -125,12 +120,8 @@ class ObsBufrFileMetaHandler(object):
 
         work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
 
-        print(f'inventory_bufr_files: {inventory_bufr_files}')
-        print(f'scrub_files: {self.meta_config.scrub_files}')
         for idx, bufr_file in inventory_bufr_files.iterrows():
             file_downloaded = False
-            print(
-               f'bufr_file: {bufr_file}')
 
             saved_filename = download_bufr_file_from_s3(work_dir, bufr_file)
 
@@ -152,7 +143,6 @@ class ObsBufrFileMetaHandler(object):
             nc_cmds.nceplibs_cmds,
             args
         )
-        print(f'cmd: {cmd}')
 
         if not cmd.send():
             return False
@@ -160,9 +150,6 @@ class ObsBufrFileMetaHandler(object):
         cmd.post_cmd_result(bufr_file.obs_day)
 
         sinv_lines_meta = cmd.parse_output(bufr_file)
-        for meta in sinv_lines_meta:
-            print(f'meta: {meta}')
-
     
         cmd.post_parsed_result(sinv_lines_meta, bufr_file)
         
@@ -196,13 +183,7 @@ class ObsPrepBufrFileMetaHandler(object):
         temp_uuid = str(uuid.uuid4())
 
         work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
-
-        print(f'inventory_prepbufr_files: {inventory_prepbufr_files}')
-        print(f'scrub_files: {self.meta_config.scrub_files}')
         for idx, prepbufr_file in inventory_prepbufr_files.iterrows():
-            print(
-               f'bufr_file: {prepbufr_file}')
-
             saved_filename = download_bufr_file_from_s3(work_dir, prepbufr_file)
 
             if saved_filename is None:
@@ -221,7 +202,6 @@ class ObsPrepBufrFileMetaHandler(object):
             nc_cmds.nceplibs_cmds,
             args
         )
-        print(f'cmd: {cmd}')
 
         if not cmd.send():
             return False
@@ -229,7 +209,5 @@ class ObsPrepBufrFileMetaHandler(object):
         cmd.post_cmd_result(prepbufr_file.obs_day)
 
         cmpbqm_lines_meta = cmd.parse_output(prepbufr_file)
-        for meta in cmpbqm_lines_meta:
-            print(f'meta: {meta}')
         
         cmd.post_parsed_result(cmpbqm_lines_meta, prepbufr_file)

@@ -89,10 +89,6 @@ def download_s3_object(
         dest_full_path=None,
         expected_size=None
 ):
-    print(f'client: {client}, bucket: {bucket}, s3_object_key: ' \
-        f'{s3_object_key}, dest_full_path: {dest_full_path}, ' \
-        f'expected_size: {expected_size}')
-
     # remove file if it exists
     try:
         if os.path.exists(dest_full_path):
@@ -135,7 +131,7 @@ def download_s3_object(
         'success': (statusCode == 200),
         'message': msg
     }
-    print(f'response: {response}')
+    print(f'S3 download response metadata: {response}')
 
     return response
 
@@ -174,7 +170,6 @@ def get_objects_list_args_valid(args):
 
 
 def download_s3_obj_args_valid(args):
-    print(f'inside download_s3_obj_args_valid - args: {args}')
     return {
         'bucket': AWS_BDP_BUCKET,
         's3_object_key': args[0],
@@ -184,7 +179,6 @@ def download_s3_obj_args_valid(args):
 
 
 def download_s3_obj_resp_parser(response, obs_cycle_time):
-    print(f'inside download_s3_obj_resp_parser - response: {response}')
     return None
 
 
@@ -194,10 +188,7 @@ def s3_object_list_v2_parser(obj_list_contents, obs_cycle_time):
               f'Received type: {type(obj_list_contents)}'
         raise TypeError(msg)
 
-    # print(f'obs_cycle_time: {obs_cycle_time}, contents: {obj_list_contents}')
-
     object_list = obj_list_contents.output.get('Contents')
-    # print(f'object_list: {object_list}')
 
     files_meta = list()
     prefix = obj_list_contents.args_0
@@ -205,19 +196,15 @@ def s3_object_list_v2_parser(obj_list_contents, obs_cycle_time):
     file_count = len(object_list)
 
     for object_item in object_list:
-        print(f'object_item: {object_item}')
-
         size = object_item.get('Size')
         last_modified = object_item.get('LastModified')
         fn_str = object_item.get('Key')
         etag = object_item.get('ETag')[1:-1]
         fn = fn_str[len(prefix):]
         
-        print(f'fn: {fn}')
         files_meta.append(
             AwsS3FileMeta(fn, permissions, last_modified, size, etag))
 
-    # print(f'files_meta: {files_meta}')
     return AwsS3ObjectsListContents(
         prefix,
         file_count,
@@ -243,7 +230,6 @@ aws_s3_cmds = {
 
 
 def is_valid_aws_s3_cmd(instance, attribute, value):
-    print(f'In is_valid_aws_s3_cmd: value: {value}')
     if value not in aws_s3_cmds:
         msg = f'AWS s3 command {value} is not valid. Use one of: ' \
               f'{aws_s3_cmds.keys()}'
@@ -265,12 +251,10 @@ class AwsS3CommandHandler(object):
 
     def __attrs_post_init__(self):
         self.cmd_obj = aws_s3_cmds[self.command]
-        print(f'In __attrs_post_init__: self.args: {self.args}')
         # it will blow up here if the arguments are invalid
         self.kwargs = self.cmd_obj.arg_validator(self.args)
 
         self.client = get_bdp_s3_client()
-        print(f'kwargs: {self.kwargs}')
 
 
     def send(self):
@@ -281,14 +265,10 @@ class AwsS3CommandHandler(object):
         except Exception as e:
             msg = f'Error after sending command {self.command}, error: {e}.'
             raise ValueError(msg)
-        response_type = type(response)
-        print(f'type(response): {response_type}, response: {response}')
         resp_meta = response.get('ResponseMetadata')
-        # print(f'resp_meta: {resp_meta}')
         self.raw_resp = response
         returncode = 404
         contents = response.get('Contents')
-        # print(f'contents: {contents}')
         if resp_meta is not None:
             returncode = resp_meta.get('HTTPStatusCode')
             if contents is None:
@@ -303,8 +283,6 @@ class AwsS3CommandHandler(object):
             self.submitted_at,
             float(self.get_cmd_duration())
         )
-
-        print(f'raw_resp: {self.raw_resp}')
 
         return (returncode == 200)
 

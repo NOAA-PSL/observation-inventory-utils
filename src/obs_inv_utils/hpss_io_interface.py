@@ -139,7 +139,6 @@ hpss_cmds = {
 
 
 def is_valid_hpss_cmd(instance, attribute, value):
-    print(f'In is_valid_hpss_cmd: value: {value}')
     if value not in hpss_cmds:
         msg = f'HPSS command {value} is not valid. Use one of: ' \
               f'{hpss_cmds.keys()}'
@@ -160,13 +159,10 @@ class HpssCommandHandler(object):
 
     def __attrs_post_init__(self):
         self.cmd_obj = hpss_cmds[self.command]
-        print(f'In __attrs_post_init__: self.args: {self.args}')
         if self.cmd_obj.arg_validator(self.args):
             self.cmd_line = getattr(self.cmd_obj,'command').copy()
             for arg in self.args:
                 self.cmd_line.append(arg)
-        print(f'cmd_line: {self.cmd_line}, args: {self.args}')
-
 
     def send(self):
         cmd_str = self.cmd_obj.command[0]
@@ -181,7 +177,6 @@ class HpssCommandHandler(object):
             self.submitted_at = datetime.now(timezone.utc)
             out, err = proc.communicate()
             self.finished_at = datetime.now(timezone.utc)
-            print(f'return_code: {proc.returncode}, out: {out}, err: {err}')
         except FileNotFoundError as e:
             msg = f'Command: {cmd_str} was not recognized. '\
                   f'error: {e}{nl}{nl}' \
@@ -204,8 +199,6 @@ class HpssCommandHandler(object):
             self.submitted_at,
             float(self.get_cmd_duration())
         )
-
-        print(f'raw_resp: {self.raw_resp}')
         
         if proc.returncode != 0:
             return False

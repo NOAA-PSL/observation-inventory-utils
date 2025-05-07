@@ -114,8 +114,7 @@ class ObsIodaFileMetaHandler(object):
 
         for idx, ioda_file in inventory_ioda_files.iterrows():
             file_downloaded = False
-            print(f'ioda_file: {ioda_file}')
-
+            
             saved_filename = download_netcdf_file_from_s3(work_dir, ioda_file)
 
             if saved_filename is None:

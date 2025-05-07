@@ -27,7 +27,6 @@ def is_valid_readable_file(filepath):
 
     # check permissions on file
     status = os.stat(filepath, follow_symlinks=True)
-    print(f'status.st_size: {status.st_size}')
     if status.st_size == 0:
         print(f'if block caught 0 byte file {status}')
         raise ValueError(f'Invalid file. File {filepath} is empty.')

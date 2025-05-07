@@ -32,7 +32,6 @@ class YamlLoader(object):
         validator=attr.validators.instance_of(bool), default=False)
 
     def load(self):
-        print(f'multiple_docs: {self.multiple_docs}')
         try:
             print(f'loading yaml file: {self.yaml_file}')
             with open(self.yaml_file, 'r') as yaml_stream:
@@ -63,8 +62,6 @@ class YamlLoader(object):
         """Lookup a key in a nested list of documents, return all matches"""
         
         found_keys = list(self._get_nested_key(key, document))
-
-        print(f'values found: {found_keys}')
         
         if len(found_keys) > 1:
             msg = f'Key "{key}" found multiple times. Result ambiguous.'

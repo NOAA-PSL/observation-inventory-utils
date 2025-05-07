@@ -263,4 +263,3 @@ def post_obs_meta_data(cmd_id, lines_meta, prepbufr_file):
     #insert items into appropriate tables
     itf.insert_obs_meta_nceplibs_prepbufr_item(obs_meta_data_items)
     itf.insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_data_agg_items)
-    print("data file items inserted to database")

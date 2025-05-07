@@ -81,11 +81,11 @@ import obs_inv_utils.obs_inv_cli as cli
 def get_start_end_time(inventory_info):
     #additional cycling options will need to be added as functionality expands 
     if inventory_info.cycling_interval == au.CYCLING_6H:
-        frequency = '6H'
+        frequency = '6h'
     elif inventory_info.cycling_interval == au.CYCLING_HOURLY:
-        frequency = 'H'
+        frequency = 'h'
     else: #default to round to closest hour
-        frequency = 'H'
+        frequency = 'h'
 
     if end_date != None:
         end = Timestamp(end_date).round(freq=frequency)

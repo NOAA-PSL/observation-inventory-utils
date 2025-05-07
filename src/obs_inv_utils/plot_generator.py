@@ -26,7 +26,7 @@ OBS_INV_DATERANGE = pd.date_range(
 OBS_INV_DATERANGE_6H_CYCLE = pd.date_range(
     DEFAULT_MIN_DATETIME,
     DEFAULT_MAX_DATETIME,
-    freq='6H'
+    freq='6h'
 )
 
 EXT_OBS_ERA5 = 'era5'
