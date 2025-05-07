@@ -33,7 +33,6 @@ class YamlLoader(object):
 
     def load(self):
         try:
-            print(f'loading yaml file: {self.yaml_file}')
             with open(self.yaml_file, 'r') as yaml_stream:
                 documents = list(
                     yaml.load_all(yaml_stream, Loader=yaml.SafeLoader)
@@ -51,7 +50,7 @@ class YamlLoader(object):
         except OSError as e:
             msg = """ Please ensure the file exists and you have the required
                       access privileges."""
-            raise VergeMLError(f"Could not open {self.yaml_file}: {e.strerror}", msg)
+            raise IOError(f"Could not open {self.yaml_file}: {e.strerror}", msg)
         except Exception as e:
             raise ValueError(f'Unkown error when parsing {self.yaml_file}, err: {e}')
         
