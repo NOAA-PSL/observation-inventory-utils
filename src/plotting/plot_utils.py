@@ -92,14 +92,15 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
             ,names=['sensor','ch_num','status','error','o1','o2','o3','o4','o5','o6','o7'])
         tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
             ,columns=['datetime','status'])
-        satinfo=pandas.concat([satinfo,tmp_frame])
+        frames_to_concat = [df for df in [satinfo, tmp_frame] if not df.empty and not df.isna().all().all()]
+        satinfo = pandas.concat(frames_to_concat)
     #if empty make 
     if (satinfo.empty):
       satinfo.loc[len(satinfo.index)] = [date(1900,1,1), False, np.nan]
       satinfo.loc[len(satinfo.index)] = [date(2100,1,1), False, np.nan]
     #convert logical to floats with nans for plotting
     satinfo['status_nan'] = satinfo.status.astype('int')
-    satinfo['status_nan'].replace(0, np.nan, inplace=True)
+    satinfo['status_nan'] = satinfo['status_nan'].replace(0, np.nan)
     #make sure the end of the series is in the future
     satinfo.loc[len(satinfo.index)]=[date(2100,1,1), satinfo.status.iat[-1], satinfo.status_nan.iat[-1]]    
     satinfo.datetime = pandas.to_datetime(satinfo.datetime)
@@ -115,7 +116,8 @@ def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
             ,names=['sensor','ch_num','status','pressure_level','gross_error','ob_error','b_oz','pg_oz'])
         tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
             ,columns=['datetime','status'])
-        ozinfo=pandas.concat([ozinfo,tmp_frame])
+        frames_to_concat = [df for df in [ozinfo, tmp_frame] if not df.empty and not df.isna().all().all()]
+        ozinfo = pandas.concat(frames_to_concat)
     #if empty make 
     if (ozinfo.empty):
       print(f'Empty ozinfo: {ozinfo_string}')
@@ -123,7 +125,7 @@ def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
       ozinfo.loc[len(ozinfo.index)] = [date(2100,1,1), False, np.nan]
     #convert logical to floats with nans for plotting
     ozinfo['status_nan'] = ozinfo.status.astype('int')
-    ozinfo['status_nan'].replace(0, np.nan, inplace=True)
+    ozinfo['status_nan'] = ozinfo['status_nan'].replace(0, np.nan)
     #make sure the end of the series is in the future
     ozinfo.loc[len(ozinfo.index)]=[date(2100,1,1), ozinfo.status.iat[-1], ozinfo.status_nan.iat[-1]]    
     ozinfo.datetime = pandas.to_datetime(ozinfo.datetime)
