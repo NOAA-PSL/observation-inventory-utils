@@ -185,5 +185,8 @@ def get_files_data(filenames, start, end):
     ).all()
 
     df = DataFrame(fn_fs)
-    #should we print if this is empty??? 
+    
+    if df.empty:
+        print(f'NO FILES TO GET: DataFrame is empty.\n Filenames: {filenames} \n Start: {start} End: {end}')
+    
     return df
