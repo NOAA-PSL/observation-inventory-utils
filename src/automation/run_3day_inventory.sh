@@ -3,8 +3,8 @@
 # the past 3 days to get updates for lagged data and plotting
 # the new data.
 
-SATINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/satinfo
-OZINFO_DIR=/contrib/$USER/home/obs-inventory/build_gsinfo/ozinfo
+SATINFO_DIR=/invdisk/obs-inventory-prod/build_gsinfo/satinfo
+OZINFO_DIR=/invdisk/obs-inventory-prod/build_gsinfo/ozinfo
 OUTPUT_LOC=/contrib/$USER/home/inventory-figures
 WORK_DIR=/invdisk/inventory-work
 
