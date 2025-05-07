@@ -88,7 +88,7 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
     satinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
     for fn in glob.glob(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
         pd_tmp = pandas.read_csv(os.path.join(satinfo_db_root,satinfo_string,os.path.basename(fn))
-            ,header=None,sep='\s+'
+            ,header=None,sep=r'\s+'
             ,names=['sensor','ch_num','status','error','o1','o2','o3','o4','o5','o6','o7'])
         tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
             ,columns=['datetime','status'])
@@ -112,7 +112,7 @@ def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
     ozinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
     for fn in glob.glob(os.path.join(ozinfo_db_root,ozinfo_string,'??????????')):
         pd_tmp = pandas.read_csv(os.path.join(ozinfo_db_root,ozinfo_string,os.path.basename(fn))
-            ,header=None,sep='\s+'
+            ,header=None,sep=r'\s+'
             ,names=['sensor','ch_num','status','pressure_level','gross_error','ob_error','b_oz','pg_oz'])
         tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
             ,columns=['datetime','status'])
