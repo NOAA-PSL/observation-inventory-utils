@@ -1,6 +1,6 @@
 from typing import Optional
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -12,16 +12,16 @@ from pandas import DataFrame
 import pathlib
 import numpy as np
 
-from config_handlers.obs_meta_cmpbqm import ObsMetaCMPBQMConfig
+from config_handlers.obs_meta_ioda import ObsMetaIodaConfig
 from obs_inv_utils import obs_inv_queries as oiq
 from obs_inv_utils import aws_s3_interface as s3
 from obs_inv_utils import time_utils
 from obs_inv_utils.time_utils import DateRange
 from obs_inv_utils import inventory_table_factory as itf
-from obs_inv_utils import subprocess_cmd_handler as sch
-from obs_inv_utils.subprocess_cmd_handler import SubprocessCmd
-from obs_inv_utils import nceplibs_cmds as nc_cmds
-from obs_inv_utils import nceplibs_cmd_cmpbqm as ncep_cmpbqm
+
+from obs_inv_utils import score_hv_cmds
+from obs_inv_utils import score_hv_cmd_handler as cmhd
+from obs_inv_utils import score_hv_cmds as hv_cmds
 
 CALLING_DIR = pathlib.Path(__file__).parent.resolve()
 TMP_OBS_DATA_DIR = 'tmp_obs_data'
@@ -46,19 +46,18 @@ def post_aws_s3_cmd_result(raw_response, obs_cycle_time):
         obs_cycle_time,
         raw_response.submitted_at,
         raw_response.latency,
-        datetime.utcnow()
+        datetime.now(timezone.utc)
     )
 
     itf.insert_cmd_result(cmd_result_data)
 
+def download_netcdf_file_from_s3(work_dir, netcdf_file):
+    object_key = netcdf_file['full_path']
 
-def download_prepbufr_file_from_s3(work_dir, bufr_file):
-    object_key = bufr_file['full_path']
-
-    obs_day = datetime.strftime(bufr_file['obs_day'], '%Y%m%d')
+    obs_day = datetime.strftime(netcdf_file['obs_day'], '%Y%m%d')
 
     dest_path = os.path.join(
-        work_dir, obs_day, bufr_file['filename'])
+        work_dir, obs_day, netcdf_file['filename'])
 
     try:
         Path(dest_path).mkdir(parents=True, exist_ok=True)
@@ -66,57 +65,45 @@ def download_prepbufr_file_from_s3(work_dir, bufr_file):
         msg = f'\'work_dir\' is not a directory - err: {err}'
         raise ValueError(msg) from err
 
-    dest_filename = os.path.join(dest_path, bufr_file['filename'])
+    dest_filename = os.path.join(dest_path, netcdf_file['filename'])
     
-    print(f'dest_filename: {dest_filename}')
-
     # setup command arguments, [file s3 key, destination location,
     # and expected filesize
-    args = [object_key, dest_filename, bufr_file['file_size']]
+    args = [object_key, dest_filename, netcdf_file['file_size']]
 
     cmd = s3.AwsS3CommandHandler(s3.CMD_DOWNLOAD_S3_OBJ, args)
-    print(f'cmd: {cmd}')
-
     saved_filename = None
     if cmd.send():
         saved_filename = dest_filename
 
     # post result from command success or failure
     raw_resp = cmd.get_raw_response()
-    print(f'raw_resp')
-
-    print('posting command results for aws s3')
+    
     post_aws_s3_cmd_result(
         raw_resp,
-        bufr_file['obs_day']
+        netcdf_file['obs_day']
     )
 
     return saved_filename
 
-
-
 @dataclass
-class ObsBufrFileMetaHandler(object):
-    meta_config: ObsMetaSinvConfig
-    bufr_files: list = field(default_factory=list, init=False)
+class ObsIodaFileMetaHandler(object):
+    meta_config: ObsMetaIodaConfig
+    ioda_files: list = field(default_factory=list, init=False)
     date_range: DateRange = field(init=False)
 
     def __post_init__(self):
         self.date_range = self.meta_config.get_date_range()
-        self.bufr_files = self.meta_config.get_bufr_file_list()
+        self.ioda_files = self.meta_config.get_ioda_file_list()
 
     def __repr__(self):
-        """
-        string representation of ObsBufrFileNetaHandler globals
-        """
         return f'meta_config: {self.meta_config}, ' \
-            f'bufr_files: {self.bufr_files}, ' \
+            f'ioda_files: {self.ioda_files}, ' \
             f'date_range: {self.date_range}'
-
-    def get_bufr_file_meta(self, cmd_type):
-
-        inventory_bufr_files = oiq.get_bufr_files_data(
-            self.bufr_files,
+    
+    def get_ioda_file_meta(self, cmd_type):
+        inventory_ioda_files = oiq.get_files_data(
+            self.ioda_files,
             self.date_range.start,
             self.date_range.end
         )
@@ -125,45 +112,32 @@ class ObsBufrFileMetaHandler(object):
 
         work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
 
-        print(f'inventory_bufr_files: {inventory_bufr_files}')
-        print(f'scrub_files: {self.meta_config.scrub_files}')
-        for idx, bufr_file in inventory_bufr_files.iterrows():
+        for idx, ioda_file in inventory_ioda_files.iterrows():
             file_downloaded = False
-            print(
-               f'bufr_file: {bufr_file}')
+            print(f'ioda_file: {ioda_file}')
 
-            saved_filename = download_prepbufr_file_from_s3(work_dir, bufr_file)
+            saved_filename = download_netcdf_file_from_s3(work_dir, ioda_file)
 
             if saved_filename is None:
                 continue
 
-            self.get_obs_counts_with_sinv(saved_filename, bufr_file)
+            self.get_obs_meta_with_hv_ioda(saved_filename, ioda_file)
 
             # clean up files
             if self.meta_config.scrub_files:
-                #os.remove( saved_filename )
                 shutil.rmtree( work_dir )
 
-    def get_obs_counts_with_sinv(self, filename, bufr_file):
-        
-        args = [filename]
-        cmd = sch.SubprocessCmdHandler(
-            nc_cmds.NCEPLIBS_SINV,
-            nc_cmds.nceplibs_cmds,
+
+    def get_obs_meta_with_hv_ioda(self, filename, ioda_file):
+        args = {'filename': filename}
+        cmd = cmhd.ScoreHVCmdHandler(
+            hv_cmds.HV_IODA_META,
+            hv_cmds.score_hv_cmds,
             args
         )
-        print(f'cmd: {cmd}')
 
-        if not cmd.send():
-            return False
+        cmd.harvest()
+        cmd.post_cmd_result(ioda_file.obs_day)
+        cmd.post_harvest_results(ioda_file)
 
-        cmd.post_cmd_result(bufr_file.obs_day)
-
-        sinv_lines_meta = cmd.parse_output(bufr_file)
-        for meta in sinv_lines_meta:
-            print(f'meta: {meta}')
-
-    
-        cmd.post_parsed_result(sinv_lines_meta, bufr_file)
-        
 

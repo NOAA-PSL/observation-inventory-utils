@@ -1,6 +1,6 @@
 import os
 import sqlalchemy as db
-from datetime import datetime
+from datetime import datetime, timezone
 from collections import namedtuple
 from obs_inv_utils import search_engine as se
 from sqlalchemy import Table, Column, MetaData, text
@@ -21,6 +21,8 @@ CMD_RESULTS_TABLE = 'cmd_results'
 OBS_META_NCEPLIBS_BUFR_TABLE = 'obs_meta_nceplibs_bufr'
 OBS_META_NCEPLIBS_PREPBUFR_TABLE = 'obs_meta_nceplibs_prepbufr'
 OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE = 'obs_meta_nceplibs_prepbufr_aggregate'
+OBS_META_HV_IODA_NETCDF_TABLE = 'obs_meta_hv_ioda_netcdf'
+OBS_META_HV_IODA_NETCDF_AGG_TABLE = 'obs_meta_hv_ioda_netcdf_aggregate'
 OBS_DATABASE = ''
 OBS_SQLITE_DEFAULT = 'observations_inventory.db'
 
@@ -286,6 +288,105 @@ def create_obs_meta_nceplibs_prepbufr_agg_table():
             )
         )
 
+def create_obs_meta_hv_ioda_netcdf_table():
+    insp = inspect(engine)
+    table_exists = insp.has_table(OBS_META_HV_IODA_NETCDF_TABLE)
+    print(f'{OBS_META_HV_IODA_NETCDF_TABLE} table exists: {table_exists}')
+    if not insp.has_table(OBS_META_HV_IODA_NETCDF_TABLE):
+
+        Table(OBS_META_HV_IODA_NETCDF_TABLE, metadata,
+              Column('meta_id', Integer, primary_key=True),
+              Column(
+                  'obs_id',
+                  Integer,
+                  ForeignKey('obs_inventory.obs_id'),
+                  nullable=False
+              ),
+              Column(
+                  'cmd_result_id',
+                  Integer,
+                  ForeignKey('cmd_results.cmd_result_id'),
+                  nullable=False
+              ),
+              Column('cmd_str', String),
+              Column('variable', String),
+              Column('num_locs', Integer),
+              Column('min_depth', Float),
+              Column('max_depth', Float),
+              Column('hasPreQC', Boolean),
+              Column('hasObsError', Boolean),
+              Column('sensor', String),
+              Column('platform', String),
+              Column('ioda_layout', String),
+              Column('processing_level', String),
+              Column('thinning', Float),
+              Column('ioda_version', String),
+              Column('filename', String),
+              Column('file_date', DateTime),
+              Column('min_data_date', DateTime),
+              Column('max_data_date', DateTime),
+              Column('obs_day', DateTime),
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'variable',
+                'num_locs',
+                'filename',
+                'obs_day',
+                name='unique_ioda_nc_meta'
+            )
+        )
+
+def create_obs_meta_hv_ioda_netcdf_agg_table():
+    insp = inspect(engine)
+    table_exists = insp.has_table(OBS_META_HV_IODA_NETCDF_AGG_TABLE)
+    print(f'{OBS_META_HV_IODA_NETCDF_AGG_TABLE} table exists: {table_exists}')
+    if not insp.has_table(OBS_META_HV_IODA_NETCDF_AGG_TABLE):
+
+        Table(OBS_META_HV_IODA_NETCDF_AGG_TABLE, metadata,
+              Column('meta_id', Integer, primary_key=True),
+              Column(
+                  'obs_id',
+                  Integer,
+                  ForeignKey('obs_inventory.obs_id'),
+                  nullable=False
+              ),
+              Column(
+                  'cmd_result_id',
+                  Integer,
+                  ForeignKey('cmd_results.cmd_result_id'),
+                  nullable=False
+              ),
+              Column('cmd_str', String),
+              Column('variable_names', String),
+              Column('num_vars', Integer),
+              Column('num_locs', Integer),
+              Column('min_depth', Float),
+              Column('max_depth', Float),
+              Column('hasPreQC', Boolean),
+              Column('hasObsError', Boolean),
+              Column('sensor', String),
+              Column('platform', String),
+              Column('ioda_layout', String),
+              Column('processing_level', String),
+              Column('thinning', Float),
+              Column('ioda_version', String),
+              Column('filename', String),
+              Column('file_date', DateTime),
+              Column('min_data_date', DateTime),
+              Column('max_data_date', DateTime),
+              Column('obs_day', DateTime),
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'num_vars',
+                'num_locs',
+                'filename',
+                'obs_day',
+                name='unique_ioda_nc_agg_meta'
+            )
+        )
+
 class CmdResult(Base):
     __tablename__ = CMD_RESULTS_TABLE
 
@@ -452,6 +553,84 @@ class ObsMetaNceplibsPrepbufrAggregate(Base):
 
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
 
+class ObsMetaHvIodaNetcdf(Base):
+    __tablename__ = OBS_META_HV_IODA_NETCDF_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'variable',
+            'num_locs',
+            'filename',
+            'obs_day',
+            name='unique_ioda_nc_meta'
+        ),
+    )
+
+    meta_id = Column(Integer, primary_key=True)
+    obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
+    cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
+    cmd_str = Column(String(31))
+    variable = Column(String(63))
+    num_locs = Column(Integer())
+    min_depth = Column(Float())
+    max_depth = Column(Float())
+    hasPreQC = Column(Boolean())
+    hasObsError = Column(Boolean())
+    sensor = Column(String(63))
+    platform = Column(String(128))
+    ioda_layout = Column(String(63))
+    processing_level = Column(String(63))
+    thinning = Column(Float())
+    ioda_version = Column(String(63))
+    filename = Column(String(63))
+    file_date = Column(DateTime())
+    min_data_date = Column(DateTime())
+    max_data_date = Column(DateTime())
+    obs_day = Column(DateTime()) 
+    inserted_at = Column(DateTime())
+
+    cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
+class ObsMetaHvIodaNetcdfAggregate(Base):
+    __tablename__ = OBS_META_HV_IODA_NETCDF_AGG_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'num_vars',
+            'num_locs',
+            'filename',
+            'obs_day',
+            name='unique_ioda_nc_agg_meta'
+        ),
+    )
+
+    meta_id = Column(Integer, primary_key=True)
+    obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
+    cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
+    cmd_str = Column(String(31))
+    variable_names = Column(String(1023))
+    num_vars = Column(Integer())
+    num_locs = Column(Integer())
+    min_depth = Column(Float())
+    max_depth = Column(Float())
+    hasPreQC = Column(Boolean())
+    hasObsError = Column(Boolean())
+    sensor = Column(String(63))
+    platform = Column(String(128))
+    ioda_layout = Column(String(63))
+    processing_level = Column(String(63))
+    thinning = Column(Float())
+    ioda_version = Column(String(63))
+    filename = Column(String(63))
+    file_date = Column(DateTime())
+    min_data_date = Column(DateTime())
+    max_data_date = Column(DateTime())
+    obs_day = Column(DateTime())
+    inserted_at = Column(DateTime())
+
+    cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
+
 def generate_obs_inventory_hash(filename, parent_dir, platform, s3_bucket):
     hash_input = f"{filename}{parent_dir}{platform}{s3_bucket}"
     return hashlib.md5(hash_input.encode('utf-8')).hexdigest()
@@ -536,7 +715,7 @@ def insert_cmd_result(cmd_result_data):
         obs_day=cmd_result_data.obs_day,
         submitted_at=cmd_result_data.submitted_at,
         latency=cmd_result_data.latency,
-        inserted_at=datetime.utcnow()
+        inserted_at=datetime.now(timezone.utc)
     )
 
     session = Session()
@@ -568,7 +747,7 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
                 'filename': item.filename,
                 'file_size': item.file_size,
                 'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-                'inserted_at': datetime.utcnow()
+                'inserted_at': datetime.now(timezone.utc)
             }
         rows.append(row)
 
@@ -588,10 +767,13 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :sat_id, :sat_id_name, :obs_count, :sat_inst_id, :sat_inst_desc, :filename, :file_size, :obs_day, :inserted_at)
             """
 
-    session = Session()
-    session.execute(text(sql), rows)
-    session.commit()
-    session.close()
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the bufr meta table.")
 
 def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
     if not isinstance(obs_meta_items, list):
@@ -623,7 +805,7 @@ def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
             'filename': item.filename,
             'file_size': item.file_size,
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-            'inserted_at': datetime.utcnow()
+            'inserted_at': datetime.now(timezone.utc)
         }
         rows.append(row)
 
@@ -640,11 +822,13 @@ def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
             (obs_id, cmd_result_id, cmd_str, variable, typ, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :typ, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
             """
-
-    session = Session()
-    session.execute(text(sql), rows)
-    session.commit()
-    session.close()
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the prepbufr meta table.")
 
 def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
     if not isinstance(obs_meta_items, list):
@@ -675,7 +859,7 @@ def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
             'filename': item.filename,
             'file_size': item.file_size,
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-            'inserted_at': datetime.utcnow()
+            'inserted_at': datetime.now(timezone.utc)
         }
         rows.append(row)
 
@@ -693,10 +877,141 @@ def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
             """
 
-    session = Session()
-    session.execute(text(sql), rows)
-    session.commit()
-    session.close()
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the prepbufr agggregate meta table.")
+
+def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items):
+    if not isinstance(obs_meta_items, list):
+        msg = 'Inserted obs meta IODA NetCDF items must be in the form of a list.' \
+              f' Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
+
+    rows = []
+    for item in obs_meta_items:
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable': item.variable,
+            'num_locs': item.num_locs,
+            'min_depth': item.min_depth,
+            'max_depth': item.max_depth,
+            'hasPreQC': item.hasPreQC,
+            'hasObsError': item.hasObsError,
+            'sensor': item.sensor,
+            'platform': item.platform,
+            'ioda_layout': item.ioda_layout,
+            'processing_level': item.processing_level,
+            'thinning': item.thinning,
+            'ioda_version': item.ioda_version,
+            'filename': item.filename,
+            'file_date': item.file_date,
+            'min_data_date': item.min_data_date,
+            'max_data_date': item.max_data_date,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.now(timezone.utc)
+        }
+        rows.append(row)
+
+    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, num_locs, min_depth, max_depth, hasPreQC, hasObsError, 
+            sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :min_depth, :max_depth, :hasPreQC, :hasObsError, 
+            :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, num_locs, min_depth, max_depth, hasPreQC, hasObsError, 
+            sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :min_depth, :max_depth, :hasPreQC, :hasObsError, 
+            :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the ioda netcdf meta table.")
+
+def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
+    if not isinstance(obs_meta_items, list):
+        msg = 'Inserted obs meta IODA NetCDF Aggregate items must be in the form of a list.' \
+              f' Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
+
+    rows = []
+    for item in obs_meta_items:
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable_names': item.variable_names,
+            'num_vars': item.num_vars,
+            'num_locs': item.num_locs,
+            'min_depth': item.min_depth,
+            'max_depth': item.max_depth,
+            'hasPreQC': item.hasPreQC,
+            'hasObsError': item.hasObsError,
+            'sensor': item.sensor,
+            'platform': item.platform,
+            'ioda_layout': item.ioda_layout,
+            'processing_level': item.processing_level,
+            'thinning': item.thinning,
+            'ioda_version': item.ioda_version,
+            'filename': item.filename,
+            'file_date': item.file_date,
+            'min_data_date': item.min_data_date,
+            'max_data_date': item.max_data_date,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.now(timezone.utc)
+        }
+        rows.append(row)
+
+    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
+            hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
+            :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
+            hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
+            :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the ioda netcdf aggregate meta table.")
+
 
 if(database_type.lower() == 'mysql'):
     Base.metadata.create_all(engine)
@@ -706,4 +1021,6 @@ else:
     create_obs_meta_nceplibs_bufr_table()
     create_obs_meta_nceplibs_prepbufr_table()
     create_obs_meta_nceplibs_prepbufr_agg_table()
+    create_obs_meta_hv_ioda_netcdf_table()
+    create_obs_meta_hv_ioda_netcdf_agg_table()
     metadata.create_all(engine)

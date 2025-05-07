@@ -27,6 +27,7 @@ class ObsSearchConfig(object):
     storage_platform: str
     search_config: dict
     date_range: DateRange
+    cycling_interval: int
     cycle_intervals: list = field(default_factory=list, init=False)
 
     def __post_init__(self):
@@ -40,6 +41,9 @@ class ObsSearchConfig(object):
 
     def get_date_range(self):
         return self.date_range
+    
+    def get_cycling_interval(self):
+        return self.cycling_interval
 
     def get_cycle_intervals(self):
         return self.cycle_intervals
@@ -89,6 +93,12 @@ class ObservationsConfig(ConfigInterface):
             return_type=dict
         )
 
+        cycling_interval = self.yaml_loader.get_value(
+            key='cycling_interval',
+            document=self.config_data,
+            return_type=int
+        )
+
         self.search_date_range = time_utils.get_date_range_from_dict(
             config_date_range)
 
@@ -112,7 +122,8 @@ class ObservationsConfig(ConfigInterface):
                 obs_search_config_obj = ObsSearchConfig(
                     storage_platform,
                     obs_search_config,
-                    date_range
+                    date_range, 
+                    cycling_interval
                 )
                 search_key = obs_search_config['key']
                 hash_key = f'{storage_platform}-{search_key}'

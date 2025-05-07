@@ -1,0 +1,24 @@
+name: obs-inventory-env
+channels:
+  - conda-forge
+dependencies:
+  - python[version='>=3.9']
+  - numpy
+  - pyyaml
+  - pytest
+  - xarray
+  - dask
+  - pandas
+  - netcdf4
+  - scipy
+  - sqlalchemy=1.4.49
+  - matplotlib
+  - python-dotenv
+  - psycopg2
+  - geoalchemy2
+  - sqlalchemy-utils
+  - boto3
+  - meson
+  - attrs
+  - joblib
+  - mysql-connector-python=8.3
