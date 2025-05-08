@@ -131,43 +131,18 @@ def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
     ozinfo.datetime = pandas.to_datetime(ozinfo.datetime)
     return ozinfo
 
-def get_distinct_bufr():
+def get_bufr():
     session = itf.Session()
-    # Subquery to get the most recent inserted_at for each combination of other columns
-    subquery = session.query(
-        omnb.obs_id,
-        omnb.sat_id,
-        omnb.sat_id_name,
-        omnb.obs_count,
-        omnb.sat_inst_id,
-        omnb.sat_inst_desc,
-        omnb.filename,
-        omnb.file_size,
-        omnb.obs_day,
-        func.max(omnb.inserted_at).label('max_inserted_at')
-    ).group_by(
-        omnb.obs_id,
-        omnb.sat_id,
-        omnb.sat_id_name,
-        omnb.obs_count,
-        omnb.sat_inst_id,
-        omnb.sat_inst_desc,
-        omnb.filename,
-        omnb.file_size,
-        omnb.obs_day
-    ).subquery()
-
-    # Join the subquery with the main table to get the full records
-    query = session.query(omnb.obs_id, omnb.filename, omnb.sat_id, omnb.sat_id_name, omnb.obs_count, omnb.obs_day, omnb.file_size, oi.parent_dir, oi.s3_bucket).join(
-        subquery,
-        (omnb.obs_id == subquery.c.obs_id) &
-        (omnb.sat_id == subquery.c.sat_id) &
-        (omnb.obs_count == subquery.c.obs_count) &
-        (omnb.sat_inst_id == subquery.c.sat_inst_id) &
-        (omnb.filename == subquery.c.filename) &
-        (omnb.file_size == subquery.c.file_size) &
-        (omnb.obs_day == subquery.c.obs_day) &
-        (omnb.inserted_at == subquery.c.max_inserted_at)
+    query = session.query(
+        omnb.obs_id, 
+        omnb.filename, 
+        omnb.sat_id, 
+        omnb.sat_id_name, 
+        omnb.obs_count, 
+        omnb.obs_day, 
+        omnb.file_size, 
+        oi.parent_dir, 
+        oi.s3_bucket
     ).join(
         oi,
         omnb.obs_id == oi.obs_id
@@ -202,48 +177,18 @@ def get_distinct_bufr():
 
     return df
 
-def get_distinct_bufr_by_sensors(sensor_list):
+def get_bufr_by_sensors(sensor_list):
     session = itf.Session()
-
-    # Subquery to get the most recent inserted_at for each combination of other columns
-    subquery = session.query(
-        omnb.obs_id,
-        omnb.sat_id,
-        omnb.sat_id_name,
-        omnb.obs_count,
-        omnb.sat_inst_id,
-        omnb.sat_inst_desc,
-        omnb.filename,
-        omnb.file_size,
-        omnb.obs_day,
-        func.max(omnb.inserted_at).label('max_inserted_at')
-    ).group_by(
-        omnb.obs_id,
-        omnb.sat_id,
-        omnb.sat_id_name,
-        omnb.obs_count,
-        omnb.sat_inst_id,
-        omnb.sat_inst_desc,
-        omnb.filename,
-        omnb.file_size,
-        omnb.obs_day
-    ).subquery()
-
-    # Join the subquery with the main table to get the full records
     query = session.query(
-        omnb.obs_id, omnb.filename, omnb.sat_id, omnb.sat_id_name,
-        omnb.obs_count, omnb.obs_day, omnb.file_size, 
-        oi.parent_dir, oi.s3_bucket
-    ).join(
-        subquery,
-        (omnb.obs_id == subquery.c.obs_id) &
-        (omnb.sat_id == subquery.c.sat_id) &
-        (omnb.obs_count == subquery.c.obs_count) &
-        (omnb.sat_inst_id == subquery.c.sat_inst_id) &
-        (omnb.filename == subquery.c.filename) &
-        (omnb.file_size == subquery.c.file_size) &
-        (omnb.obs_day == subquery.c.obs_day) &
-        (omnb.inserted_at == subquery.c.max_inserted_at)
+        omnb.obs_id, 
+        omnb.filename, 
+        omnb.sat_id, 
+        omnb.sat_id_name,
+        omnb.obs_count, 
+        omnb.obs_day, 
+        omnb.file_size, 
+        oi.parent_dir, 
+        oi.s3_bucket
     ).join(
         oi,
         omnb.obs_id == oi.obs_id
@@ -284,42 +229,19 @@ def get_distinct_bufr_by_sensors(sensor_list):
     return df
 
 
-def get_distinct_prepbufr():
+def get_prepbufr():
     session = itf.Session()
-    # Subquery to get the most recent inserted_at for each combination of other columns
-    subquery = session.query(
-        omnp.obs_id,
-        omnp.variable,
-        omnp.typ,
-        omnp.tot,
-        omnp.qm0thru3,
-        omnp.filename,
-        omnp.file_size,
-        omnp.obs_day,
-        func.max(omnp.inserted_at).label('max_inserted_at')
-    ).group_by(
-        omnp.obs_id,
-        omnp.variable,
-        omnp.typ,
-        omnp.tot,
-        omnp.qm0thru3,
-        omnp.filename,
-        omnp.file_size,
-        omnp.obs_day
-    ).subquery()
-
-    # Join the subquery with the main table to get the full records
-    query = session.query(omnp.obs_id, omnp.variable, omnp.typ, omnp.tot, omnp.qm0thru3, omnp.filename, omnp.file_size, omnp.obs_day, oi.parent_dir, oi.s3_bucket).join(
-        subquery,
-        (omnp.obs_id == subquery.c.obs_id) &
-        (omnp.variable == subquery.c.variable) &
-        (omnp.typ == subquery.c.typ) &
-        (omnp.tot == subquery.c.tot) &
-        (omnp.qm0thru3 == subquery.c.qm0thru3) &
-        (omnp.filename == subquery.c.filename) &
-        (omnp.file_size == subquery.c.file_size) &
-        (omnp.obs_day == subquery.c.obs_day) &
-        (omnp.inserted_at == subquery.c.max_inserted_at)
+    query = session.query(
+        omnp.obs_id, 
+        omnp.variable, 
+        omnp.typ, 
+        omnp.tot, 
+        omnp.qm0thru3, 
+        omnp.filename, 
+        omnp.file_size, 
+        omnp.obs_day, 
+        oi.parent_dir, 
+        oi.s3_bucket
     ).join(
         oi,
         omnp.obs_id == oi.obs_id
@@ -355,45 +277,22 @@ def get_distinct_prepbufr():
 
     return df
 
-def get_distinct_prepbufr_by_typ(typ_list):
+def get_prepbufr_by_typ(typ_list):
     if typ_list is None:
-        return get_distinct_prepbufr() #return all values if no filter given
+        return get_prepbufr() #return all values if no filter given
 
     session = itf.Session()
-    # Subquery to get the most recent inserted_at for each combination of other columns
-    subquery = session.query(
-        omnp.obs_id,
-        omnp.variable,
-        omnp.typ,
-        omnp.tot,
-        omnp.qm0thru3,
-        omnp.filename,
-        omnp.file_size,
-        omnp.obs_day,
-        func.max(omnp.inserted_at).label('max_inserted_at')
-    ).group_by(
-        omnp.obs_id,
-        omnp.variable,
-        omnp.typ,
-        omnp.tot,
-        omnp.qm0thru3,
-        omnp.filename,
-        omnp.file_size,
-        omnp.obs_day
-    ).subquery()
-
-    # Join the subquery with the main table to get the full records
-    query = session.query(omnp.obs_id, omnp.variable, omnp.typ, omnp.tot, omnp.qm0thru3, omnp.filename, omnp.file_size, omnp.obs_day, oi.parent_dir, oi.s3_bucket).join(
-        subquery,
-        (omnp.obs_id == subquery.c.obs_id) &
-        (omnp.variable == subquery.c.variable) &
-        (omnp.typ == subquery.c.typ) &
-        (omnp.tot == subquery.c.tot) &
-        (omnp.qm0thru3 == subquery.c.qm0thru3) &
-        (omnp.filename == subquery.c.filename) &
-        (omnp.file_size == subquery.c.file_size) &
-        (omnp.obs_day == subquery.c.obs_day) &
-        (omnp.inserted_at == subquery.c.max_inserted_at)
+    query = session.query(
+        omnp.obs_id, 
+        omnp.variable, 
+        omnp.typ, 
+        omnp.tot, 
+        omnp.qm0thru3, 
+        omnp.filename, 
+        omnp.file_size, 
+        omnp.obs_day, 
+        oi.parent_dir, 
+        oi.s3_bucket
     ).join(
         oi,
         omnp.obs_id == oi.obs_id
@@ -466,49 +365,26 @@ def get_ioda_nc():
 
     return df
 
-def get_distinct_prepbufr_by_typ_variable(typ_list, var_list):
+def get_prepbufr_by_typ_variable(typ_list, var_list):
     if typ_list is None and var_list is None:
-        return get_distinct_prepbufr() #return all values if no filter given
+        return get_prepbufr() #return all values if no filter given
     if var_list is None:
-        return get_distinct_prepbufr_by_typ(typ_list) #no variables, just use typ list
+        return get_prepbufr_by_typ(typ_list) #no variables, just use typ list
     if typ_list is None: 
-        return get_distinct_prepbufr() #return all values since no variable only options right now
+        return get_prepbufr() #return all values since no variable only options right now
 
     session = itf.Session()
-    # Subquery to get the most recent inserted_at for each combination of other columns
-    subquery = session.query(
-        omnp.obs_id,
-        omnp.variable,
-        omnp.typ,
-        omnp.tot,
-        omnp.qm0thru3,
-        omnp.filename,
-        omnp.file_size,
-        omnp.obs_day,
-        func.max(omnp.inserted_at).label('max_inserted_at')
-    ).group_by(
-        omnp.obs_id,
-        omnp.variable,
-        omnp.typ,
-        omnp.tot,
-        omnp.qm0thru3,
-        omnp.filename,
-        omnp.file_size,
-        omnp.obs_day
-    ).subquery()
-
-    # Join the subquery with the main table to get the full records
-    query = session.query(omnp.obs_id, omnp.variable, omnp.typ, omnp.tot, omnp.qm0thru3, omnp.filename, omnp.file_size, omnp.obs_day, oi.parent_dir, oi.s3_bucket).join(
-        subquery,
-        (omnp.obs_id == subquery.c.obs_id) &
-        (omnp.variable == subquery.c.variable) &
-        (omnp.typ == subquery.c.typ) &
-        (omnp.tot == subquery.c.tot) &
-        (omnp.qm0thru3 == subquery.c.qm0thru3) &
-        (omnp.filename == subquery.c.filename) &
-        (omnp.file_size == subquery.c.file_size) &
-        (omnp.obs_day == subquery.c.obs_day) &
-        (omnp.inserted_at == subquery.c.max_inserted_at)
+    query = session.query(
+        omnp.obs_id, 
+        omnp.variable, 
+        omnp.typ, 
+        omnp.tot, 
+        omnp.qm0thru3, 
+        omnp.filename, 
+        omnp.file_size, 
+        omnp.obs_day, 
+        oi.parent_dir, 
+        oi.s3_bucket
     ).join(
         oi,
         omnp.obs_id == oi.obs_id

@@ -62,9 +62,9 @@ def get_source_dir(row):
 
 #read data from sql database of obs counts
 print('getting data from database')
-db_frame1 = utils.get_distinct_bufr()
+db_frame1 = utils.get_bufr()
 print('bufr done, getting prepbufr')
-db_frame2 = utils.get_distinct_prepbufr()
+db_frame2 = utils.get_prepbufr()
 print('prepbufr done')
 
 db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)

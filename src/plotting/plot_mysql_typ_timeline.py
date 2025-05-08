@@ -206,7 +206,7 @@ def plot_timeseries_by_typ_qm0thru3(df):
         # Optionally, clear the figure after each iteration
         plt.clf()
 
-df = utils.get_distinct_prepbufr_by_typ(args.typ_list)
+df = utils.get_prepbufr_by_typ(args.typ_list)
 
 if args.qc_only is True: #quality controlled only
     if args.plot_separate is False:

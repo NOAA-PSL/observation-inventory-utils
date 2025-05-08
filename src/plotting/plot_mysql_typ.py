@@ -34,7 +34,7 @@ def get_sensor(row):
 
 
 #read data from sql database of obs counts
-db_frame = utils.get_distinct_prepbufr()
+db_frame = utils.get_prepbufr()
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)

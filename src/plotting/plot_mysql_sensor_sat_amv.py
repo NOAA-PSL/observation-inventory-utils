@@ -66,7 +66,7 @@ def get_source_dir(row):
     return source_dir
 
 #read data from sql database of obs counts
-db_frame = utils.get_distinct_bufr_by_sensors(['observations/reanalysis/amv/'])
+db_frame = utils.get_bufr_by_sensors(['observations/reanalysis/amv/'])
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)

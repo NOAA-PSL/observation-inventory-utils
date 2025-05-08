@@ -63,7 +63,7 @@ def get_source_dir(row):
 
 #read data from sql database of obs counts
 print('connecting to mysql db') 
-db_frame = utils.get_distinct_bufr()
+db_frame = utils.get_bufr()
 print("Data pulled from mysql database")
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
