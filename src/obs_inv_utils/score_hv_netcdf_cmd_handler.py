@@ -153,7 +153,7 @@ class ObsWODFileMetaHandler(object):
 
     def __repr__(self):
         return f'meta_config: {self.meta_config}, ' \
-            f'ioda_files: {self.wod_files}, ' \
+            f'wod_files: {self.wod_files}, ' \
             f'date_range: {self.date_range}'
     
     def get_wod_file_meta(self, cmd_type):
