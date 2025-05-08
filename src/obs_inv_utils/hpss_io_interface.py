@@ -61,7 +61,6 @@ def inspect_tarball_args_valid(args):
         msg = f'Args must be in the form of a list, args: {args}'
         raise TypeError(msg)
     cmd = hpss_cmds[CMD_INSPECT_TARBALL].command
-    print(f'{nl}{nl}In inspect tarball args valid: cmd: {cmd}{nl}{nl}')
     if (len(args) > 1 or len(args) == 0):
         msg = f'Command "{cmd}" accepts exactly 1 argument, received ' \
               f'{len(args)}.'
@@ -95,7 +94,6 @@ def inspect_tarball_parser(response, obs_day):
     parent_dir = ''
     files_meta = list()
     for output_line in output:
-        print(f'out_line: {output_line}')
         components = output_line.split()
         if len(components) < EXPECTED_COMPONENTS_HTAR_TVF_FILE_OBJ:
             continue
@@ -139,7 +137,6 @@ hpss_cmds = {
 
 
 def is_valid_hpss_cmd(instance, attribute, value):
-    print(f'In is_valid_hpss_cmd: value: {value}')
     if value not in hpss_cmds:
         msg = f'HPSS command {value} is not valid. Use one of: ' \
               f'{hpss_cmds.keys()}'
@@ -160,13 +157,10 @@ class HpssCommandHandler(object):
 
     def __attrs_post_init__(self):
         self.cmd_obj = hpss_cmds[self.command]
-        print(f'In __attrs_post_init__: self.args: {self.args}')
         if self.cmd_obj.arg_validator(self.args):
             self.cmd_line = getattr(self.cmd_obj,'command').copy()
             for arg in self.args:
                 self.cmd_line.append(arg)
-        print(f'cmd_line: {self.cmd_line}, args: {self.args}')
-
 
     def send(self):
         cmd_str = self.cmd_obj.command[0]
@@ -181,7 +175,6 @@ class HpssCommandHandler(object):
             self.submitted_at = datetime.now(timezone.utc)
             out, err = proc.communicate()
             self.finished_at = datetime.now(timezone.utc)
-            print(f'return_code: {proc.returncode}, out: {out}, err: {err}')
         except FileNotFoundError as e:
             msg = f'Command: {cmd_str} was not recognized. '\
                   f'error: {e}{nl}{nl}' \
@@ -204,8 +197,6 @@ class HpssCommandHandler(object):
             self.submitted_at,
             float(self.get_cmd_duration())
         )
-
-        print(f'raw_resp: {self.raw_resp}')
         
         if proc.returncode != 0:
             return False

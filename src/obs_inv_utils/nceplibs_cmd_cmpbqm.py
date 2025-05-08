@@ -104,7 +104,7 @@ def parse_output(output, prepbufr_file):
                 break
 
             # skip lines which are all ----
-            if cleaned_line[0] is '-':
+            if cleaned_line[0] == '-':
                 continue
 
             #skip lines with 'DATA' in it since this is just a header
@@ -263,4 +263,3 @@ def post_obs_meta_data(cmd_id, lines_meta, prepbufr_file):
     #insert items into appropriate tables
     itf.insert_obs_meta_nceplibs_prepbufr_item(obs_meta_data_items)
     itf.insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_data_agg_items)
-    print("data file items inserted to database")
