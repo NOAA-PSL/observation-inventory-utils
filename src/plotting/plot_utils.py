@@ -148,7 +148,7 @@ def get_bufr():
         omnb.obs_id == oi.obs_id
     ).filter(
         oi.s3_bucket == 'noaa-reanalyses-pds'
-    )
+    ).distinct()
 
     # Execute the query
     results = query.all()
@@ -247,7 +247,7 @@ def get_prepbufr():
         omnp.obs_id == oi.obs_id
     ).filter(
         oi.s3_bucket == 'noaa-reanalyses-pds'
-    )
+    ).distinct()
 
     # Execute the query
     results = query.all()
