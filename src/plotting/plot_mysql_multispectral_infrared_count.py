@@ -34,7 +34,7 @@ def get_sensor(row):
 
 
 #read data from sql database of obs counts
-df = utils.get_distinct_bufr_by_sensors(['ssu', 'hirs'])
+df = utils.get_distinct_bufr_by_sensors(['observations/reanalysis/ssu', 'observations/reanalysis/hirs'])
 
 df['datetime'] = pd.to_datetime(df.obs_day)
 df['sensor'] = df.apply(get_sensor, axis=1)
