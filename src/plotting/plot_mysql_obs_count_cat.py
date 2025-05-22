@@ -60,7 +60,7 @@ def make_sensor_list_by_category(category):
     sensor_list = []
     if category in category_dicts:
         for cat in category_dicts[category]:
-            sensor_list.append("observations/reanalysis/" + {cat})
+            sensor_list.append("observations/reanalysis/" + cat)
     else: 
         print(f"No category found with name {category}")
     return sensor_list
