@@ -73,21 +73,34 @@ df = utils.get_distinct_bufr_by_sensors(sensor_list)
 df['datetime'] = pd.to_datetime(df.obs_day)
 df['sensor'] = df.apply(get_sensor, axis=1)
 
-unique_sensor = df.sort_values('sensor', ascending=False).drop_duplicates('sensor')
+# Group by sensor and obs_day, summing obs_count
+grouped_df = df.groupby(['sensor', 'obs_day'], as_index=False)['obs_count'].sum()
+
+# Convert obs_day to datetime if needed
+if not pd.api.types.is_datetime64_any_dtype(grouped_df['obs_day']):
+    grouped_df['obs_day'] = pd.to_datetime(grouped_df['obs_day'])
+
+# Sort the grouped data
+grouped_df = grouped_df.sort_values(by='obs_day')
+
+# Get unique sensors
+unique_sensors = grouped_df['sensor'].unique()
+
+#unique_sensors = df.sort_values('sensor', ascending=False).drop_duplicates('sensor')
 
 # Convert obs_day to datetime if it is not already in datetime format
-if not pd.api.types.is_datetime64_any_dtype(df['obs_day']):
-    df['obs_day'] = pd.to_datetime(df['obs_day'])
+# if not pd.api.types.is_datetime64_any_dtype(df['obs_day']):
+#     df['obs_day'] = pd.to_datetime(df['obs_day'])
 
-# Sort the data by obs_day to ensure proper plotting
-df = df.sort_values(by='obs_day')
+# # Sort the data by obs_day to ensure proper plotting
+# df = df.sort_values(by='obs_day')
 
 # Create the plot
 fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
-for index, row in unique_sensor.iterrows():
+for index, row in unique_sensors.iterrows():
     sensor = row['sensor']
-    single_sensor_df = df[(df['sensor'] == sensor)]
+    single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
 
     ax.scatter(single_sensor_df['obs_day'], single_sensor_df['obs_count'], marker='o', label=f'Sensor {sensor}')
 
