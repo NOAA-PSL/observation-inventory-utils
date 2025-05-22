@@ -98,8 +98,9 @@ unique_sensors = grouped_df['sensor'].unique()
 # Create the plot
 fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
-for index, row in unique_sensors.iterrows():
-    sensor = row['sensor']
+# for index, row in unique_sensors.iterrows():
+#     sensor = row['sensor']
+for sensor in unique_sensors:
     single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
 
     ax.scatter(single_sensor_df['obs_day'], single_sensor_df['obs_count'], marker='o', label=f'Sensor {sensor}')
