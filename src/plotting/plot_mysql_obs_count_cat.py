@@ -15,7 +15,31 @@ import obs_inv_utils.inventory_table_factory as itf
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
+parser.add_argument("-cat", dest='category', help="Category of sensors to plot", typ=str)
 args = parser.parse_args()
+
+category_dicts = {
+    'AMV': {'amv'},
+    'GPS': {'gps'},
+    'geo_rad' : {'geo'},
+    'hyper_infrared': {'cris', 'iasi', 'airs'}, 
+    'multi_infrared': {'ssu', 'hirs'}, 
+    'micro_imagers': {'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis'},
+    'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'}, 
+    'ozone': {'ozone'},
+}
+
+category_titles = {
+    'AMV': 'AMV',
+    'GPS': 'GPS',
+    'geo_rad': 'Geostationary Radiances',
+    'hyper_infrared': 'Hyperspectral Infrared',
+    'multi_infrared': 'Multispectral Infrared',
+    'micro_imagers': 'Microwave Imagers', 
+    'micro_sounders': 'Microwave Sounders', 
+    'ozone': 'Ozone',
+}
+
 
 #parameters
 daterange=[date(1975,1,1), date(2026,1,1)]
@@ -32,9 +56,19 @@ def get_sensor(row):
     sensor = directory.split("/")[2]
     return sensor
 
+def make_sensor_list_by_category(category):
+    sensor_list = []
+    if category in category_dicts:
+        for cat in category_dicts[category]:
+            sensor_list.append("observations/reanalysis/" + {cat})
+    else: 
+        print(f"No category found with name {category}")
+    return sensor_list
 
+
+sensor_list = make_sensor_list_by_category(args.category)
 #read data from sql database of obs counts
-df = utils.get_distinct_bufr_by_sensors(['observations/reanalysis/ssu', 'observations/reanalysis/hirs'])
+df = utils.get_distinct_bufr_by_sensors(sensor_list)
 
 df['datetime'] = pd.to_datetime(df.obs_day)
 df['sensor'] = df.apply(get_sensor, axis=1)
@@ -57,11 +91,10 @@ for index, row in unique_sensor.iterrows():
 
     ax.scatter(single_sensor_df['obs_day'], single_sensor_df['obs_count'], marker='o', label=f'Sensor {sensor}')
 
-ax.set_title('Time Series for Multispectral Infrared')
+ax.set_title(f'Time Series for {category_titles[args.category]}')
 ax.set_xlabel('Observation Day')
 ax.set_ylabel('Observation Count')
 ax.set_yscale('log')  # log10 y-axis
-
 # Formatting the x-axis for dates (display only the year)
 ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
 ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
@@ -74,9 +107,9 @@ ax.legend()
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = "multispectral_infrared_count.png"
+file_name = f"{args.category}_count.png"
 if args.dev:
-    file_name = "multispectral_infrared_count_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"{args.category}_count_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
