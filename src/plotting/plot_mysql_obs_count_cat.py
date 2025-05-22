@@ -15,7 +15,7 @@ import obs_inv_utils.inventory_table_factory as itf
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
-parser.add_argument("-cat", dest='category', help="Category of sensors to plot", typ=str)
+parser.add_argument("-cat", dest='category', help="Category of sensors to plot", type=str)
 args = parser.parse_args()
 
 category_dicts = {
