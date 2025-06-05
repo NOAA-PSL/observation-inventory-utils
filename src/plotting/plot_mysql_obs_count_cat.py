@@ -86,20 +86,9 @@ grouped_df = grouped_df.sort_values(by='obs_day')
 # Get unique sensors
 unique_sensors = grouped_df['sensor'].unique()
 
-#unique_sensors = df.sort_values('sensor', ascending=False).drop_duplicates('sensor')
-
-# Convert obs_day to datetime if it is not already in datetime format
-# if not pd.api.types.is_datetime64_any_dtype(df['obs_day']):
-#     df['obs_day'] = pd.to_datetime(df['obs_day'])
-
-# # Sort the data by obs_day to ensure proper plotting
-# df = df.sort_values(by='obs_day')
-
 # Create the plot
 fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
-# for index, row in unique_sensors.iterrows():
-#     sensor = row['sensor']
 for sensor in unique_sensors:
     single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
 
