@@ -11,7 +11,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.mysql import insert as mysql_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+from sqlalchemy.exc import OperationalError
 import hashlib
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -726,30 +728,12 @@ def insert_cmd_result(cmd_result_data):
     return cmd_id
 
 
-def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
+def insert_obs_meta_nceplibs_bufr_item(obs_meta_items, max_retries=3, backoff_delay=0.2):
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs nceplibs bufr meta items must be in the form' \
               f' of a list.  Received type: {type(obs_meta_items)}'
         raise TypeError(msg)
     
-    rows = []
-    for item in obs_meta_items:
-        row = {
-                'obs_id': item.obs_id,
-                'cmd_result_id': item.cmd_result_id,
-                'cmd_str': item.cmd_str,
-                'sat_id': item.sat_id,
-                'sat_id_name': item.sat_id_name,
-                'obs_count': item.obs_count,
-                'sat_inst_id': item.sat_inst_id,
-                'sat_inst_desc': item.sat_inst_desc,
-                'filename': item.filename,
-                'file_size': item.file_size,
-                'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-                'inserted_at': datetime.now(timezone.utc)
-            }
-        rows.append(row)
-
     #This has to be raw SQL to use the INSERT/IGNORE call
     if(database_type.lower() == 'mysql'):
         #mysql compatible
@@ -765,13 +749,44 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items):
             (obs_id, cmd_result_id, cmd_str, sat_id, sat_id_name, obs_count, sat_inst_id, sat_inst_desc, filename, file_size, obs_day, inserted_at)
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :sat_id, :sat_id_name, :obs_count, :sat_inst_id, :sat_inst_desc, :filename, :file_size, :obs_day, :inserted_at)
             """
-
-    if len(rows) > 0:
-        session = Session()
-        session.execute(text(sql), rows)
-        session.commit()
-        session.close()
-    else:
+        
+    session = Session()
+    inserted_count = 0
+    
+    for item in obs_meta_items:
+        row = {
+                'obs_id': item.obs_id,
+                'cmd_result_id': item.cmd_result_id,
+                'cmd_str': item.cmd_str,
+                'sat_id': item.sat_id,
+                'sat_id_name': item.sat_id_name,
+                'obs_count': item.obs_count,
+                'sat_inst_id': item.sat_inst_id,
+                'sat_inst_desc': item.sat_inst_desc,
+                'filename': item.filename,
+                'file_size': item.file_size,
+                'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+                'inserted_at': datetime.now(timezone.utc)
+            }
+        
+        for attempt in range(max_retries):
+            try:
+                session.execute(text(sql), row)
+                session.commit()
+                inserted_count += 1
+                break
+            except OperationalError as e:
+                session.rollback()
+                if '1213' in str(e): #MySQL deadlock
+                    time.sleep(backoff_delay * (attempt + 1))
+                    continue
+                else:
+                    session.close()
+                    raise
+        
+    session.close()
+    
+    if inserted_count == 0:
         print("NO DATA PROVIDED TO INSERT. No data inserted into the bufr meta table.")
 
 def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
