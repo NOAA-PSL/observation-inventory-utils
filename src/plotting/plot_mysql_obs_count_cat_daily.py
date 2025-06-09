@@ -79,8 +79,7 @@ df['date_only'] = df['datetime'].dt.date
 grouped_df = df.groupby(['sensor', 'date_only'], as_index=False)['obs_count'].sum()
 
 # Convert obs_day to datetime if needed
-if not pd.api.types.is_datetime64_any_dtype(grouped_df['obs_day']):
-    grouped_df['obs_day'] = pd.to_datetime(grouped_df['obs_day'])
+grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
 
 # Sort the grouped data
 grouped_df = grouped_df.sort_values(by='obs_day')
@@ -94,7 +93,7 @@ fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 for sensor in unique_sensors:
     single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
 
-    ax.scatter(single_sensor_df['obs_day'], single_sensor_df['obs_count'], marker='o', label=f'Sensor {sensor}')
+    ax.scatter(single_sensor_df['date_only'], single_sensor_df['obs_count'], marker='o', label=f'Sensor {sensor}')
 
 ax.set_title(f'Time Series for {category_titles[args.category]}')
 ax.set_xlabel('Observation Day')
