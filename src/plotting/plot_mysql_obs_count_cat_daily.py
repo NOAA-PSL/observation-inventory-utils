@@ -93,7 +93,7 @@ fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 for sensor in unique_sensors:
     single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
 
-    ax.scatter(single_sensor_df['date_only'], single_sensor_df['obs_count'], marker='o', label=f'Sensor {sensor}')
+    ax.plot(single_sensor_df['date_only'], single_sensor_df['obs_count'], marker='o', label=f'Sensor {sensor}')
 
 ax.set_title(f'Time Series for {category_titles[args.category]}')
 ax.set_xlabel('Observation Day')
