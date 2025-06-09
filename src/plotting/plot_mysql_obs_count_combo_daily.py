@@ -78,7 +78,7 @@ df['datetime'] = pd.to_datetime(df.obs_day)
 df['date_only'] = df['datetime'].dt.date
 
 # Group by sensor and obs_day-- date only, summing obs_count
-grouped_df = df.groupby(['sensor', 'date_only'], as_index=False)['obs_count'].sum()
+grouped_df = df.groupby(['date_only'], as_index=False)['obs_count'].sum()
 
 # Convert obs_day to datetime if needed
 grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
