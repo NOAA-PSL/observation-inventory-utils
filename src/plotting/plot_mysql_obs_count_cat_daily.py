@@ -1,0 +1,120 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from datetime import datetime, date
+import matplotlib.dates as mdates
+import os
+import argparse
+import plot_utils as utils
+import obs_inv_utils.inventory_table_factory as itf
+
+#argparse section
+parser = argparse.ArgumentParser()
+parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
+parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
+parser.add_argument("-cat", dest='category', help="Category of sensors to plot", type=str)
+args = parser.parse_args()
+
+category_dicts = {
+    'AMV': {'amv'},
+    'GPS': {'gps'},
+    'geo_rad' : {'geo'},
+    'hyper_infrared': {'cris', 'iasi', 'airs'}, 
+    'multi_infrared': {'ssu', 'hirs'}, 
+    'micro_imagers': {'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis'},
+    'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'}, 
+    'ozone': {'ozone'},
+}
+
+category_titles = {
+    'AMV': 'AMV',
+    'GPS': 'GPS',
+    'geo_rad': 'Geostationary Radiances',
+    'hyper_infrared': 'Hyperspectral Infrared',
+    'multi_infrared': 'Multispectral Infrared',
+    'micro_imagers': 'Microwave Imagers', 
+    'micro_sounders': 'Microwave Sounders', 
+    'ozone': 'Ozone',
+}
+
+
+#parameters
+daterange=[date(1975,1,1), date(2026,1,1)]
+
+def plot_one_line(dftmp, yloc):
+    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
+
+def select_sensor(sensor, db_frame):
+    dftmp = db_frame.loc[db_frame['sensor']==sensor]
+    return dftmp
+
+def get_sensor(row):
+    directory = row['parent_dir']
+    sensor = directory.split("/")[2]
+    return sensor
+
+def make_sensor_list_by_category(category):
+    sensor_list = []
+    if category in category_dicts:
+        for cat in category_dicts[category]:
+            sensor_list.append("observations/reanalysis/" + cat)
+    else: 
+        print(f"No category found with name {category}")
+    return sensor_list
+
+
+sensor_list = make_sensor_list_by_category(args.category)
+#read data from sql database of obs counts
+df = utils.get_distinct_bufr_by_sensors(sensor_list)
+
+df['datetime'] = pd.to_datetime(df.obs_day)
+df['sensor'] = df.apply(get_sensor, axis=1)
+
+df['date_only'] = df['datetime'].dt.date
+
+# Group by sensor and obs_day-- date only, summing obs_count
+grouped_df = df.groupby(['sensor', 'date_only'], as_index=False)['obs_count'].sum()
+
+# Convert obs_day to datetime if needed
+if not pd.api.types.is_datetime64_any_dtype(grouped_df['obs_day']):
+    grouped_df['obs_day'] = pd.to_datetime(grouped_df['obs_day'])
+
+# Sort the grouped data
+grouped_df = grouped_df.sort_values(by='obs_day')
+
+# Get unique sensors
+unique_sensors = grouped_df['sensor'].unique()
+
+# Create the plot
+fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
+
+for sensor in unique_sensors:
+    single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
+
+    ax.scatter(single_sensor_df['obs_day'], single_sensor_df['obs_count'], marker='o', label=f'Sensor {sensor}')
+
+ax.set_title(f'Time Series for {category_titles[args.category]}')
+ax.set_xlabel('Observation Day')
+ax.set_ylabel('Observation Count')
+ax.set_yscale('log')  # log10 y-axis
+# Formatting the x-axis for dates (display only the year)
+ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
+ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
+plt.xticks(rotation=45, ha='right')
+
+# Add grid and legend
+ax.grid(True)
+ax.legend()
+
+plt.tight_layout()
+plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
+file_name = f"{args.category}_count_daily.png"
+if args.dev:
+    file_name = f"{args.category}_count_dailyl_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+fnout=os.path.join(args.out_dir,file_name)
+print(f"saving {fnout}")
+plt.savefig(fnout, bbox_inches='tight')
