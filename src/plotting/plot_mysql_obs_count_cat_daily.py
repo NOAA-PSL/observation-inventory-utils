@@ -82,7 +82,7 @@ grouped_df = df.groupby(['sensor', 'date_only'], as_index=False)['obs_count'].su
 grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
 
 # Sort the grouped data
-grouped_df = grouped_df.sort_values(by='obs_day')
+grouped_df = grouped_df.sort_values(by='date_only')
 
 # Get unique sensors
 unique_sensors = grouped_df['sensor'].unique()
