@@ -617,3 +617,45 @@ def get_distinct_prepbufr_by_variable(var_list):
     session.close()
 
     return df
+
+def get_ioda_nc_by_sensor(sensor_list):
+    session = itf.Session()
+    query = session.query(
+        omhin.variable,
+        omhin.num_locs,
+        omhin.sensor,
+        omhin.obs_day,
+        omhin.ioda_version,
+        oi.parent_dir
+    ).join(
+        oi,
+        omhin.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    if sensor_list:
+        sensor_filters = [oi.parent_dir.like(f"{sensor}%") for sensor in sensor_list]
+        query = query.filter(or_(*sensor_filters))
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.num_locs,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day,
+            'ioda_version': result.ioda_version,
+            'parent_dir': result.parent_dir
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
