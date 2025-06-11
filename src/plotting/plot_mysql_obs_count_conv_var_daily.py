@@ -41,7 +41,7 @@ variable_titles = {
 daterange=[date(1975,1,1), date(2026,1,1)]
 
 def plot_one_line(dftmp, yloc):
-    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
+    plt.plot(dftmp.datetime, yloc*dftmp.tot.astype('bool'),'|',color='black',markersize=5)
 
 
 #read data from sql database of obs counts
@@ -52,7 +52,7 @@ df['datetime'] = pd.to_datetime(df.obs_day)
 df['date_only'] = df['datetime'].dt.date
 
 # Group by sensor and obs_day-- date only, summing obs_count
-grouped_df = df.groupby(['variable', 'date_only'], as_index=False)['obs_count'].sum()
+grouped_df = df.groupby(['variable', 'date_only'], as_index=False)['tot'].sum()
 
 # Convert obs_day to datetime if needed
 grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
@@ -70,7 +70,7 @@ fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 for var in unique_vars:
     single_var_df = grouped_df[(grouped_df['variable'] == var)]
 
-    ax.plot(single_var_df['date_only'], single_var_df['obs_count'])
+    ax.plot(single_var_df['date_only'], single_var_df['tot'])
 
 ax.set_title(f'Time Series for {variable_titles[args.var]}')
 ax.set_xlabel('Observation Day')
