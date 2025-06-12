@@ -16,6 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 parser.add_argument("-variable", dest='var', help="Variable of conventional data to plot", type=str)
+parser.add_argument("-window", dest='window', help="Category of sensors to plot", type=int, default=1)
 args = parser.parse_args()
 
 variable_dicts = {
@@ -62,6 +63,9 @@ grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
 # Sort the grouped data
 grouped_df = grouped_df.sort_values(by='date_only')
 
+#Rolling average
+grouped_df['rolling_avg'] = grouped_df['tot'].rolling(window=args.window, min_periods=1).mean()
+
 # Get unique sensors
 unique_vars = grouped_df['variable'].unique()
 
@@ -72,7 +76,7 @@ fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 for var in unique_vars:
     single_var_df = grouped_df[(grouped_df['variable'] == var)]
 
-    ax.plot(single_var_df['date_only'], single_var_df['tot'],  label=f'{var}')
+    ax.plot(single_var_df['date_only'], single_var_df['rolling_avg'],  label=f'{var}')
 
 ax.set_title(f'Time Series for {variable_titles[args.var]}')
 ax.set_xlabel('Observation Day')

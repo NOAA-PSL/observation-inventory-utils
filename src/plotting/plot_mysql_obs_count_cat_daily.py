@@ -16,6 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 parser.add_argument("-cat", dest='category', help="Category of sensors to plot", type=str)
+parser.add_argument("-window", dest='window', help="Category of sensors to plot", type=int, default=1)
 args = parser.parse_args()
 
 category_dicts = {
@@ -84,6 +85,8 @@ grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
 # Sort the grouped data
 grouped_df = grouped_df.sort_values(by='date_only')
 
+grouped_df['rolling_avg'] = grouped_df['obs_count'].rolling(window=args.window, min_periods=1).mean()
+
 # Get unique sensors
 unique_sensors = grouped_df['sensor'].unique()
 
@@ -93,7 +96,7 @@ fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 for sensor in unique_sensors:
     single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
 
-    ax.plot(single_sensor_df['date_only'], single_sensor_df['obs_count'], label=f'Sensor {sensor}')
+    ax.plot(single_sensor_df['date_only'], single_sensor_df['rolling_avg'], label=f'Sensor {sensor}')
 
 ax.set_title(f'Time Series for {category_titles[args.category]}')
 ax.set_xlabel('Observation Day')
