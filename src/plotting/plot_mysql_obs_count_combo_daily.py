@@ -116,9 +116,9 @@ ax.legend()
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = f"{args.category}_combo_daily.png"
+file_name = f"{args.category}_combo_avg_{args.window}_days.png"
 if args.dev:
-    file_name = f"{args.category}_combo_daily_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"{args.category}_combo_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
