@@ -25,6 +25,7 @@ variable_dicts = {
     'pressure': {'PRESSURE'}, 
     'wind comp': {'WIND COMPONENTS'}, 
     'height': {'HEIGHT'},
+    'conv': {'TEMPERATURE', 'SPECIFIC HUMIDITY', 'PRESSURE', 'WIND COMPONENTS', 'HEIGHT'}
 }
 
 variable_titles = {
@@ -34,6 +35,7 @@ variable_titles = {
     'pressure': 'Conventional Pressure',
     'wind comp': 'Conventional Wind Components',
     'height': 'Conventional Height', 
+    'conv': 'Conventional Data',
 }
 
 
@@ -70,7 +72,7 @@ fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 for var in unique_vars:
     single_var_df = grouped_df[(grouped_df['variable'] == var)]
 
-    ax.plot(single_var_df['date_only'], single_var_df['tot'])
+    ax.plot(single_var_df['date_only'], single_var_df['tot'],  label=f'{var}')
 
 ax.set_title(f'Time Series for {variable_titles[args.var]}')
 ax.set_xlabel('Observation Day')
@@ -84,7 +86,7 @@ plt.xticks(rotation=45, ha='right')
 
 # Add grid and legend
 ax.grid(True)
-#ax.legend() #only need to add legend if we add variable names for multiple variables
+ax.legend() #only need to add legend if we add variable names for multiple variables
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
