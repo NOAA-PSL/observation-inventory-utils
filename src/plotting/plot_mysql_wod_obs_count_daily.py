@@ -26,9 +26,9 @@ variable_dicts = {
 }
 
 variable_titles = {
-    'temperature': 'Insitu Temperature',
-    'salinity': 'Insitu Salinity',
-    'pressure': 'Insitu Pressure',
+    'temperature': 'Insitu Ocean Temperature',
+    'salinity': 'Insitu Ocean Salinity',
+    'pressure': 'Insitu Ocean Pressure',
 }
 
 
