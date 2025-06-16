@@ -424,3 +424,38 @@ def get_wod_nc():
     session.close()
 
     return df 
+
+def get_wod_nc_by_variable(var_list):
+    session = itf.Session()
+    query = session.query(
+        omwn.variable,
+        omwn.var_count,
+        omwn.sensor,
+        omwn.obs_day,
+        oi.parent_dir
+    ).join(
+        oi,
+        omwn.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds',
+        omwn.variable.in_(var_list)
+    )
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.var_count,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir
+        }
+        for result in results
+    ]
+
+    df = pandas.DataFrame(result_dicts)
+
+    session.close()
+
+    return df 
