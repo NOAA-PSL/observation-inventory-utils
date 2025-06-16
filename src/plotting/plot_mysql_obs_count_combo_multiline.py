@@ -15,8 +15,9 @@ import obs_inv_utils.inventory_table_factory as itf
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
-parser.add_argument("-cat", dest='category', help="Category of sensors to plot", type=str)
-parser.add_argument("-window", dest='window', help="Rolling average of window size", type=int, default=1)
+parser.add_argument("-window", dest='window', help=" Rolling average of window size", type=int, default=1)
+parser.add_argument("-title", dest='title', help='Title for the plot', type=str, default="Time Series of Observation Count")
+parser.add_argument("-cats", dest='cat_list', help="Categories of sensors to plot", type=str, nargs='+')
 args = parser.parse_args()
 
 category_dicts = {
@@ -54,32 +55,40 @@ def select_sensor(sensor, db_frame):
     dftmp = db_frame.loc[db_frame['sensor']==sensor]
     return dftmp
 
+def get_category(sensor, cat_list):
+    for cat in cat_list:
+        if sensor in category_dicts.get(cat, set()):
+            return cat
+    return None
+
 def get_sensor(row):
     directory = row['parent_dir']
     sensor = directory.split("/")[2]
     return sensor
 
-def make_sensor_list_by_category(category):
+def make_sensor_list_by_categories(cat_list):
     sensor_list = []
-    if category in category_dicts:
-        for cat in category_dicts[category]:
-            sensor_list.append("observations/reanalysis/" + cat)
-    else: 
-        print(f"No category found with name {category}")
+    for category in cat_list:
+        if category in category_dicts:
+            for cat in category_dicts[category]:
+                sensor_list.append("observations/reanalysis/" + cat)
+        else: 
+            print(f"No category found with name {category}")
     return sensor_list
 
 
-sensor_list = make_sensor_list_by_category(args.category)
+sensor_list = make_sensor_list_by_categories(args.cats)
 #read data from sql database of obs counts
 df = utils.get_distinct_bufr_by_sensors(sensor_list)
 
 df['datetime'] = pd.to_datetime(df.obs_day)
-# df['sensor'] = df.apply(get_sensor, axis=1)
+df['sensor'] = df.apply(get_sensor, axis=1)
+df['category'] = df.apply(get_category, axis=1)
 
 df['date_only'] = df['datetime'].dt.date
 
 # Group by sensor and obs_day-- date only, summing obs_count
-grouped_df = df.groupby(['date_only'], as_index=False)['obs_count'].sum()
+grouped_df = df.groupby(['category', 'date_only'], as_index=False)['obs_count'].sum()
 
 # Convert obs_day to datetime if needed
 grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
@@ -90,17 +99,17 @@ grouped_df = grouped_df.sort_values(by='date_only')
 grouped_df['rolling_avg'] = grouped_df['obs_count'].rolling(window=args.window, min_periods=1).mean()
 
 # Get unique sensors
-#unique_sensors = grouped_df['sensor'].unique()
+unique_categories = grouped_df['category'].unique()
 
 # Create the plot
 fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
-# for sensor in unique_sensors:
-#     single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
+for category in unique_categories:
+    single_category_df = grouped_df[(grouped_df['category'] == category)]
 
-ax.plot(grouped_df['date_only'], grouped_df['rolling_avg'])
+    ax.plot(single_category_df['date_only'], single_category_df['rolling_avg'], label=f'{category_titles[args.category]}')
 
-ax.set_title(f'Time Series for {category_titles[args.category]}')
+ax.set_title(f'{args.title}')
 ax.set_xlabel('Observation Day')
 ax.set_ylabel('Observation Count')
 ax.set_yscale('log')  # log10 y-axis
@@ -112,13 +121,13 @@ plt.xticks(rotation=45, ha='right')
 
 # Add grid and legend
 ax.grid(True)
-#ax.legend()
+ax.legend()
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = f"{args.category}_combo_avg_{args.window}_days.png"
+file_name = f"atm_time_series_combo_avg_{args.window}_days.png"
 if args.dev:
-    file_name = f"{args.category}_combo_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"atm_time_series_combo_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
