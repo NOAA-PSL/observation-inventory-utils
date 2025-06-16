@@ -108,7 +108,7 @@ fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 for category in unique_categories:
     single_category_df = grouped_df[(grouped_df['category'] == category)]
 
-    ax.plot(single_category_df['date_only'], single_category_df['rolling_avg'], label=f'{category_titles[args.category]}')
+    ax.plot(single_category_df['date_only'], single_category_df['rolling_avg'], label=f'{category_titles[category]}')
 
 ax.set_title(f'{args.title}')
 ax.set_xlabel('Observation Day')
