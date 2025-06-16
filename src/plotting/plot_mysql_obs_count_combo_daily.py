@@ -100,7 +100,7 @@ fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
 ax.plot(grouped_df['date_only'], grouped_df['rolling_avg'])
 
-ax.set_title(f'Total Daily Observations for {category_titles[args.category]}')
+ax.set_title(f'Time Series for {category_titles[args.category]}')
 ax.set_xlabel('Observation Day')
 ax.set_ylabel('Observation Count')
 ax.set_yscale('log')  # log10 y-axis
