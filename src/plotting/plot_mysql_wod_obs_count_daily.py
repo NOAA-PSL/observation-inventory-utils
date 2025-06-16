@@ -82,7 +82,7 @@ plt.xticks(rotation=45, ha='right')
 
 # Add grid and legend
 ax.grid(True)
-ax.legend() #only need to add legend if we add variable names for multiple variables
+#ax.legend() #only need to add legend if we add variable names for multiple variables
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
