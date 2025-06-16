@@ -55,8 +55,9 @@ def select_sensor(sensor, db_frame):
     dftmp = db_frame.loc[db_frame['sensor']==sensor]
     return dftmp
 
-def get_category(sensor, cat_list):
-    for cat in cat_list:
+def get_category(row):
+    sensor = row['sensor']
+    for cat in args.cat_list:
         if sensor in category_dicts.get(cat, set()):
             return cat
     return None
@@ -77,7 +78,7 @@ def make_sensor_list_by_categories(cat_list):
     return sensor_list
 
 
-sensor_list = make_sensor_list_by_categories(args.cats)
+sensor_list = make_sensor_list_by_categories(args.cat_list)
 #read data from sql database of obs counts
 df = utils.get_distinct_bufr_by_sensors(sensor_list)
 
