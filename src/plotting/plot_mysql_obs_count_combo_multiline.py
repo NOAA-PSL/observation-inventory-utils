@@ -103,26 +103,26 @@ grouped_df['rolling_avg'] = grouped_df.groupby('category')['obs_count'].transfor
 unique_categories = grouped_df['category'].unique()
 
 # Create the plot
-fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
+fig, ax = plt.subplots(figsize=(14, 8))  # Increase figure width
 
 for category in unique_categories:
     single_category_df = grouped_df[(grouped_df['category'] == category)]
 
     ax.plot(single_category_df['date_only'], single_category_df['rolling_avg'], label=f'{category_titles[category]}')
 
-ax.set_title(f'{args.title}')
-ax.set_xlabel('Observation Day')
-ax.set_ylabel('Observation Count')
+ax.set_title(f'{args.title}', fontsize = 16)
+ax.set_xlabel('Observation Day', fontsize = 14)
+ax.set_ylabel('Observation Count', fontsize = 14)
 ax.set_yscale('log')  # log10 y-axis
 # Formatting the x-axis for dates (display only the year)
 ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
-ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+#ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
 plt.xticks(rotation=45, ha='right')
 
 # Add grid and legend
 ax.grid(True)
-ax.legend()
+ax.legend(fontsize = 12)
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
