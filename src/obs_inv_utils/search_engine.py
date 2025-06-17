@@ -552,8 +552,12 @@ class ObsInventorySearchEngine(object):
                             contents
                         )
                 else:
-                    msg = f'Command failed!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - error code: {cmd.get_raw_response}.'
+                    msg = f'Command failed!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - error code: {raw_resp}.'
                     print(msg)
+
+                    if raw_resp.return_code == 404:
+                        with open("files_not_found.log", "a") as file:
+                            file.write(search_path + "\n")
 
                 raw_resp = cmd.get_raw_response()
 
