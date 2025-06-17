@@ -70,7 +70,7 @@ grouped_df['rolling_avg'] = grouped_df['tot'].rolling(window=args.window, min_pe
 unique_vars = grouped_df['variable'].unique()
 
 # Create the plot
-fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
+fig, ax = plt.subplots(figsize=(14, 8))  # Increase figure width
 
 #This handles if dictionaries are increased to have mulitple variables at once 
 for var in unique_vars:
@@ -78,19 +78,19 @@ for var in unique_vars:
 
     ax.plot(single_var_df['date_only'], single_var_df['rolling_avg'],  label=f'{var}')
 
-ax.set_title(f'Time Series for {variable_titles[args.var]}')
-ax.set_xlabel('Observation Day')
-ax.set_ylabel('Observation Count')
+ax.set_title(f'Time Series of {variable_titles[args.var]}', fontsize = 16)
+ax.set_xlabel('Observation Day', fontsize = 14)
+ax.set_ylabel('Daily Observation Count', fontsize = 14)
 ax.set_yscale('log')  # log10 y-axis
 # Formatting the x-axis for dates (display only the year)
 ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
-ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+#ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
 plt.xticks(rotation=45, ha='right')
 
 # Add grid and legend
 ax.grid(True)
-ax.legend() #only need to add legend if we add variable names for multiple variables
+ax.legend(fontsize = 12) #only need to add legend if we add variable names for multiple variables
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
