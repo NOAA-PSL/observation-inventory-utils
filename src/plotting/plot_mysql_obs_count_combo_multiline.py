@@ -112,7 +112,7 @@ for category in unique_categories:
 
 ax.set_title(f'{args.title}', fontsize = 16)
 ax.set_xlabel('Observation Day', fontsize = 14)
-ax.set_ylabel('Observation Count', fontsize = 14)
+ax.set_ylabel('Daily Observation Count', fontsize = 14)
 ax.set_yscale('log')  # log10 y-axis
 # Formatting the x-axis for dates (display only the year)
 ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
