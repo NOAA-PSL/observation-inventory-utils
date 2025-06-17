@@ -102,17 +102,17 @@ ax.set_xlabel('Observation Day', fontsize = 14)
 ax.set_ylabel('Average Daily Observation Count', fontsize = 14)
 ax.set_yscale('log')  # log10 y-axis
 # Formatting the x-axis for dates (display only the year)
-ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
-#ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+ax.xaxis.set_major_locator(mdates.YearLocator(5))  # Major ticks every 5 years
+ax.xaxis.set_minor_locator(mdates.YearLocator())  # Minor ticks every year
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
 plt.xticks(rotation=45, ha='right')
 
 # Add grid and legend
 ax.grid(True)
-ax.legend(fontsize = 12)
+ax.legend(fontsize = 11)
 
 plt.tight_layout()
-plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
+# plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
 file_name = f"conv_time_series_combo_avg_{args.window}_days.png"
 if args.dev:
     file_name = f"conv_time_series_combo_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
