@@ -48,9 +48,6 @@ category_titles = {
 #parameters
 daterange=[date(1975,1,1), date(2026,1,1)]
 
-def plot_one_line(dftmp, yloc):
-    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
-
 def select_sensor(sensor, db_frame):
     dftmp = db_frame.loc[db_frame['sensor']==sensor]
     return dftmp
@@ -112,7 +109,7 @@ for category in unique_categories:
 
 ax.set_title(f'{args.title}', fontsize = 16)
 ax.set_xlabel('Observation Day', fontsize = 14)
-ax.set_ylabel('Daily Observation Count', fontsize = 14)
+ax.set_ylabel('Average Daily Observation Count', fontsize = 14)
 ax.set_yscale('log')  # log10 y-axis
 # Formatting the x-axis for dates (display only the year)
 ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year

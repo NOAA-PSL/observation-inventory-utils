@@ -47,9 +47,6 @@ category_titles = {
 #parameters
 daterange=[date(1975,1,1), date(2026,1,1)]
 
-def plot_one_line(dftmp, yloc):
-    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
-
 def select_sensor(sensor, db_frame):
     dftmp = db_frame.loc[db_frame['sensor']==sensor]
     return dftmp
