@@ -35,10 +35,6 @@ variable_titles = {
 #parameters
 daterange=[date(1975,1,1), date(2026,1,1)]
 
-def plot_one_line(dftmp, yloc):
-    plt.plot(dftmp.datetime, yloc*dftmp.tot.astype('bool'),'|',color='black',markersize=5)
-
-
 #read data from sql database of obs counts
 df = utils.get_wod_nc_by_variable(variable_dicts[args.var])
 
