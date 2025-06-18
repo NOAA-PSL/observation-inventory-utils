@@ -67,7 +67,7 @@ df['category'] = df.apply(get_category, axis=1)
 df['date_only'] = df['datetime'].dt.date
 
 # Group by sensor and obs_day-- date only, summing obs_count
-grouped_df = df.groupby(['category', 'date_only'], as_index=False)['tot'].sum()
+grouped_df = df.groupby(['category', 'date_only'], as_index=False)['var_count'].sum()
 
 # Convert obs_day to datetime if needed
 grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
@@ -75,7 +75,7 @@ grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
 # Sort the grouped data
 grouped_df = grouped_df.sort_values(by=['category','date_only'])
 
-grouped_df['rolling_avg'] = grouped_df.groupby('category')['tot'].transform(lambda x: x.rolling(window=args.window, min_periods=1).mean())
+grouped_df['rolling_avg'] = grouped_df.groupby('category')['var_count'].transform(lambda x: x.rolling(window=args.window, min_periods=1).mean())
 
 # Get unique sensors
 unique_categories = grouped_df['category'].unique()
