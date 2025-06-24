@@ -559,8 +559,6 @@ class ObsInventorySearchEngine(object):
                         with open("files_not_found.log", "a") as file:
                             file.write(search_path + "\n")
 
-                raw_resp = cmd.get_raw_response()
-
                 search_config.get_date_range().increment(seconds=search_config.get_cycling_interval())
 
             if finished_count == len(self.search_configs):
