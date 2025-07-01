@@ -63,7 +63,7 @@ adt_nesdis_ers2_v2 = InventoryInfo(
 
 adt_nesdis_ers2_v3 = InventoryInfo(
     obs_name='adt_nesdis_ers2_v3',
-    key='observations/reanalysis/adt/nesdis/ers1/%Y/%m/24h/iodav3/ers2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    key='observations/reanalysis/adt/nesdis/ers2/%Y/%m/24h/iodav3/ers2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
     start='19950515T120000Z',
     s3_prefix='observations/reanalysis/adt/nesdis/ers2/%Y/%m/24h/iodav3/',
     files='ers2.nesdis.adt.%z.iodav3.nc',
