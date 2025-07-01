@@ -556,7 +556,8 @@ class ObsInventorySearchEngine(object):
                     print(msg)
 
                     if raw_resp.return_code == 404:
-                        with open("files_not_found.log", "a") as file:
+                        date_str = datetime.now().strftime("%Y%m%d")
+                        with open(f"files_not_found_{date_str}.log", "a") as file:
                             file.write(search_path + "\n")
 
                 search_config.get_date_range().increment(seconds=search_config.get_cycling_interval())
