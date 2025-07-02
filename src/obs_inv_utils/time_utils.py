@@ -43,7 +43,6 @@ def is_valid_increment_type(value):
 def set_datetime(time_str, format_str):
     try:
         time = datetime.strptime(time_str, format_str)
-        print(f'in set_datetime - time: {time}, time_str: {time_str}, format_str: {format_str}')
     except Exception as e:
         msg = f'Invalid time str: {time_str} or format string: {format_str}. {e}'
         raise ValueError(msg)

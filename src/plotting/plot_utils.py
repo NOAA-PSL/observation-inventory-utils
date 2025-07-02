@@ -89,18 +89,19 @@ def read_satinfo_files(satinfo_db_root,satinfo_string):
     satinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
     for fn in glob.glob(os.path.join(satinfo_db_root,satinfo_string,'??????????')):
         pd_tmp = pandas.read_csv(os.path.join(satinfo_db_root,satinfo_string,os.path.basename(fn))
-            ,header=None,sep='\s+'
+            ,header=None,sep=r'\s+'
             ,names=['sensor','ch_num','status','error','o1','o2','o3','o4','o5','o6','o7'])
         tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
             ,columns=['datetime','status'])
-        satinfo=pandas.concat([satinfo,tmp_frame])
+        frames_to_concat = [df for df in [satinfo, tmp_frame] if not df.empty and not df.isna().all().all()]
+        satinfo = pandas.concat(frames_to_concat)
     #if empty make 
     if (satinfo.empty):
       satinfo.loc[len(satinfo.index)] = [date(1900,1,1), False, np.nan]
       satinfo.loc[len(satinfo.index)] = [date(2100,1,1), False, np.nan]
     #convert logical to floats with nans for plotting
     satinfo['status_nan'] = satinfo.status.astype('int')
-    satinfo['status_nan'].replace(0, np.nan, inplace=True)
+    satinfo['status_nan'] = satinfo['status_nan'].replace(0, np.nan)
     #make sure the end of the series is in the future
     satinfo.loc[len(satinfo.index)]=[date(2100,1,1), satinfo.status.iat[-1], satinfo.status_nan.iat[-1]]    
     satinfo.datetime = pandas.to_datetime(satinfo.datetime)
@@ -112,11 +113,12 @@ def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
     ozinfo=pandas.DataFrame(columns=['datetime','status','status_nan'])
     for fn in glob.glob(os.path.join(ozinfo_db_root,ozinfo_string,'??????????')):
         pd_tmp = pandas.read_csv(os.path.join(ozinfo_db_root,ozinfo_string,os.path.basename(fn))
-            ,header=None,sep='\s+'
+            ,header=None,sep=r'\s+'
             ,names=['sensor','ch_num','status','pressure_level','gross_error','ob_error','b_oz','pg_oz'])
         tmp_frame=pandas.DataFrame([[datetime.strptime(os.path.basename(fn),'%Y%m%d%H'), (pd_tmp['status']>0).any()]]
             ,columns=['datetime','status'])
-        ozinfo=pandas.concat([ozinfo,tmp_frame])
+        frames_to_concat = [df for df in [ozinfo, tmp_frame] if not df.empty and not df.isna().all().all()]
+        ozinfo = pandas.concat(frames_to_concat)
     #if empty make 
     if (ozinfo.empty):
       print(f'Empty ozinfo: {ozinfo_string}')
@@ -124,7 +126,7 @@ def read_ozinfo_files(ozinfo_db_root,ozinfo_string):
       ozinfo.loc[len(ozinfo.index)] = [date(2100,1,1), False, np.nan]
     #convert logical to floats with nans for plotting
     ozinfo['status_nan'] = ozinfo.status.astype('int')
-    ozinfo['status_nan'].replace(0, np.nan, inplace=True)
+    ozinfo['status_nan'] = ozinfo['status_nan'].replace(0, np.nan)
     #make sure the end of the series is in the future
     ozinfo.loc[len(ozinfo.index)]=[date(2100,1,1), ozinfo.status.iat[-1], ozinfo.status_nan.iat[-1]]    
     ozinfo.datetime = pandas.to_datetime(ozinfo.datetime)
@@ -354,6 +356,78 @@ def get_distinct_prepbufr():
 
     return df
 
+def get_distinct_prepbufr_by_typ(typ_list):
+    if typ_list is None:
+        return get_distinct_prepbufr() #return all values if no filter given
+
+    session = itf.Session()
+    # Subquery to get the most recent inserted_at for each combination of other columns
+    subquery = session.query(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day,
+        func.max(omnp.inserted_at).label('max_inserted_at')
+    ).group_by(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day
+    ).subquery()
+
+    # Join the subquery with the main table to get the full records
+    query = session.query(omnp.obs_id, omnp.variable, omnp.typ, omnp.tot, omnp.qm0thru3, omnp.filename, omnp.file_size, omnp.obs_day, oi.parent_dir, oi.s3_bucket).join(
+        subquery,
+        (omnp.obs_id == subquery.c.obs_id) &
+        (omnp.variable == subquery.c.variable) &
+        (omnp.typ == subquery.c.typ) &
+        (omnp.tot == subquery.c.tot) &
+        (omnp.qm0thru3 == subquery.c.qm0thru3) &
+        (omnp.filename == subquery.c.filename) &
+        (omnp.file_size == subquery.c.file_size) &
+        (omnp.obs_day == subquery.c.obs_day) &
+        (omnp.inserted_at == subquery.c.max_inserted_at)
+    ).join(
+        oi,
+        omnp.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds',
+        omnp.typ.in_(typ_list) #filter by typ_list
+    )
+
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [
+        {
+            'obs_id': result.obs_id,
+            'variable': result.variable,
+            'typ': result.typ,
+            'tot': result.tot,
+            'qm0thru3': result.qm0thru3,
+            'filename': result.filename,
+            'file_size': result.file_size,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
+        }
+        for result in results
+    ]
+    
+    df = pandas.DataFrame(result_dicts)
+
+    session.close()
+
+    return df 
 
 def get_ioda_nc():
     session = itf.Session()
@@ -454,8 +528,241 @@ def get_wod_nc_by_variable(var_list):
         for result in results
     ]
 
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
+
+def get_distinct_prepbufr_by_typ_variable(typ_list, var_list):
+    if typ_list is None and var_list is None:
+        return get_distinct_prepbufr() #return all values if no filter given
+    if var_list is None:
+        return get_distinct_prepbufr_by_typ(typ_list) #no variables, just use typ list
+    if typ_list is None: 
+        return get_distinct_prepbufr() #return all values since no variable only options right now
+
+    session = itf.Session()
+    # Subquery to get the most recent inserted_at for each combination of other columns
+    subquery = session.query(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day,
+        func.max(omnp.inserted_at).label('max_inserted_at')
+    ).group_by(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day
+    ).subquery()
+
+    # Join the subquery with the main table to get the full records
+    query = session.query(omnp.obs_id, omnp.variable, omnp.typ, omnp.tot, omnp.qm0thru3, omnp.filename, omnp.file_size, omnp.obs_day, oi.parent_dir, oi.s3_bucket).join(
+        subquery,
+        (omnp.obs_id == subquery.c.obs_id) &
+        (omnp.variable == subquery.c.variable) &
+        (omnp.typ == subquery.c.typ) &
+        (omnp.tot == subquery.c.tot) &
+        (omnp.qm0thru3 == subquery.c.qm0thru3) &
+        (omnp.filename == subquery.c.filename) &
+        (omnp.file_size == subquery.c.file_size) &
+        (omnp.obs_day == subquery.c.obs_day) &
+        (omnp.inserted_at == subquery.c.max_inserted_at)
+    ).join(
+        oi,
+        omnp.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds',
+        omnp.typ.in_(typ_list), #filter by typ_list
+        omnp.variable.in_(var_list)
+    )
+
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [
+        {
+            'obs_id': result.obs_id,
+            'variable': result.variable,
+            'typ': result.typ,
+            'tot': result.tot,
+            'qm0thru3': result.qm0thru3,
+            'filename': result.filename,
+            'file_size': result.file_size,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
+
+def get_wod_nc():
+    session = itf.Session()
+    query = session.query(
+        omwn.variable,
+        omwn.var_count,
+        omwn.sensor,
+        omwn.obs_day,
+        oi.parent_dir
+    ).join(
+        oi,
+        omwn.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.var_count,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir
+        }
+        for result in results
+    ]
+
     df = pandas.DataFrame(result_dicts)
 
     session.close()
 
     return df 
+
+def get_wod_nc_by_variable(var_list):
+    session = itf.Session()
+    query = session.query(
+        omwn.variable,
+        omwn.var_count,
+        omwn.sensor,
+        omwn.obs_day,
+        oi.parent_dir
+    ).join(
+        oi,
+        omwn.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds',
+        omwn.variable.in_(var_list)
+    )
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.var_count,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
+
+def get_distinct_prepbufr_by_typ_variable(typ_list, var_list):
+    if typ_list is None and var_list is None:
+        return get_distinct_prepbufr() #return all values if no filter given
+    if var_list is None:
+        return get_distinct_prepbufr_by_typ(typ_list) #no variables, just use typ list
+    if typ_list is None: 
+        return get_distinct_prepbufr() #return all values since no variable only options right now
+
+    session = itf.Session()
+    # Subquery to get the most recent inserted_at for each combination of other columns
+    subquery = session.query(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day,
+        func.max(omnp.inserted_at).label('max_inserted_at')
+    ).group_by(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day
+    ).subquery()
+
+    # Join the subquery with the main table to get the full records
+    query = session.query(omnp.obs_id, omnp.variable, omnp.typ, omnp.tot, omnp.qm0thru3, omnp.filename, omnp.file_size, omnp.obs_day, oi.parent_dir, oi.s3_bucket).join(
+        subquery,
+        (omnp.obs_id == subquery.c.obs_id) &
+        (omnp.variable == subquery.c.variable) &
+        (omnp.typ == subquery.c.typ) &
+        (omnp.tot == subquery.c.tot) &
+        (omnp.qm0thru3 == subquery.c.qm0thru3) &
+        (omnp.filename == subquery.c.filename) &
+        (omnp.file_size == subquery.c.file_size) &
+        (omnp.obs_day == subquery.c.obs_day) &
+        (omnp.inserted_at == subquery.c.max_inserted_at)
+    ).join(
+        oi,
+        omnp.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds',
+        omnp.typ.in_(typ_list), #filter by typ_list
+        omnp.variable.in_(var_list)
+    )
+
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [
+        {
+            'obs_id': result.obs_id,
+            'variable': result.variable,
+            'typ': result.typ,
+            'tot': result.tot,
+            'qm0thru3': result.qm0thru3,
+            'filename': result.filename,
+            'file_size': result.file_size,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df

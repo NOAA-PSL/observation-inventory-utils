@@ -311,7 +311,6 @@ def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
     listed_objects = contents.listed_objects
 
     files_meta = []
-    print(f'inside process_aws_s3_list_objects - cmd_result_id: {cmd_result_id}')
     for listed_object in listed_objects:
         fn = listed_object.name
         print(f'filename: {fn}')
@@ -319,7 +318,6 @@ def process_aws_s3_list_objects_v2_resp(cmd_result_id, contents):
         if fn_meta is None:
             print('regular expression file name did not match, reverting to default behavior')
             fn_meta = parse_filename(fn)
-        print(f'filename meta: {fn_meta}')
 
         file_meta = TarballFileMeta(
             cmd_result_id,
@@ -356,15 +354,12 @@ def process_aws_s3_clean_resp(cmd_result_id, contents):
     listed_objects = contents.listed_objects
 
     files_meta = []
-    print(f'inside process_aws_s3_list_objects - cmd_result_id: {cmd_result_id}')
-    print(f'inside process_aws_s3_list_objects - contents: {contents}')
     fn = os.path.basename(contents.prefix)
     print(f'filename: {fn}')
     fn_meta = parse_filename_regex(fn)
     if fn_meta is None: #if the regular expression didn't match, default to old behavior
         print('regular expression file name did not match, reverting to default behavior')
         fn_meta = parse_filename_clean_bucket(fn)
-    print(f'filename meta: {fn_meta}')
 
     listed_object = listed_objects[0]
     files_meta.append(TarballFileMeta(
@@ -406,7 +401,6 @@ def process_inspect_tarball_resp(cmd_result_id, contents):
         fn = inspected_file.name
         print(f'filename: {fn}')
         fn_meta = parse_filename(fn)
-        print(f'filename meta: {fn_meta}')
 
         tarball_file_meta = TarballFileMeta(
             cmd_result_id,
@@ -483,7 +477,6 @@ def post_hpss_cmd_result(raw_response, obs_day):
         datetime.now(timezone.utc)
     )
 
-    print(f'HPSS cmd_result: {cmd_result_data}')
     cmd_result_id = tbl_factory.insert_cmd_result(cmd_result_data)
 
     return cmd_result_id
@@ -502,27 +495,21 @@ class ObsInventorySearchEngine(object):
 
         date_range = self.obs_inv_conf.get_search_date_range()
         master_list = []
-        print(f'search config date range: {date_range}')
 
         all_search_paths_finished = False
         loop_count = 0
         while not all_search_paths_finished:
-            print(
-                f'loop {loop_count} of while loop, all_search_paths_finished: {all_search_paths_finished}')
             loop_count += 1
             finished_count = 0
             for key, search_config in self.search_configs.items():
-                # print(f'search_config: {search_config}')
                 search_path = search_config.get_current_search_path()
 
                 if search_config.get_date_range().at_end():
                     end = search_config.get_date_range().end
                     finished_count += 1
-                    print(f'Finished search, path: {search_path}, end: {end}')
                     continue
 
                 args = [search_path]
-                print(f'args: {args}, search_path: {search_path}')
                 platform = search_config.get_storage_platform()
                 if platform == platforms.AWS_S3 or platform == platforms.AWS_S3_CLEAN:
                     cmd = s3.AwsS3CommandHandler(s3.CMD_GET_S3_OBJ_LIST, args)
@@ -530,15 +517,11 @@ class ObsInventorySearchEngine(object):
                     cmd = hpss.HpssCommandHandler(
                         hpss.CMD_INSPECT_TARBALL, args)
   
-
-                print(f'cmd: {cmd}, finished_count: {finished_count}')
-
                 success = cmd.send()
 
                 raw_resp = cmd.get_raw_response()
 
                 if platform == platforms.AWS_S3 or platform == platforms.AWS_S3_CLEAN:
-                    print('posting command results for aws s3')
                     self.cmd_post_id = post_aws_s3_cmd_result(
                         raw_resp,
                         search_config.get_date_range().current
@@ -549,11 +532,8 @@ class ObsInventorySearchEngine(object):
                         search_config.get_date_range().current
                     )
 
-                print(f'self.cmd_post_id: {self.cmd_post_id}')
-
                 if success:
                     current_time = search_config.get_date_range().current
-                    print(f'current_time: {current_time}')
                     contents = cmd.parse_response(current_time)
 
                     if platform == platforms.AWS_S3:
@@ -572,13 +552,15 @@ class ObsInventorySearchEngine(object):
                             contents
                         )
                 else:
-                    msg = f'Command failed!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - error code: {cmd.get_raw_response}.'
+                    msg = f'Command failed!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - error code: {raw_resp}.'
                     print(msg)
 
-                raw_resp = cmd.get_raw_response()
+                    if raw_resp.return_code == 404:
+                        date_str = datetime.now().strftime("%Y%m%d")
+                        with open(f"files_not_found_{date_str}.log", "a") as file:
+                            file.write(search_path + "\n")
 
                 search_config.get_date_range().increment(seconds=search_config.get_cycling_interval())
-                print(f'Current search path: {search_path}')
 
             if finished_count == len(self.search_configs):
                 all_search_paths_finished = True

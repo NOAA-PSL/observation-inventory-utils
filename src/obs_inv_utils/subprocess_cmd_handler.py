@@ -49,13 +49,10 @@ class SubprocessCmdHandler(object):
 
     def __post_init__(self):
         self.cmd_obj = self.subprocess_cmds[self.command]
-        print(f'In __post_init__: self.args: {self.args}')
-        print(f'In __post_init__: self.cmd_obj: {self.cmd_obj}')
         if self.cmd_obj.validate_args(self.args):
             self.cmd_line = getattr(self.cmd_obj,'command').copy()
             for arg in self.args:
                 self.cmd_line.append(arg)
-        print(f'cmd_line: {self.cmd_line}, args: {self.args}')
 
 
     def send(self):
@@ -71,7 +68,6 @@ class SubprocessCmdHandler(object):
             self.submitted_at = datetime.now(timezone.utc)
             out, err = proc.communicate()
             self.finished_at = datetime.now(timezone.utc)
-            print(f'return_code: {proc.returncode}, out: {out}, err: {err}')
         except FileNotFoundError as e:
             msg = f'Command: {cmd_str} was not recognized. '\
                   f'error: {e}{nl}{nl}' \
@@ -94,8 +90,6 @@ class SubprocessCmdHandler(object):
             self.submitted_at,
             float(self.get_cmd_duration())
         )
-
-        print(f'raw_resp: {self.raw_resp}')
         
         if proc.returncode != 0:
             return False
@@ -139,7 +133,6 @@ class SubprocessCmdHandler(object):
         )
 
         self.cmd_id = tbl_factory.insert_cmd_result(cmd_result_data)
-        print(f'In subproc, cmd result id: {self.cmd_id}')
 
 
     def post_parsed_result(self, parsed_data, context):

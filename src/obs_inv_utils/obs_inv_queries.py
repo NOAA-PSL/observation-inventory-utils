@@ -30,8 +30,6 @@ def get_family_fs_data(obs_family):
 
     session = Session()
     oi = itf.ObsInventory
-    print(
-        f'Here in sql query - table_exists: {table_exists}, obs_family: {obs_family}')
     filenames = set()
     members = obs_family.get_members()
     for member in members:
@@ -94,8 +92,6 @@ def get_filesize_timeline_data(min_instances):
         'un'
     ).subquery()
 
-    print(f'subquery unique_names: {unique_names}')
-
     fn_fs = session.query(
         oi.prefix,
         oi.filename,
@@ -151,8 +147,6 @@ def get_files_data(filenames, start, end):
     session = Session()
     oi = itf.ObsInventory
 
-    print(
-        f'Here in sql query - bufr_filenames: {filenames}, {start}, {end}')
     unique_filenames = set()
     for filename in filenames:
         unique_filenames.add(filename)
@@ -190,10 +184,9 @@ def get_files_data(filenames, start, end):
         oi.filename
     ).all()
 
-    print(f'fn_fs: {fn_fs}')
-
     df = DataFrame(fn_fs)
-
-    print(f'df: {df}')
-
+    
+    if df.empty:
+        print(f'NO FILES TO GET: DataFrame is empty.\n Filenames: {filenames} \n Start: {start} End: {end}')
+    
     return df
