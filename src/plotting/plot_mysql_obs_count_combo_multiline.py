@@ -25,11 +25,14 @@ category_dicts = {
     'GPS': {'gps'},
     'geo_rad' : {'geo'},
     'hyper_infrared': {'cris', 'iasi', 'airs'}, 
-    'multi_infrared': {'ssu', 'hirs'}, 
+    'multi_infrared': {'ssu', 'hirs/1bhrs2', 'hirs/1bhrs3', 'hirs/1bhrs4'}, 
     'micro_imagers': {'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis'},
     'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'}, 
     'ozone': {'ozone'},
-    'polar_orbit_BT': {'cris', 'iasi', 'airs', 'ssu', 'hirs', 'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis', 'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'}
+    'polar_orbit_BT': {'cris', 'iasi', 'airs', 'ssu', 'hirs/1bhrs2', 'hirs/1bhrs3', 'hirs/1bhrs4' , 'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis', 'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'},
+    'tovs': {'hirs/1bhrs2', 'ssu', 'msu'},
+    'atovs': {'hirs/1bhrs3', 'hirs/1bhrs4', 'amsua', 'amsub', 'mhs'},
+    'post-atovs': {'cris', 'atms'}
 }
 
 category_titles = {
@@ -41,7 +44,10 @@ category_titles = {
     'micro_imagers': 'Microwave Imagers', 
     'micro_sounders': 'Microwave Sounders', 
     'ozone': 'Ozone',
-    'polar_orbit_BT': 'Polar Orbiting Brightness Temperature'
+    'polar_orbit_BT': 'Polar Orbiting Brightness Temperature',
+    'tovs': 'TOVS',
+    'atovs': 'ATOVS',
+    'post-atovs': 'Post-ATOVS',
 }
 
 
@@ -62,6 +68,8 @@ def get_category(row):
 def get_sensor(row):
     directory = row['parent_dir']
     sensor = directory.split("/")[2]
+    if sensor == 'hirs':
+        sensor = 'hirs/' + directory.split("/")[3]
     return sensor
 
 def make_sensor_list_by_categories(cat_list):
