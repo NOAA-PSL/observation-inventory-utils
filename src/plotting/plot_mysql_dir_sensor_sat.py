@@ -93,7 +93,7 @@ first_datetime.rename(columns={'datetime': 'first_datetime'}, inplace=True)
 df = db_frame[['source_dir', 'sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count')
 df = df.merge(first_datetime, on=['sensor', 'source_dir', 'sat_id'], how='left')
 
-df_sorted = df.sort_values(by=['sensor', 'source_dir', 'first_datetime'], ascending=[False, False, True])
+df_sorted = df.sort_values(by=['sensor', 'source_dir', 'first_datetime'], ascending=[False, False, False])
 
 #loop and plot sensors/sat_ids
 #unique_dir_sensor_sats = db_frame[['source_dir', 'sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'source_dir', 'sat_id_name'], ascending=[False, False, False])
