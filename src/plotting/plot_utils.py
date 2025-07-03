@@ -22,7 +22,7 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                "NOAA 15":"n15","NOAA 16":"n16","NOAA 17":"n17","NOAA 18":"n18","NOAA 19":"n19","NOAA 20":"n20", "NOAA 21":"n21",
                "METOP-1":"metop-b","METOP-2":"metop-a","METOP-3":"metop-c",
                "METOP-1 (Metop-A":"metop-b","METOP-2 (Metop-B":"metop-a","METOP-3 (Metop-C":"metop-c",
-               "METOP-1 (Metop-B":"metop-b","METOP-2 (Metop-A":"metop-a",
+               "METOP-1 (Metop-B":"metop-b","METOP-2 (Metop-A":"metop-a", "METOP-B":"metop-b", "METOP-A":"metop-a", "METOP-C":"metop-c",
                "AQUA":"aqua", "NPP":"npp",
                "GOES 7" : "g07", "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
                "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16", "GOES 17":"g17", "GOES 18":"g18",

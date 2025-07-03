@@ -83,6 +83,10 @@ db_frame.drop(index_geo, inplace=True)
 index_ozone = db_frame[(db_frame['sensor']=='ozone')].index
 db_frame.drop(index_ozone, inplace=True)
 
+db_frame.loc[db_frame['sat_id_name'].isin(['METOP-1', 'METOP-1 (Metop-B']), 'sat_id_name'] = 'METOP-B'
+db_frame.loc[db_frame['sat_id_name'].isin(['METOP-2', 'METOP-2 (Metop-A']), 'sat_id_name'] = 'METOP-A'
+db_frame.loc[db_frame['sat_id_name'].isin(['METOP-3', 'METOP-3 (Metop-C']), 'sat_id_name'] = 'METOP-C'
+
 #loop and plot sensors/sat_ids
 unique_dir_sensor_sats = db_frame[['source_dir', 'sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'source_dir', 'sat_id_name'], ascending=[False, False, False])
 step=0.05
