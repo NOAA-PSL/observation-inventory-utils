@@ -12,6 +12,7 @@ from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsBufr as omnb
 from obs_inv_utils.inventory_table_factory import ObsMetaNceplibsPrepbufr as omnp 
 from obs_inv_utils.inventory_table_factory import ObsMetaHvIodaNetcdf as omhin
 from obs_inv_utils.inventory_table_factory import ObsInventory as oi
+from obs_inv_utils.inventory_table_factory import ObsMetaHvWodNetcdf as omwn
 import obs_inv_utils.inventory_table_factory as itf
 from sqlalchemy.sql import func, or_
 
@@ -453,6 +454,226 @@ def get_ioda_nc():
             'sensor': result.sensor,
             'obs_day': result.obs_day,
             'ioda_version': result.ioda_version,
+            'parent_dir': result.parent_dir
+        }
+        for result in results
+    ]
+
+    df = pandas.DataFrame(result_dicts)
+
+    session.close()
+
+    return df
+
+def get_wod_nc():
+    session = itf.Session()
+    query = session.query(
+        omwn.variable,
+        omwn.var_count,
+        omwn.sensor,
+        omwn.obs_day,
+        oi.parent_dir
+    ).join(
+        oi,
+        omwn.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.var_count,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir
+        }
+        for result in results
+    ]
+
+    df = pandas.DataFrame(result_dicts)
+
+    session.close()
+
+    return df 
+
+def get_wod_nc_by_variable(var_list):
+    session = itf.Session()
+    query = session.query(
+        omwn.variable,
+        omwn.var_count,
+        omwn.sensor,
+        omwn.obs_day,
+        oi.parent_dir
+    ).join(
+        oi,
+        omwn.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds',
+        omwn.variable.in_(var_list)
+    )
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.var_count,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
+
+def get_distinct_prepbufr_by_typ_variable(typ_list, var_list):
+    if typ_list is None and var_list is None:
+        return get_distinct_prepbufr() #return all values if no filter given
+    if var_list is None:
+        return get_distinct_prepbufr_by_typ(typ_list) #no variables, just use typ list
+    if typ_list is None: 
+        return get_distinct_prepbufr() #return all values since no variable only options right now
+
+    session = itf.Session()
+    # Subquery to get the most recent inserted_at for each combination of other columns
+    subquery = session.query(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day,
+        func.max(omnp.inserted_at).label('max_inserted_at')
+    ).group_by(
+        omnp.obs_id,
+        omnp.variable,
+        omnp.typ,
+        omnp.tot,
+        omnp.qm0thru3,
+        omnp.filename,
+        omnp.file_size,
+        omnp.obs_day
+    ).subquery()
+
+    # Join the subquery with the main table to get the full records
+    query = session.query(omnp.obs_id, omnp.variable, omnp.typ, omnp.tot, omnp.qm0thru3, omnp.filename, omnp.file_size, omnp.obs_day, oi.parent_dir, oi.s3_bucket).join(
+        subquery,
+        (omnp.obs_id == subquery.c.obs_id) &
+        (omnp.variable == subquery.c.variable) &
+        (omnp.typ == subquery.c.typ) &
+        (omnp.tot == subquery.c.tot) &
+        (omnp.qm0thru3 == subquery.c.qm0thru3) &
+        (omnp.filename == subquery.c.filename) &
+        (omnp.file_size == subquery.c.file_size) &
+        (omnp.obs_day == subquery.c.obs_day) &
+        (omnp.inserted_at == subquery.c.max_inserted_at)
+    ).join(
+        oi,
+        omnp.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds',
+        omnp.typ.in_(typ_list), #filter by typ_list
+        omnp.variable.in_(var_list)
+    )
+
+    # Execute the query
+    results = query.all()
+
+    # Convert results to a list of dictionaries
+    result_dicts = [
+        {
+            'obs_id': result.obs_id,
+            'variable': result.variable,
+            'typ': result.typ,
+            'tot': result.tot,
+            'qm0thru3': result.qm0thru3,
+            'filename': result.filename,
+            'file_size': result.file_size,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir,
+            's3_bucket': result.s3_bucket
+        }
+        for result in results
+    ]
+
+    # Convert the list of dictionaries to a pandas DataFrame
+    df = pandas.DataFrame(result_dicts)
+
+    # Close the session
+    session.close()
+
+    return df
+
+def get_wod_nc():
+    session = itf.Session()
+    query = session.query(
+        omwn.variable,
+        omwn.var_count,
+        omwn.sensor,
+        omwn.obs_day,
+        oi.parent_dir
+    ).join(
+        oi,
+        omwn.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds'
+    )
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.var_count,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day,
+            'parent_dir': result.parent_dir
+        }
+        for result in results
+    ]
+
+    df = pandas.DataFrame(result_dicts)
+
+    session.close()
+
+    return df 
+
+def get_wod_nc_by_variable(var_list):
+    session = itf.Session()
+    query = session.query(
+        omwn.variable,
+        omwn.var_count,
+        omwn.sensor,
+        omwn.obs_day,
+        oi.parent_dir
+    ).join(
+        oi,
+        omwn.obs_id == oi.obs_id
+    ).filter(
+        oi.s3_bucket == 'noaa-reanalyses-pds',
+        omwn.variable.in_(var_list)
+    )
+
+    results = query.all()
+
+    result_dicts = [
+        {
+            'variable': result.variable,
+            'var_count': result.var_count,
+            'sensor': result.sensor,
+            'obs_day': result.obs_day,
             'parent_dir': result.parent_dir
         }
         for result in results

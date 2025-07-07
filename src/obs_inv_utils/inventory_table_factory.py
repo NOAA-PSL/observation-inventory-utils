@@ -23,6 +23,8 @@ OBS_META_NCEPLIBS_PREPBUFR_TABLE = 'obs_meta_nceplibs_prepbufr'
 OBS_META_NCEPLIBS_PREPBUFR_AGG_TABLE = 'obs_meta_nceplibs_prepbufr_aggregate'
 OBS_META_HV_IODA_NETCDF_TABLE = 'obs_meta_hv_ioda_netcdf'
 OBS_META_HV_IODA_NETCDF_AGG_TABLE = 'obs_meta_hv_ioda_netcdf_aggregate'
+OBS_META_HV_WOD_NETCDF_TABLE = 'obs_meta_hv_wod_netcdf'
+OBS_META_HV_WOD_NETCDF_AGG_TABLE = 'obs_meta_hv_wod_netcdf_aggregate'
 OBS_DATABASE = ''
 OBS_SQLITE_DEFAULT = 'observations_inventory.db'
 
@@ -387,6 +389,93 @@ def create_obs_meta_hv_ioda_netcdf_agg_table():
             )
         )
 
+def create_obs_meta_hv_wod_netcdf_table():
+    insp = inspect(engine)
+    table_exists = insp.has_table(OBS_META_HV_WOD_NETCDF_TABLE)
+    print(f'{OBS_META_HV_WOD_NETCDF_TABLE} table exists: {table_exists}')
+    if not insp.has_table(OBS_META_HV_WOD_NETCDF_TABLE):
+
+        Table(OBS_META_HV_WOD_NETCDF_TABLE, metadata,
+              Column('meta_id', Integer, primary_key=True),
+              Column(
+                  'obs_id',
+                  Integer,
+                  ForeignKey('obs_inventory.obs_id'),
+                  nullable=False
+              ),
+              Column(
+                  'cmd_result_id',
+                  Integer,
+                  ForeignKey('cmd_results.cmd_result_id'),
+                  nullable=False
+              ),
+              Column('cmd_str', String),
+              Column('variable', String),
+              Column('var_count', Integer),
+              Column('min_depth', Float),
+              Column('max_depth', Float),
+              Column('min_file_depth', Float),
+              Column('max_file_depth', Float),
+              Column('sensor', String),
+              Column('casts', Integer),
+              Column('filename', String),
+              Column('min_data_date', DateTime),
+              Column('max_data_date', DateTime),
+              Column('obs_day', DateTime),
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'variable',
+                'var_count',
+                'filename',
+                'obs_day',
+                name='unique_wod_nc_meta'
+            )
+        )
+
+def create_obs_meta_hv_wod_netcdf_agg_table():
+    insp = inspect(engine)
+    table_exists = insp.has_table(OBS_META_HV_WOD_NETCDF_AGG_TABLE)
+    print(f'{OBS_META_HV_WOD_NETCDF_AGG_TABLE} table exists: {table_exists}')
+    if not insp.has_table(OBS_META_HV_WOD_NETCDF_AGG_TABLE):
+
+        Table(OBS_META_HV_WOD_NETCDF_AGG_TABLE, metadata,
+              Column('meta_id', Integer, primary_key=True),
+              Column(
+                  'obs_id',
+                  Integer,
+                  ForeignKey('obs_inventory.obs_id'),
+                  nullable=False
+              ),
+              Column(
+                  'cmd_result_id',
+                  Integer,
+                  ForeignKey('cmd_results.cmd_result_id'),
+                  nullable=False
+              ),
+              Column('cmd_str', String),
+              Column('variable_names', String),
+              Column('num_vars', Integer),
+              Column('var_counts', Integer),
+              Column('min_depth', Float),
+              Column('max_depth', Float),
+              Column('sensor', String),
+              Column('casts', Integer),
+              Column('filename', String),
+              Column('min_data_date', DateTime),
+              Column('max_data_date', DateTime),
+              Column('obs_day', DateTime),
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'num_vars',
+                'var_counts',
+                'filename',
+                'obs_day',
+                name='unique_wod_nc_agg_meta'
+            )
+        )
+
 class CmdResult(Base):
     __tablename__ = CMD_RESULTS_TABLE
 
@@ -623,6 +712,72 @@ class ObsMetaHvIodaNetcdfAggregate(Base):
     ioda_version = Column(String(63))
     filename = Column(String(63))
     file_date = Column(DateTime())
+    min_data_date = Column(DateTime())
+    max_data_date = Column(DateTime())
+    obs_day = Column(DateTime())
+    inserted_at = Column(DateTime())
+
+    cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
+
+class ObsMetaHvWodNetcdf(Base):
+    __tablename__ = OBS_META_HV_WOD_NETCDF_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'variable',
+            'var_count',
+            'filename',
+            'obs_day',
+            name='unique_wod_nc_meta'
+        ),
+    )
+
+    meta_id = Column(Integer, primary_key=True)
+    obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
+    cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
+    cmd_str = Column(String(31))
+    variable = Column(String(63))
+    var_count = Column(Integer())
+    min_depth = Column(Float())
+    max_depth = Column(Float())
+    min_file_depth = Column(Float())
+    max_file_depth = Column(Float())
+    sensor = Column(String(63))
+    casts = Column(Integer())
+    filename = Column(String(63))
+    min_data_date = Column(DateTime())
+    max_data_date = Column(DateTime())
+    obs_day = Column(DateTime()) 
+    inserted_at = Column(DateTime())
+
+    cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
+class ObsMetaHvWodNetcdfAggregate(Base):
+    __tablename__ = OBS_META_HV_WOD_NETCDF_AGG_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'num_vars',
+            'var_counts',
+            'filename',
+            'obs_day',
+            name='unique_wod_nc_agg_meta'
+        ),
+    )
+
+    meta_id = Column(Integer, primary_key=True)
+    obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
+    cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
+    cmd_str = Column(String(31))
+    variable_names = Column(String(1023))
+    num_vars = Column(Integer())
+    var_counts = Column(Integer())
+    min_depth = Column(Float())
+    max_depth = Column(Float())
+    sensor = Column(String(63))
+    casts = Column(Integer())
+    filename = Column(String(63))
     min_data_date = Column(DateTime())
     max_data_date = Column(DateTime())
     obs_day = Column(DateTime())
@@ -1012,6 +1167,113 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
         print("NO DATA PROVIDED TO INSERT. No data inserted into the ioda netcdf aggregate meta table.")
 
 
+def insert_obs_meta_hv_wod_netcdf_item(obs_meta_items):
+    if not isinstance(obs_meta_items, list):
+        msg = 'Inserted obs meta wod NetCDF items must be in the form of a list.' \
+              f' Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
+
+    rows = []
+    for item in obs_meta_items:
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable': item.variable,
+            'var_count': item.var_count,
+            'min_depth': item.min_depth,
+            'max_depth': item.max_depth,
+            'min_file_depth': item.min_file_depth,
+            'max_file_depth': item.max_file_depth,
+            'sensor': item.sensor,
+            'casts': item.casts,
+            'filename': item.filename,
+            'min_data_date': item.min_data_date,
+            'max_data_date': item.max_data_date,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.utcnow()
+        }
+        rows.append(row)
+
+    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_hv_wod_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, var_count, min_depth, max_depth, min_file_depth, max_file_depth,
+            sensor, casts, filename, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :var_count, :min_depth, :max_depth, :min_file_depth, :max_file_depth,
+            :sensor, :casts, :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_hv_wod_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, var_count, min_depth, max_depth, min_file_depth, max_file_depth,
+            sensor, casts, filename, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :var_count, :min_depth, :max_depth, :min_file_depth, :max_file_depth,
+            :sensor, :casts, :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the wod netcdf meta table.")
+
+def insert_obs_meta_hv_wod_netcdf_agg_item(obs_meta_items):
+    if not isinstance(obs_meta_items, list):
+        msg = 'Inserted obs meta wod NetCDF Aggregate items must be in the form of a list.' \
+              f' Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
+
+    rows = []
+    for item in obs_meta_items:
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable_names': item.variable_names,
+            'num_vars': item.num_vars,
+            'var_counts': item.var_counts,
+            'min_depth': item.min_depth,
+            'max_depth': item.max_depth,
+            'sensor': item.sensor,
+            'casts': item.casts,
+            'filename': item.filename,
+            'min_data_date': item.min_data_date,
+            'max_data_date': item.max_data_date,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.utcnow()
+        }
+        rows.append(row)
+
+    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_hv_wod_netcdf_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, var_counts, min_depth, max_depth, sensor, casts,
+            filename, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :var_counts, :min_depth, :max_depth, :sensor, :casts,
+            :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_hv_wod_netcdf_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, var_counts, min_depth, max_depth, sensor, casts,
+            filename, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :var_counts, :min_depth, :max_depth, :sensor, :casts,
+            :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+
+    if len(rows) > 0:
+        session = Session()
+        session.execute(text(sql), rows)
+        session.commit()
+        session.close()
+    else:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the wod netcdf aggregate meta table.")
+
 if(database_type.lower() == 'mysql'):
     Base.metadata.create_all(engine)
 else:
@@ -1022,4 +1284,6 @@ else:
     create_obs_meta_nceplibs_prepbufr_agg_table()
     create_obs_meta_hv_ioda_netcdf_table()
     create_obs_meta_hv_ioda_netcdf_agg_table()
+    create_obs_meta_hv_wod_netcdf_table()
+    create_obs_meta_hv_wod_netcdf_agg_table()
     metadata.create_all(engine)
