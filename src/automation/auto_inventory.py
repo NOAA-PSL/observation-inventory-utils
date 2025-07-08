@@ -128,6 +128,10 @@ def run_inv_cmd(inventory_info):
         yaml_file = yg.generate_hv_ioda_inventory_config(inventory_info, start_time, end_time, args.work_dir)
         cli.get_obs_count_meta_ioda_hv_base(yaml_file)
         os.remove(yaml_file)
+    elif inventory_info.inv_cmd == au.HV_WOD_NC_META:
+        yaml_file = yg.generate_hv_wod_inventory_config(inventory_info, start_time, end_time, args.work_dir)
+        cli.get_obs_count_meta_wod_hv_base(yaml_file)
+        os.remove(yaml_file)
     else:
         print(f'No valid commmand found for inv_cmd in {inventory_info.obs_name} inventory info with value: ' + inventory_info.inv_cmd)
 

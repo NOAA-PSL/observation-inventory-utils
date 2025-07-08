@@ -140,3 +140,57 @@ class ObsIodaFileMetaHandler(object):
         cmd.post_harvest_results(ioda_file)
 
 
+@dataclass
+class ObsWODFileMetaHandler(object):
+    meta_config: ObsMetaIodaConfig
+    wod_files: list = field(default_factory=list, init=False)
+    date_range: DateRange = field(init=False)
+
+    def __post_init__(self):
+        self.date_range = self.meta_config.get_date_range()
+        self.wod_files = self.meta_config.get_wod_file_list()
+
+    def __repr__(self):
+        return f'meta_config: {self.meta_config}, ' \
+            f'wod_files: {self.wod_files}, ' \
+            f'date_range: {self.date_range}'
+    
+    def get_wod_file_meta(self, cmd_type):
+        inventory_wod_files = oiq.get_files_data(
+            self.wod_files,
+            self.date_range.start,
+            self.date_range.end
+        )
+
+        temp_uuid = str(uuid.uuid4())
+
+        work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
+
+        for idx, wod_file in inventory_wod_files.iterrows():
+            file_downloaded = False
+
+            saved_filename = download_netcdf_file_from_s3(work_dir, wod_file)
+
+            if saved_filename is None:
+                continue
+
+            self.get_obs_meta_with_hv_wod(saved_filename, wod_file)
+
+            # clean up files
+            if self.meta_config.scrub_files:
+                shutil.rmtree( work_dir )
+
+
+    def get_obs_meta_with_hv_wod(self, filename, wod_file):
+        args = {'filename': filename}
+        cmd = cmhd.ScoreHVCmdHandler(
+            hv_cmds.HV_WOD_NC_META,
+            hv_cmds.score_hv_cmds,
+            args
+        )
+
+        cmd.harvest()
+        cmd.post_cmd_result(wod_file.obs_day)
+        cmd.post_harvest_results(wod_file)
+
+
