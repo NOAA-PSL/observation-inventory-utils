@@ -25,6 +25,30 @@ adt_nesdis_cryosat2_v3 = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
+adt_nesdis_cryosat2_12_v2 = InventoryInfo(
+    obs_name='adt_nesdis_cryosat2_12_v2',
+    key='observations/reanalysis/adt/nesdis/cryosat2/%Y/%m/24h/iodav2/cryosat2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
+    start='20170101T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/cryosat2/%Y/%m/24h/iodav2/',
+    files='cryosat2.nesdis.adt.%z.iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_cryosat2_12_v3 = InventoryInfo(
+    obs_name='adt_nesdis_cryosat2_12_v3',
+    key='observations/reanalysis/adt/nesdis/cryosat2/%Y/%m/24h/iodav3/cryosat2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='20170101T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/cryosat2/%Y/%m/24h/iodav3/',
+    files='cryosat2.nesdis.adt.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 adt_nesdis_ers1_v2 = InventoryInfo(
     obs_name='adt_nesdis_ers1_v2',
     key='observations/reanalysis/adt/nesdis/ers1/%Y/%m/24h/iodav2/ers1.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
@@ -49,6 +73,30 @@ adt_nesdis_ers1_v3 = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
+adt_nesdis_ers2_v2 = InventoryInfo(
+    obs_name='adt_nesdis_ers2_v2',
+    key='observations/reanalysis/adt/nesdis/ers2/%Y/%m/24h/iodav2/ers2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
+    start='19950515T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/ers2/%Y/%m/24h/iodav2/',
+    files='ers2.nesdis.adt.%z.iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_ers2_v3 = InventoryInfo(
+    obs_name='adt_nesdis_ers2_v3',
+    key='observations/reanalysis/adt/nesdis/ers2/%Y/%m/24h/iodav3/ers2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='19950515T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/ers2/%Y/%m/24h/iodav3/',
+    files='ers2.nesdis.adt.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 adt_nesdis_jason2_v2 = InventoryInfo(
     obs_name='adt_nesdis_jason2_v2',
     key='observations/reanalysis/adt/nesdis/jason2/%Y/%m/24h/iodav2/jason2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
@@ -65,6 +113,30 @@ adt_nesdis_jason2_v3 = InventoryInfo(
     obs_name='adt_nesdis_jason2_v3',
     key='observations/reanalysis/adt/nesdis/jason2/%Y/%m/24h/iodav3/jason2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
     start='20080712T000000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/jason2/%Y/%m/24h/iodav3/',
+    files='jason2.nesdis.adt.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_jason2_12_v2 = InventoryInfo(
+    obs_name='adt_nesdis_jason2_12_v2',
+    key='observations/reanalysis/adt/nesdis/jason2/%Y/%m/24h/iodav2/jason2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
+    start='20170101T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/jason2/%Y/%m/24h/iodav2/',
+    files='jason2.nesdis.adt.%z.iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_jason2_12_v3 = InventoryInfo(
+    obs_name='adt_nesdis_jason2_12_v3',
+    key='observations/reanalysis/adt/nesdis/jason2/%Y/%m/24h/iodav3/jason2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='20170101T120000Z',
     s3_prefix='observations/reanalysis/adt/nesdis/jason2/%Y/%m/24h/iodav3/',
     files='jason2.nesdis.adt.%z.iodav3.nc',
     inv_cmd=au.HV_IODA_META,
@@ -97,6 +169,30 @@ adt_nesdis_jason3_v3 = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
+adt_nesdis_jason3_12_v2 = InventoryInfo(
+    obs_name='adt_nesdis_jason3_12_v2',
+    key='observations/reanalysis/adt/nesdis/jason3/%Y/%m/24h/iodav2/jason3.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
+    start='20170101T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/jason3/%Y/%m/24h/iodav2/',
+    files='jason3.nesdis.adt.%z.iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_jason3_12_v3 = InventoryInfo(
+    obs_name='adt_nesdis_jason3_12_v3',
+    key='observations/reanalysis/adt/nesdis/jason3/%Y/%m/24h/iodav3/jason3.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='20170101T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/jason3/%Y/%m/24h/iodav3/',
+    files='jason3.nesdis.adt.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 adt_nesdis_saral_v2 = InventoryInfo(
     obs_name='adt_nesdis_saral_v2',
     key='observations/reanalysis/adt/nesdis/saral/%Y/%m/24h/iodav2/saral.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
@@ -121,6 +217,30 @@ adt_nesdis_saral_v3 = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
+adt_nesdis_saral_12_v2 = InventoryInfo(
+    obs_name='adt_nesdis_saral_12_v2',
+    key='observations/reanalysis/adt/nesdis/saral/%Y/%m/24h/iodav2/saral.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
+    start='20170101T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/saral/%Y/%m/24h/iodav2/',
+    files='saral.nesdis.adt.%z.iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_saral_12_v3 = InventoryInfo(
+    obs_name='adt_nesdis_saral_12_v3',
+    key='observations/reanalysis/adt/nesdis/saral/%Y/%m/24h/iodav3/saral.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='20170101T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/saral/%Y/%m/24h/iodav3/',
+    files='saral.nesdis.adt.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 adt_nesdis_sentinel3a_v2 = InventoryInfo(
     obs_name='adt_nesdis_sentinel3a_v2',
     key='observations/reanalysis/adt/nesdis/sentinel3a/%Y/%m/24h/iodav2/sentinel3a.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
@@ -137,6 +257,30 @@ adt_nesdis_sentinel3a_v3 = InventoryInfo(
     obs_name='adt_nesdis_sentinel3a_v3',
     key='observations/reanalysis/adt/nesdis/sentinel3a/%Y/%m/24h/iodav3/sentinel3a.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
     start='20160301T000000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/sentinel3a/%Y/%m/24h/iodav3/',
+    files='sentinel3a.nesdis.adt.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_sentinel3a_12_v2 = InventoryInfo(
+    obs_name='adt_nesdis_sentinel3a_12_v2',
+    key='observations/reanalysis/adt/nesdis/sentinel3a/%Y/%m/24h/iodav2/sentinel3a.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
+    start='20170101T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/sentinel3a/%Y/%m/24h/iodav2/',
+    files='sentinel3a.nesdis.adt.%z.iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_sentinel3a_12_v3 = InventoryInfo(
+    obs_name='adt_nesdis_sentinel3a_12_v3',
+    key='observations/reanalysis/adt/nesdis/sentinel3a/%Y/%m/24h/iodav3/sentinel3a.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='20170101T120000Z',
     s3_prefix='observations/reanalysis/adt/nesdis/sentinel3a/%Y/%m/24h/iodav3/',
     files='sentinel3a.nesdis.adt.%z.iodav3.nc',
     inv_cmd=au.HV_IODA_META,
@@ -185,6 +329,30 @@ adt_nesdis_topex_poseidon_v3 = InventoryInfo(
     obs_name='adt_nesdis_topex_poseidon_v3',
     key='observations/reanalysis/adt/nesdis/topex_poseidon/%Y/%m/24h/iodav3/topex_poseidon.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
     start='19930101T120000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/topex_poseidon/%Y/%m/24h/iodav3/',
+    files='topex_poseidon.nesdis.adt.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_topex_poseidon_00_v2 = InventoryInfo(
+    obs_name='adt_nesdis_topex_poseidon_00_v2',
+    key='observations/reanalysis/adt/nesdis/topex_poseidon/%Y/%m/24h/iodav2/topex_poseidon.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
+    start='20000101T000000Z',
+    s3_prefix='observations/reanalysis/adt/nesdis/topex_poseidon/%Y/%m/24h/iodav2/',
+    files='topex_poseidon.nesdis.adt.%z.iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_nesdis_topex_poseidon_00_v3 = InventoryInfo(
+    obs_name='adt_nesdis_topex_poseidon_00_v3',
+    key='observations/reanalysis/adt/nesdis/topex_poseidon/%Y/%m/24h/iodav3/topex_poseidon.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='20000101T000000Z',
     s3_prefix='observations/reanalysis/adt/nesdis/topex_poseidon/%Y/%m/24h/iodav3/',
     files='topex_poseidon.nesdis.adt.%z.iodav3.nc',
     inv_cmd=au.HV_IODA_META,
@@ -649,9 +817,13 @@ insitu_wod_xbt = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET
 )
 
-ocn_infos = [adt_nesdis_cryosat2_v2, adt_nesdis_cryosat2_v3, adt_nesdis_ers1_v2, adt_nesdis_ers1_v3, adt_nesdis_jason2_v2, adt_nesdis_jason2_v3, adt_nesdis_jason3_v2,
-             adt_nesdis_jason3_v3, adt_nesdis_saral_v2, adt_nesdis_saral_v3, adt_nesdis_sentinel3a_v2, adt_nesdis_sentinel3a_v3, adt_nesdis_sentinel3b_v2,
-             adt_nesdis_sentinel3b_v3, adt_nesdis_topex_poseidon_v2, adt_nesdis_topex_poseidon_v3, insitu_ncei_wod_v2, insitu_ncei_wod_v3, 
+ocn_infos = [adt_nesdis_cryosat2_v2, adt_nesdis_cryosat2_v3, adt_nesdis_cryosat2_12_v2, adt_nesdis_cryosat2_12_v3, adt_nesdis_ers1_v2, adt_nesdis_ers1_v3, adt_nesdis_ers2_v2, adt_nesdis_ers2_v3,
+             adt_nesdis_jason2_v2, adt_nesdis_jason2_v3, adt_nesdis_jason2_12_v2, adt_nesdis_jason2_12_v3, adt_nesdis_jason3_v2,
+             adt_nesdis_jason3_v3, adt_nesdis_jason3_12_v2, adt_nesdis_jason3_12_v3, adt_nesdis_saral_v2, adt_nesdis_saral_v3, 
+             adt_nesdis_saral_12_v2, adt_nesdis_saral_12_v3, adt_nesdis_sentinel3a_v2, adt_nesdis_sentinel3a_v3, adt_nesdis_sentinel3a_12_v2, 
+             adt_nesdis_sentinel3a_12_v3, adt_nesdis_sentinel3b_v2, adt_nesdis_sentinel3b_v3,
+             adt_nesdis_topex_poseidon_v2, adt_nesdis_topex_poseidon_v3, adt_nesdis_topex_poseidon_00_v2, adt_nesdis_topex_poseidon_00_v3,
+             insitu_ncei_wod_v2, insitu_ncei_wod_v3,  
              sss_jpl_sentinel1a_v2, sss_jpl_sentinel1a_v3, sst_jpl_coriolis_v2, sst_jpl_coriolis_v3, sst_nesdis_amsr2_v2, sst_nesdis_amsr2_v3,
              sst_nesdis_gpm_v2, sst_nesdis_gpm_v3, sst_nesdis_metopa_v2, sst_nesdis_metopa_v3, sst_nesdis_noaa07_v2, sst_nesdis_noaa07_v3, 
              sst_nesdis_noaa09_v2, sst_nesdis_noaa09_v3, sst_nesdis_noaa11_v2, sst_nesdis_noaa11_v3, sst_nesdis_noaa12_v2, sst_nesdis_noaa12_v3, 
