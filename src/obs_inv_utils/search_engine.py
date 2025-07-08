@@ -552,10 +552,13 @@ class ObsInventorySearchEngine(object):
                             contents
                         )
                 else:
-                    msg = f'Command failed!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - error code: {cmd.get_raw_response}.'
+                    msg = f'Command failed!!!!!!!!!!!!!!!!!!!!!!!!!!!!! - error code: {raw_resp}.'
                     print(msg)
 
-                raw_resp = cmd.get_raw_response()
+                    if raw_resp.return_code == 404:
+                        date_str = datetime.now().strftime("%Y%m%d")
+                        with open(f"files_not_found_{date_str}.log", "a") as file:
+                            file.write(search_path + "\n")
 
                 search_config.get_date_range().increment(seconds=search_config.get_cycling_interval())
 
