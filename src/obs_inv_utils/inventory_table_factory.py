@@ -1182,33 +1182,12 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
         print("NO DATA PROVIDED TO INSERT. No data inserted into the ioda netcdf aggregate meta table.")
 
 
-def insert_obs_meta_hv_wod_netcdf_item(obs_meta_items):
+def insert_obs_meta_hv_wod_netcdf_item(obs_meta_items, max_retries=3, backoff_delay=0.2):
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs meta wod NetCDF items must be in the form of a list.' \
               f' Received type: {type(obs_meta_items)}'
         raise TypeError(msg)
 
-    rows = []
-    for item in obs_meta_items:
-        row = {
-            'obs_id': item.obs_id,
-            'cmd_result_id': item.cmd_result_id,
-            'cmd_str': item.cmd_str,
-            'variable': item.variable,
-            'var_count': item.var_count,
-            'min_depth': item.min_depth,
-            'max_depth': item.max_depth,
-            'min_file_depth': item.min_file_depth,
-            'max_file_depth': item.max_file_depth,
-            'sensor': item.sensor,
-            'casts': item.casts,
-            'filename': item.filename,
-            'min_data_date': item.min_data_date,
-            'max_data_date': item.max_data_date,
-            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-            'inserted_at': datetime.utcnow()
-        }
-        rows.append(row)
 
     # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
     if(database_type.lower() == 'mysql'):
@@ -1228,12 +1207,45 @@ def insert_obs_meta_hv_wod_netcdf_item(obs_meta_items):
             :sensor, :casts, :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
 
-    if len(rows) > 0:
-        session = Session()
-        session.execute(text(sql), rows)
-        session.commit()
-        session.close()
-    else:
+    session = Session()
+    inserted_count = 0
+
+    for item in obs_meta_items:
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable': item.variable,
+            'var_count': item.var_count,
+            'min_depth': item.min_depth,
+            'max_depth': item.max_depth,
+            'min_file_depth': item.min_file_depth,
+            'max_file_depth': item.max_file_depth,
+            'sensor': item.sensor,
+            'casts': item.casts,
+            'filename': item.filename,
+            'min_data_date': item.min_data_date,
+            'max_data_date': item.max_data_date,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.utcnow()
+        }
+
+        for attempt in range(max_retries):
+            try:
+                session.execute(text(sql), row)
+                session.commit()
+                inserted_count += 1
+                break
+            except OperationalError as e:
+                session.rollback()
+                if '1213' in str(e): #MySQL deadlock
+                    time.sleep(backoff_delay * (attempt + 1))
+                else:
+                    session.close()
+                    raise
+
+    session.close()
+    if inserted_count == 0:
         print("NO DATA PROVIDED TO INSERT. No data inserted into the wod netcdf meta table.")
 
 def insert_obs_meta_hv_wod_netcdf_agg_item(obs_meta_items):
