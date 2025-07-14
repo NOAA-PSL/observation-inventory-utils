@@ -944,13 +944,29 @@ def insert_obs_meta_nceplibs_bufr_item(obs_meta_items, max_retries=3, backoff_de
     if inserted_count == 0:
         print("NO DATA PROVIDED TO INSERT. No data inserted into the bufr meta table.")
 
-def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
+def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items, max_retries=3, backoff_delay=0.2):
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs nceplibs prepbufr meta items must be in the form' \
               f' of a list.  Received type: {type(obs_meta_items)}'
         raise TypeError(msg)
 
-    rows = []
+    # SQL statement with INSERT/IGNORE
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_nceplibs_prepbufr
+            (obs_id, cmd_result_id, cmd_str, variable, typ, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :typ, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
+            """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_nceplibs_prepbufr
+            (obs_id, cmd_result_id, cmd_str, variable, typ, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :typ, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
+            """
+
+    session = Session()
+    inserted_count = 0
+
     for item in obs_meta_items:
         row = {
             'obs_id': item.obs_id,
@@ -976,36 +992,49 @@ def insert_obs_meta_nceplibs_prepbufr_item(obs_meta_items):
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
             'inserted_at': datetime.now(timezone.utc)
         }
-        rows.append(row)
-
-    # SQL statement with INSERT/IGNORE
-    if(database_type.lower() == 'mysql'):
-        sql = """
-            INSERT IGNORE INTO obs_meta_nceplibs_prepbufr
-            (obs_id, cmd_result_id, cmd_str, variable, typ, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :typ, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
-            """
-    else:
-        sql = """
-            INSERT OR IGNORE INTO obs_meta_nceplibs_prepbufr
-            (obs_id, cmd_result_id, cmd_str, variable, typ, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :typ, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
-            """
-    if len(rows) > 0:
-        session = Session()
-        session.execute(text(sql), rows)
-        session.commit()
-        session.close()
-    else:
+        
+        for attempt in range(max_retries):
+            try:
+                session.execute(text(sql), row)
+                session.commit()
+                inserted_count += 1
+                break
+            except OperationalError as e:
+                session.rollback()
+                if '1213' in str(e): #MySQL deadlock
+                    time.sleep(backoff_delay * (attempt + 1))
+                    continue
+                else:
+                    session.close()
+                    raise
+    
+    session.close()
+    if inserted_count == 0:
         print("NO DATA PROVIDED TO INSERT. No data inserted into the prepbufr meta table.")
 
-def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
+def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items, max_retries=3, backoff_delay=0.2):
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs nceplibs prepbufr aggregate meta items must be in the form' \
               f' of a list.  Received type: {type(obs_meta_items)}'
         raise TypeError(msg)
     
-    rows = []
+    # SQL statement with INSERT IGNORE
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_nceplibs_prepbufr_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
+            """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_nceplibs_prepbufr_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
+            """
+
+    session = Session()
+    inserted_count = 0
+
     for item in obs_meta_items:
         row = {
             'obs_id': item.obs_id,
@@ -1030,37 +1059,57 @@ def insert_obs_meta_nceplibs_prepbufr_agg_item(obs_meta_items):
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
             'inserted_at': datetime.now(timezone.utc)
         }
-        rows.append(row)
 
-    # SQL statement with INSERT IGNORE
-    if(database_type.lower() == 'mysql'):
-        sql = """
-            INSERT IGNORE INTO obs_meta_nceplibs_prepbufr_aggregate
-            (obs_id, cmd_result_id, cmd_str, variable, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
-            """
-    else:
-        sql = """
-            INSERT OR IGNORE INTO obs_meta_nceplibs_prepbufr_aggregate
-            (obs_id, cmd_result_id, cmd_str, variable, tot, qm0thru3, qm4thru7, qm8, qm9, qm10, qm11, qm12, qm13, qm14, qm15, cka, ckb, filename, file_size, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :tot, :qm0thru3, :qm4thru7, :qm8, :qm9, :qm10, :qm11, :qm12, :qm13, :qm14, :qm15, :cka, :ckb, :filename, :file_size, :obs_day, :inserted_at)
-            """
+        for attempt in range(max_retries):
+            try:
+                session.execute(text(sql), row)
+                session.commit()
+                inserted_count += 1
+                break
+            except OperationalError as e:
+                session.rollback()
+                if '1213' in str(e): #MySQL deadlock
+                    time.sleep(backoff_delay * (attempt + 1))
+                    continue
+                else:
+                    session.close()
+                    raise
 
-    if len(rows) > 0:
-        session = Session()
-        session.execute(text(sql), rows)
-        session.commit()
-        session.close()
-    else:
+    session.close()
+    if inserted_count == 0:
         print("NO DATA PROVIDED TO INSERT. No data inserted into the prepbufr agggregate meta table.")
 
-def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items):
+def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items, max_retries=3, backoff_delay=0.2):
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs meta IODA NetCDF items must be in the form of a list.' \
               f' Received type: {type(obs_meta_items)}'
         raise TypeError(msg)
 
-    rows = []
+    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, num_locs, min_depth, max_depth, hasPreQC, hasObsError, 
+            sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :min_depth, :max_depth, :hasPreQC, :hasObsError, 
+            :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, num_locs, min_depth, max_depth, hasPreQC, hasObsError, 
+            sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :min_depth, :max_depth, :hasPreQC, :hasObsError, 
+            :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+
+    session = Session()
+    inserted_count = 0
+
     for item in obs_meta_items:
         row = {
             'obs_id': item.obs_id,
@@ -1085,45 +1134,57 @@ def insert_obs_meta_hv_ioda_netcdf_item(obs_meta_items):
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
             'inserted_at': datetime.now(timezone.utc)
         }
-        rows.append(row)
 
-    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
-    if(database_type.lower() == 'mysql'):
-        sql = """
-            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf
-            (obs_id, cmd_result_id, cmd_str, variable, num_locs, min_depth, max_depth, hasPreQC, hasObsError, 
-            sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
-            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :min_depth, :max_depth, :hasPreQC, :hasObsError, 
-            :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
-        """
-    else:
-        sql = """
-            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf
-            (obs_id, cmd_result_id, cmd_str, variable, num_locs, min_depth, max_depth, hasPreQC, hasObsError, 
-            sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
-            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :num_locs, :min_depth, :max_depth, :hasPreQC, :hasObsError, 
-            :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
-        """
-
-    if len(rows) > 0:
-        session = Session()
-        session.execute(text(sql), rows)
-        session.commit()
-        session.close()
-    else:
+        for attempt in range(max_retries):
+            try:
+                session.execute(text(sql), row)
+                session.commit()
+                inserted_count += 1
+                break
+            except OperationalError as e:
+                session.rollback()
+                if '1213' in str(e): #MySQL deadlock
+                    time.sleep(backoff_delay * (attempt + 1))
+                    continue
+                else:
+                    session.close()
+                    raise
+    
+    session.close()
+    if inserted_count ==0 :
         print("NO DATA PROVIDED TO INSERT. No data inserted into the ioda netcdf meta table.")
 
-def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
+def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items, max_retries=3, backoff_delay=0.2):
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs meta IODA NetCDF Aggregate items must be in the form of a list.' \
               f' Received type: {type(obs_meta_items)}'
         raise TypeError(msg)
 
-    rows = []
+    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
+            hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
+            :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf_aggregate
+            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
+            hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
+            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
+            :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
+            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+
+    session = Session()
+    inserted_count = 0
+
     for item in obs_meta_items:
         row = {
             'obs_id': item.obs_id,
@@ -1149,36 +1210,24 @@ def insert_obs_meta_hv_ioda_netcdf_agg_item(obs_meta_items):
             'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
             'inserted_at': datetime.now(timezone.utc)
         }
-        rows.append(row)
 
-    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
-    if(database_type.lower() == 'mysql'):
-        sql = """
-            INSERT IGNORE INTO obs_meta_hv_ioda_netcdf_aggregate
-            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
-            hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
-            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
-            :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
-        """
-    else:
-        sql = """
-            INSERT OR IGNORE INTO obs_meta_hv_ioda_netcdf_aggregate
-            (obs_id, cmd_result_id, cmd_str, variable_names, num_vars, num_locs, min_depth, max_depth, hasPreQC, 
-            hasObsError, sensor, platform, ioda_layout, processing_level, thinning, ioda_version, 
-            filename, file_date, min_data_date, max_data_date, obs_day, inserted_at)
-            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable_names, :num_vars, :num_locs, :min_depth, :max_depth, :hasPreQC, 
-            :hasObsError, :sensor, :platform, :ioda_layout, :processing_level, :thinning, :ioda_version, 
-            :filename, :file_date, :min_data_date, :max_data_date, :obs_day, :inserted_at)
-        """
+        for attempt in range(max_retries):
+            try:
+                session.execute(text(sql), row)
+                session.commit()
+                inserted_count += 1
+                break
+            except OperationalError as e:
+                session.rollback()
+                if '1213' in str(e): #MySQL deadlock
+                    time.sleep(backoff_delay * (attempt + 1))
+                    continue
+                else:
+                    session.close()
+                    raise
 
-    if len(rows) > 0:
-        session = Session()
-        session.execute(text(sql), rows)
-        session.commit()
-        session.close()
-    else:
+    session.close()
+    if inserted_count == 0:
         print("NO DATA PROVIDED TO INSERT. No data inserted into the ioda netcdf aggregate meta table.")
 
 
@@ -1248,32 +1297,11 @@ def insert_obs_meta_hv_wod_netcdf_item(obs_meta_items, max_retries=3, backoff_de
     if inserted_count == 0:
         print("NO DATA PROVIDED TO INSERT. No data inserted into the wod netcdf meta table.")
 
-def insert_obs_meta_hv_wod_netcdf_agg_item(obs_meta_items):
+def insert_obs_meta_hv_wod_netcdf_agg_item(obs_meta_items, max_retries=3, backoff_delay=0.2):
     if not isinstance(obs_meta_items, list):
         msg = 'Inserted obs meta wod NetCDF Aggregate items must be in the form of a list.' \
               f' Received type: {type(obs_meta_items)}'
         raise TypeError(msg)
-
-    rows = []
-    for item in obs_meta_items:
-        row = {
-            'obs_id': item.obs_id,
-            'cmd_result_id': item.cmd_result_id,
-            'cmd_str': item.cmd_str,
-            'variable_names': item.variable_names,
-            'num_vars': item.num_vars,
-            'var_counts': item.var_counts,
-            'min_depth': item.min_depth,
-            'max_depth': item.max_depth,
-            'sensor': item.sensor,
-            'casts': item.casts,
-            'filename': item.filename,
-            'min_data_date': item.min_data_date,
-            'max_data_date': item.max_data_date,
-            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
-            'inserted_at': datetime.utcnow()
-        }
-        rows.append(row)
 
     # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
     if(database_type.lower() == 'mysql'):
@@ -1293,12 +1321,45 @@ def insert_obs_meta_hv_wod_netcdf_agg_item(obs_meta_items):
             :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
 
-    if len(rows) > 0:
-        session = Session()
-        session.execute(text(sql), rows)
-        session.commit()
-        session.close()
-    else:
+    session = Session()
+    inserted_count = 0
+
+    for item in obs_meta_items:
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable_names': item.variable_names,
+            'num_vars': item.num_vars,
+            'var_counts': item.var_counts,
+            'min_depth': item.min_depth,
+            'max_depth': item.max_depth,
+            'sensor': item.sensor,
+            'casts': item.casts,
+            'filename': item.filename,
+            'min_data_date': item.min_data_date,
+            'max_data_date': item.max_data_date,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.utcnow()
+        }
+
+        for attempt in range(max_retries):
+                try:
+                    session.execute(text(sql), row)
+                    session.commit()
+                    inserted_count += 1
+                    break
+                except OperationalError as e:
+                    session.rollback()
+                    if '1213' in str(e): #MySQL deadlock
+                        time.sleep(backoff_delay * (attempt + 1))
+                        continue
+                    else:
+                        session.close()
+                        raise
+
+    session.close()
+    if inserted_count == 0:
         print("NO DATA PROVIDED TO INSERT. No data inserted into the wod netcdf aggregate meta table.")
 
 if(database_type.lower() == 'mysql'):
