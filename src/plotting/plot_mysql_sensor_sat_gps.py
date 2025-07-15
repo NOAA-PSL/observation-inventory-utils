@@ -70,6 +70,8 @@ db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 db_frame.loc[db_frame['sat_id_name'].isin(['METOP-1', 'METOP-1 (Metop-B']), 'sat_id_name'] = 'METOP-B'
 db_frame.loc[db_frame['sat_id_name'].isin(['METOP-2', 'METOP-2 (Metop-A']), 'sat_id_name'] = 'METOP-A'
 db_frame.loc[db_frame['sat_id_name'].isin(['METOP-3', 'METOP-3 (Metop-C']), 'sat_id_name'] = 'METOP-C'
+db_frame.loc[db_frame['sat_id_name'].isin(['GRACE C (GRACE-F']), 'sat_id_name'] = 'GRACE C'
+db_frame.loc[db_frame['sat_id_name'].isin(['GRACE D (GRACE-F']), 'sat_id_name'] = 'GRACE D'
 
 #loop and plot sensors/sat_ids
 unique_sensor_sats = db_frame[['sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'sat_id_name'], ascending=[False, False])
