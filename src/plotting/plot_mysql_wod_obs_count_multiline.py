@@ -98,6 +98,7 @@ ax.xaxis.set_major_locator(mdates.YearLocator(5))  # Major ticks every 5 years
 ax.xaxis.set_minor_locator(mdates.YearLocator())  # Minor ticks every year
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
 plt.xticks(rotation=45, ha='right')
+ax.tick_params(labelsize=12)
 
 # Add grid and legend
 ax.grid(True)
