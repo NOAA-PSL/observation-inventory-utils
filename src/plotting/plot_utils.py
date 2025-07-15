@@ -37,6 +37,7 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                "COSMIC-2 E1":"COSMIC-2 E1", "COSMIC-2 E2":"COSMIC-2 E2", "COSMIC-2 E3":"COSMIC-2 E3",
                 "COSMIC-2 E4":"COSMIC-2 E4", "COSMIC-2 E5":"COSMIC-2 E5", "COSMIC-2 E6":"COSMIC-2 E6",
                "GRACE A":"GRACE A","GRACE B":"GRACE B", "GRACE C (GRACE-F":"GRACE C", "GRACE D (GRACE-F":"GRACE D",
+               "GRACE C": "GRACE C", "GRACE D":"GRACE D",
                "SAC-C":"SAC C","TerraSAR-X":"TerraSAR-X","TERRA":"TERRA",
                "ERS 2":"ERS 2", "GMS 3" : "GMS 3 ","GMS 4":"GMS 4","GMS 5":"GMS 5",
                "INSAT 3A":"INSAT 3A","INSAT 3D":"INSAT 3D","INSAT 3DR":"INSAT 3DR",
