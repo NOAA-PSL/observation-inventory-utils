@@ -33,7 +33,7 @@ variable_titles = {
 
 
 #parameters
-daterange=[date(1975,1,1), date(2026,1,1)]
+daterange=[date(1979,1,1), date(2026,1,1)]
 
 #read data from sql database of obs counts
 df = utils.get_wod_nc_by_variable(variable_dicts[args.var])
@@ -70,6 +70,7 @@ ax.set_title(f'Time Series for {variable_titles[args.var]}')
 ax.set_xlabel('Observation Day')
 ax.set_ylabel('Observation Count')
 ax.set_yscale('log')  # log10 y-axis
+ax.set_xlim(daterange)
 # Formatting the x-axis for dates (display only the year)
 ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
 ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
