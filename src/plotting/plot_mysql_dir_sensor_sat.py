@@ -96,7 +96,6 @@ df = df.merge(first_datetime, on=['sensor', 'source_dir', 'sat_id'], how='left')
 df_sorted = df.sort_values(by=['sensor', 'source_dir', 'first_datetime'], ascending=[False, False, False])
 
 #loop and plot sensors/sat_ids
-#unique_dir_sensor_sats = db_frame[['source_dir', 'sensor', 'sat_id', 'sat_id_name']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'source_dir', 'sat_id_name'], ascending=[False, False, False])
 unique_dir_sensor_sats = df_sorted
 step=0.05
 height=step*len(unique_dir_sensor_sats)
