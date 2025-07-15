@@ -97,9 +97,9 @@ for category in unique_categories:
 
     ax.plot(single_category_df['date_only'], single_category_df['rolling_avg'], label=f'{category_titles[category]}')
 
-ax.set_title(f'{args.title}', fontsize = 20) #16
-ax.set_xlabel('Observation Day', fontsize = 18) #14
-ax.set_ylabel('Average Daily Observation Count', fontsize = 18) #14
+ax.set_title(f'{args.title}', fontsize = 18) #16
+ax.set_xlabel('Observation Day', fontsize = 17) #14
+ax.set_ylabel('Average Daily Observation Count', fontsize = 17) #14
 ax.set_yscale('log')  # log10 y-axis
 ax.set_xlim(daterange)
 # Formatting the x-axis for dates (display only the year)
@@ -111,7 +111,7 @@ ax.tick_params(labelsize=12)
 
 # Add grid and legend
 ax.grid(True)
-ax.legend(fontsize = 15) #11
+ax.legend(fontsize = 12) #11
 
 plt.tight_layout()
 # plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
