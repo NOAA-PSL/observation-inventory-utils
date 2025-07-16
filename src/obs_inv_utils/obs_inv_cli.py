@@ -22,9 +22,10 @@ from config_handlers.obs_search_conf import ObservationsConfig
 from config_handlers.obs_meta_sinv import ObsMetaSinvConfig
 from config_handlers.obs_meta_cmpbqm import ObsMetaCMPBQMConfig
 from config_handlers.obs_meta_ioda import ObsMetaIodaConfig
-from config_handlers import obs_meta_sinv, obs_meta_cmpbqm, obs_meta_ioda
+from config_handlers.obs_meta_wod import ObsMetaWodConfig
+from config_handlers import obs_meta_sinv, obs_meta_cmpbqm, obs_meta_ioda, obs_meta_wod
 from obs_inv_utils.nceplibs_bufr_cmd_handler import ObsBufrFileMetaHandler, ObsPrepBufrFileMetaHandler
-from obs_inv_utils.score_hv_netcdf_cmd_handler import ObsIodaFileMetaHandler
+from obs_inv_utils.score_hv_netcdf_cmd_handler import ObsIodaFileMetaHandler, ObsWODFileMetaHandler
 
 from obs_inv_utils import plot_generator as pg
 from obs_inv_utils import search_engine as se
@@ -93,6 +94,18 @@ def get_obs_count_meta_ioda_hv_base(config_yaml):
 @click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
 def get_obs_count_meta_ioda_hv(config_yaml):
     return get_obs_count_meta_ioda_hv_base(config_yaml)
+
+def get_obs_count_meta_wod_hv_base(config_yaml):
+    config = ObsMetaWodConfig(config_yaml)
+    config.load()
+    print(repr(config))
+    mh = ObsWODFileMetaHandler(config)
+    mh.get_wod_file_meta(obs_meta_wod.HV_WOD_META)
+
+@cli.command()
+@click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
+def get_obs_count_meta_wod_hv(config_yaml):
+    return get_obs_count_meta_wod_hv_base(config_yaml)
     
 
 if __name__ == '__main__':
