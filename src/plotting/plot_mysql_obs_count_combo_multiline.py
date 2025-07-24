@@ -132,7 +132,6 @@ ax.grid(True)
 ax.legend(fontsize = 12) #11
 
 plt.tight_layout()
-# plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
 file_name = f"atm_time_series_combo_avg_{args.window}_days.png"
 if args.dev:
     file_name = f"atm_time_series_combo_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
