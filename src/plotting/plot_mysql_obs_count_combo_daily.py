@@ -62,7 +62,7 @@ def make_sensor_list_by_category(category):
         for cat in category_dicts[category]:
             sensor_list.append("observations/reanalysis/" + cat)
     else: 
-        print(f"No category found with name {category}")
+        raise ValueError(f"No category found with name {category}. Must provide a valid category from {list(category_dicts.keys())}.")
     return sensor_list
 
 
@@ -71,7 +71,6 @@ sensor_list = make_sensor_list_by_category(args.category)
 df = utils.get_distinct_bufr_by_sensors(sensor_list)
 
 df['datetime'] = pd.to_datetime(df.obs_day)
-# df['sensor'] = df.apply(get_sensor, axis=1)
 
 df['date_only'] = df['datetime'].dt.date
 
@@ -86,14 +85,8 @@ grouped_df = grouped_df.sort_values(by='date_only')
 
 grouped_df['rolling_avg'] = grouped_df['obs_count'].rolling(window=args.window, min_periods=1).mean()
 
-# Get unique sensors
-#unique_sensors = grouped_df['sensor'].unique()
-
 # Create the plot
 fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
-
-# for sensor in unique_sensors:
-#     single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
 
 ax.plot(grouped_df['date_only'], grouped_df['rolling_avg'])
 
