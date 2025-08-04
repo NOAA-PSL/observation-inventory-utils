@@ -15,35 +15,61 @@ import obs_inv_utils.inventory_table_factory as itf
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
-parser.add_argument("-variable", dest='var', help="Variable of conventional data to plot", type=str)
-parser.add_argument("-window", dest='window', help="Category of sensors to plot", type=int, default=1)
+parser.add_argument("-cat", dest='category', help="Category of sensors to plot", type=str)
 args = parser.parse_args()
 
-variable_dicts = {
-    'temperature': {'Temperature'},
-    'salinity': {'Salinity'},
-    'pressure': {'Pressure'}, 
+category_dicts = {
+    'sst': {'sst'},
+    'sss': {'sss'},
+    'icec' : {'icec'},
+    'icefb': {'icefb'}, 
+    'adt': {'adt'}, 
+    'insitu': {'insitu'},
 }
 
-variable_titles = {
-    'temperature': 'Insitu Ocean Temperature',
-    'salinity': 'Insitu Ocean Salinity',
-    'pressure': 'Insitu Ocean Pressure',
+category_titles = {
+    'sst': 'SST',
+    'sss': 'SSS',
+    'icec': 'Ice Concentration',
+    'icefb': 'Ice Free Board',
+    'adt': 'ADT',
+    'insitu': 'Ocean Insitu', 
 }
 
 
 #parameters
 daterange=[date(1979,1,1), date(2026,1,1)]
 
+def select_sensor(sensor, db_frame):
+    dftmp = db_frame.loc[db_frame['sensor']==sensor]
+    return dftmp
+
+def get_sensor(row):
+    directory = row['parent_dir']
+    sensor = directory.split("/")[2]
+    return sensor
+
+def make_sensor_list_by_category(category):
+    sensor_list = []
+    if category in category_dicts:
+        for cat in category_dicts[category]:
+            sensor_list.append("observations/reanalysis/" + cat)
+    else: 
+        print(f"No category found with name {category}")
+    return sensor_list
+
+
+sensor_list = make_sensor_list_by_category(args.category)
 #read data from sql database of obs counts
-df = utils.get_wod_nc_by_variable(variable_dicts[args.var])
+df = utils.get_ioda_nc_by_sensor(sensor_list)
 
 df['datetime'] = pd.to_datetime(df.obs_day)
+df['sensor'] = df.apply(get_sensor, axis=1)
 
 df['date_only'] = df['datetime'].dt.date
 
 # Group by sensor and obs_day-- date only, summing obs_count
-grouped_df = df.groupby(['variable', 'date_only'], as_index=False)['var_count'].sum()
+grouped_df = df.groupby(['sensor', 'date_only'], as_index=False)['var_count'].sum()
 
 # Convert obs_day to datetime if needed
 grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
@@ -51,22 +77,18 @@ grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
 # Sort the grouped data
 grouped_df = grouped_df.sort_values(by='date_only')
 
-#Rolling average
-grouped_df['rolling_avg'] = grouped_df['var_count'].rolling(window=args.window, min_periods=1).mean()
-
 # Get unique sensors
-unique_vars = grouped_df['variable'].unique()
+unique_sensors = grouped_df['sensor'].unique()
 
 # Create the plot
 fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
-#This handles if dictionaries are increased to have mulitple variables at once 
-for var in unique_vars:
-    single_var_df = grouped_df[(grouped_df['variable'] == var)]
+for sensor in unique_sensors:
+    single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
 
-    ax.plot(single_var_df['date_only'], single_var_df['rolling_avg'],  label=f'{var}')
+    ax.plot(single_sensor_df['date_only'], single_sensor_df['var_count'], label=f'Sensor {sensor}')
 
-ax.set_title(f'Time Series for {variable_titles[args.var]}')
+ax.set_title(f'Time Series for {category_titles[args.category]}')
 ax.set_xlabel('Observation Day')
 ax.set_ylabel('Observation Count')
 ax.set_yscale('log')  # log10 y-axis
@@ -79,13 +101,13 @@ plt.xticks(rotation=45, ha='right')
 
 # Add grid and legend
 ax.grid(True)
-#ax.legend() #only need to add legend if we add variable names for multiple variables
+ax.legend()
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = f"{args.var}_wod_count_avg_{args.window}_days.png"
+file_name = f"{args.category}_count_daily.png"
 if args.dev:
-    file_name = f"{args.var}_wod_count_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"{args.category}_count_daily_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
