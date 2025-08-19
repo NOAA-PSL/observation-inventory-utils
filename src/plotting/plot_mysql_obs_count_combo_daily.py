@@ -26,9 +26,9 @@ category_dicts = {
     'hyper_infrared': {'cris', 'iasi', 'airs'}, 
     'multi_infrared': {'ssu', 'hirs'}, 
     'micro_imagers': {'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis'},
-    'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'}, 
+    'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua/1bamua'}, 
     'ozone': {'ozone'},
-    'polar_orbit_BT': {'cris', 'iasi', 'airs', 'ssu', 'hirs', 'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis', 'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'}
+    'polar_orbit_BT': {'cris', 'iasi', 'airs/nasa', 'ssu', 'hirs', 'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis', 'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua/1bamua'}
 }
 
 category_titles = {
