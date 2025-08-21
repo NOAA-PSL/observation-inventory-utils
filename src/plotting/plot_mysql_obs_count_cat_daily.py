@@ -23,10 +23,10 @@ category_dicts = {
     'AMV': {'amv'},
     'GPS': {'gps'},
     'geo_rad' : {'geo'},
-    'hyper_infrared': {'cris', 'iasi', 'airs'}, 
+    'hyper_infrared': {'cris', 'iasi', 'airs/nasa'}, 
     'multi_infrared': {'ssu', 'hirs'}, 
     'micro_imagers': {'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis'},
-    'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'}, 
+    'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua/1bamua'}, 
     'ozone': {'ozone'},
 }
 

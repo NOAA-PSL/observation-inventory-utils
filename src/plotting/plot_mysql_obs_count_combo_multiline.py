@@ -24,14 +24,14 @@ category_dicts = {
     'AMV': {'amv'},
     'GPS': {'gps'},
     'geo_rad' : {'geo'},
-    'hyper_infrared': {'cris', 'iasi', 'airs'}, 
+    'hyper_infrared': {'cris', 'iasi', 'airs/nasa'}, 
     'multi_infrared': {'ssu', 'hirs/1bhrs2', 'hirs/1bhrs3', 'hirs/1bhrs4'}, 
     'micro_imagers': {'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis'},
-    'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'}, 
+    'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua/1bamua'}, 
     'ozone': {'ozone'},
-    'polar_orbit_BT': {'cris', 'iasi', 'airs', 'ssu', 'hirs/1bhrs2', 'hirs/1bhrs3', 'hirs/1bhrs4' , 'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis', 'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua'},
+    'polar_orbit_BT': {'cris', 'iasi', 'airs/nasa', 'ssu', 'hirs/1bhrs2', 'hirs/1bhrs3', 'hirs/1bhrs4' , 'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis', 'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua/1bamua'},
     'tovs': {'hirs/1bhrs2', 'ssu', 'msu'},
-    'atovs': {'hirs/1bhrs3', 'hirs/1bhrs4', 'amsua', 'amsub', 'mhs'},
+    'atovs': {'hirs/1bhrs3', 'hirs/1bhrs4', 'amsua/1bamua', 'amsub', 'mhs'},
     'post-atovs': {'cris', 'atms'}
 }
 
@@ -92,6 +92,10 @@ df['sensor'] = df.apply(get_sensor, axis=1)
 df['category'] = df.apply(get_category, axis=1)
 
 df['date_only'] = df['datetime'].dt.date
+
+cris_cutoff = pd.to_datetime("2018-01-16 18:00:00")
+cris_prefix = "observations/reanalysis/cris/cris/"
+df = df.loc[~(df['parent_dir'].str.startswith(cris_prefix) & (df["datetime"] > cris_cutoff))]
 
 # Group by sensor and obs_day-- date only, summing obs_count
 grouped_df = df.groupby(['category', 'date_only'], as_index=False)['obs_count'].sum()

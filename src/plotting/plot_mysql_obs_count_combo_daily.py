@@ -23,7 +23,7 @@ category_dicts = {
     'AMV': {'amv'},
     'GPS': {'gps'},
     'geo_rad' : {'geo'},
-    'hyper_infrared': {'cris', 'iasi', 'airs'}, 
+    'hyper_infrared': {'cris', 'iasi', 'airs/nasa'}, 
     'multi_infrared': {'ssu', 'hirs'}, 
     'micro_imagers': {'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis'},
     'micro_sounders': {'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua/1bamua'}, 
@@ -73,6 +73,10 @@ df = utils.get_distinct_bufr_by_sensors(sensor_list)
 df['datetime'] = pd.to_datetime(df.obs_day)
 
 df['date_only'] = df['datetime'].dt.date
+
+cris_cutoff = pd.to_datetime("2018-01-16 18:00:00")
+cris_prefix = "observations/reanalysis/cris/cris/"
+df = df.loc[~(df['parent_dir'].str.startswith(cris_prefix) & (df["datetime"] > cris_cutoff))]
 
 # Group by sensor and obs_day-- date only, summing obs_count
 grouped_df = df.groupby(['date_only'], as_index=False)['obs_count'].sum()
