@@ -76,6 +76,10 @@ df['sensor'] = df.apply(get_sensor, axis=1)
 
 df['date_only'] = df['datetime'].dt.date
 
+cris_cutoff = pd.to_datetime("2018-01-16 18:00:00")
+cris_prefix = "observations/reanalysis/cris/cris/"
+df = df.loc[~(df['parent_dir'].str.startswith(cris_prefix) & (df["datetime"] > cris_cutoff))]
+
 # Group by sensor and obs_day-- date only, summing obs_count
 grouped_df = df.groupby(['sensor', 'date_only'], as_index=False)['obs_count'].sum()
 
