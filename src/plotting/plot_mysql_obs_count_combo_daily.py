@@ -22,7 +22,7 @@ args = parser.parse_args()
 category_dicts = {
     'AMV': {'amv'},
     'GPS': {'gps'},
-    'geo_rad' : {'geo'},
+    'geo_rad' : {'geo/ahicsr', 'geo/geoimr', 'geo/goesfv', 'geo/goesnd', 'geo/gsrasr'},
     'hyper_infrared': {'cris', 'iasi', 'airs/nasa'}, 
     'multi_infrared': {'ssu', 'hirs'}, 
     'micro_imagers': {'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis'},
