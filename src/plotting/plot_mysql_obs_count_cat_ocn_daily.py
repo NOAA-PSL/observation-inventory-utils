@@ -15,6 +15,7 @@ import obs_inv_utils.inventory_table_factory as itf
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
+parser.add_argument("-version", dest='ioda_version', help="Version of ioda to include in the plot, if not provided will include all versions inventoried. Value should be an int.", type=int, default=0)
 parser.add_argument("-cat", dest='category', help="Category of sensors to plot", type=str)
 args = parser.parse_args()
 
@@ -68,6 +69,11 @@ df['sensor'] = df.apply(get_sensor, axis=1)
 
 df['date_only'] = df['datetime'].dt.date
 
+if args.ioda_version == 2:
+    df = df[df["ioda_version"] == "v2"]
+if args.ioda_version == 3:
+    df = df[df["ioda_version"] == "v3"]
+
 # Group by sensor and obs_day-- date only, summing obs_count
 grouped_df = df.groupby(['sensor', 'date_only'], as_index=False)['var_count'].sum()
 
@@ -105,9 +111,9 @@ ax.legend()
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = f"{args.category}_count_daily.png"
+file_name = f"{args.category}_v{args.ioda_version}_count_daily.png"
 if args.dev:
-    file_name = f"{args.category}_count_daily_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"{args.category}_v{args.ioda_version}_count_daily_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
