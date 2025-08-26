@@ -113,7 +113,6 @@ plt.ylabel('Sensor & Satellite')
 
 directory_labels = []
 counter=0
-# for index, row in unique_sat_id.iterrows():
 for index, row in unique_dir_sensor_sats.iterrows():
     try:
         satinfo_string_ = row['sensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
