@@ -16,6 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 parser.add_argument("-window", dest='window', help=" Rolling average of window size", type=int, default=1)
+parser.add_argument("-version", dest='ioda_version', help="Version of ioda to include in the plot, if not provided will include all versions inventoried. Should just be the number", type=int, default=0)
 parser.add_argument("-title", dest='title', help='Title for the plot', type=str, default="Time Series of Observation Count")
 parser.add_argument("-cats", dest='cat_list', help="Categories of sensors to plot", type=str, nargs='+')
 args = parser.parse_args()
@@ -75,6 +76,11 @@ df['category'] = df.apply(get_category, axis=1)
 
 df['date_only'] = df['datetime'].dt.date
 
+if args.ioda_version == 2:
+    df = df[df["ioda_version"] == "v2"]
+if args.ioda_version == 3:
+    df = df[df["ioda_version"] == "v3"]
+
 # Group by sensor and obs_day-- date only, summing obs_count
 grouped_df = df.groupby(['category', 'date_only'], as_index=False)['var_count'].sum()
 
@@ -115,9 +121,9 @@ ax.legend(fontsize = 12) #11
 
 plt.tight_layout()
 # plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = f"ice_time_series_combo_avg_{args.window}_days.png"
+file_name = f"ice_time_series_combo_v{args.ioda_version}_avg_{args.window}_days.png"
 if args.dev:
-    file_name = f"ice_time_series_combo_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"ice_time_series_combo_v{args.ioda_version}_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
