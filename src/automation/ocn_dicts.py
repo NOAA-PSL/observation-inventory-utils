@@ -1,6 +1,126 @@
 import automation_utils as au
 from automation_utils import InventoryInfo
 
+adt_glore_3a_v2 = InventoryInfo(
+    obs_name='adt_glore_3a_v2',
+    key='observations/reanalysis/adt/GLORe/3a/%Y/%m/iodav2/adt_3a_%Y%m%d_iodav2.nc',
+    start='20160301T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/3a/%Y/%m/iodav2/',
+    files='adt_3a_%z_iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_glore_3a_v3 = InventoryInfo(
+    obs_name='adt_glore_3a_v3',
+    key='observations/reanalysis/adt/GLORe/3a/%Y/%m/iodav3/adt_3a_%Y%m%d_iodav3.nc',
+    start='20160301T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/3a/%Y/%m/iodav3/',
+    files='adt_3a_%z_iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_glore_3b_v2 = InventoryInfo(
+    obs_name='adt_glore_3b_v2',
+    key='observations/reanalysis/adt/GLORe/3b/%Y/%m/iodav2/adt_3b_%Y%m%d_iodav2.nc',
+    start='20180526T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/3b/%Y/%m/iodav2/',
+    files='adt_3b_%z_iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_glore_3b_v3 = InventoryInfo(
+    obs_name='adt_glore_3b_v3',
+    key='observations/reanalysis/adt/GLORe/3b/%Y/%m/iodav3/adt_3b_%Y%m%d_iodav3.nc',
+    start='20180526T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/3b/%Y/%m/iodav3/',
+    files='adt_3b_%z_iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_glore_6a_v2 = InventoryInfo(
+    obs_name='adt_glore_6a_v2',
+    key='observations/reanalysis/adt/GLORe/6a/%Y/%m/iodav2/adt_6a_%Y%m%d_iodav2.nc',
+    start='20220111T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/6a/%Y/%m/iodav2/',
+    files='adt_6a_%z_iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_glore_6a_v3 = InventoryInfo(
+    obs_name='adt_glore_6a_v3',
+    key='observations/reanalysis/adt/GLORe/6a/%Y/%m/iodav3/adt_6a_%Y%m%d_iodav3.nc',
+    start='20220111T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/6a/%Y/%m/iodav3/',
+    files='adt_6a_%z_iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_glore_c2_v2 = InventoryInfo(
+    obs_name='adt_glore_c2_v2',
+    key='observations/reanalysis/adt/GLORe/c2/%Y/%m/iodav2/adt_c2_%Y%m%d_iodav2.nc',
+    start='20100716T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/c2/%Y/%m/iodav2/',
+    files='adt_c2_%z_iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_glore_c2_v3 = InventoryInfo(
+    obs_name='adt_glore_c2_v3',
+    key='observations/reanalysis/adt/GLORe/c2/%Y/%m/iodav3/adt_c2_%Y%m%d_iodav3.nc',
+    start='20100716T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/c2/%Y/%m/iodav3/',
+    files='adt_c2_%z_iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_glore_e1_v2 = InventoryInfo(
+    obs_name='adt_glore_e1_v2',
+    key='observations/reanalysis/adt/GLORe/e1/%Y/%m/iodav2/adt_e1_%Y%m%d_iodav2.nc',
+    start='20100716T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/e1/%Y/%m/iodav2/',
+    files='adt_e1_%z_iodav2.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
+adt_glore_e1_v3 = InventoryInfo(
+    obs_name='adt_glore_e1_v3',
+    key='observations/reanalysis/adt/GLORe/e1/%Y/%m/iodav3/adt_e1_%Y%m%d_iodav3.nc',
+    start='20100716T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/e1/%Y/%m/iodav3/',
+    files='adt_e1_%z_iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_DAILY,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 adt_nesdis_cryosat2_v2 = InventoryInfo(
     obs_name='adt_nesdis_cryosat2_v2',
     key='observations/reanalysis/adt/nesdis/cryosat2/%Y/%m/24h/iodav2/cryosat2.nesdis.adt.%Y%m%d.T%H%M%SZ.iodav2.nc',
@@ -853,7 +973,9 @@ insitu_wod_xbt = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET
 )
 
-ocn_infos = [adt_nesdis_cryosat2_v2, adt_nesdis_cryosat2_v3, adt_nesdis_cryosat2_12_v2, adt_nesdis_cryosat2_12_v3, adt_nesdis_ers1_v2, adt_nesdis_ers1_v3, adt_nesdis_ers2_v2, adt_nesdis_ers2_v3,
+ocn_infos = [adt_glore_3a_v2, adt_glore_3a_v3, adt_glore_3b_v2, adt_glore_3b_v3, adt_glore_6a_v2, adt_glore_6a_v3, 
+             adt_glore_c2_v2, adt_glore_c2_v3, adt_glore_e1_v2, adt_glore_e1_v3, 
+             adt_nesdis_cryosat2_v2, adt_nesdis_cryosat2_v3, adt_nesdis_cryosat2_12_v2, adt_nesdis_cryosat2_12_v3, adt_nesdis_ers1_v2, adt_nesdis_ers1_v3, adt_nesdis_ers2_v2, adt_nesdis_ers2_v3,
              adt_nesdis_jason2_v2, adt_nesdis_jason2_v3, adt_nesdis_jason2_12_v2, adt_nesdis_jason2_12_v3, adt_nesdis_jason3_v2,
              adt_nesdis_jason3_v3, adt_nesdis_jason3_12_v2, adt_nesdis_jason3_12_v3, adt_nesdis_saral_v2, adt_nesdis_saral_v3, 
              adt_nesdis_saral_12_v2, adt_nesdis_saral_12_v3, adt_nesdis_sentinel3a_v2, adt_nesdis_sentinel3a_v3, adt_nesdis_sentinel3a_12_v2, 
