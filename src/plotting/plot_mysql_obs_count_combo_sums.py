@@ -140,9 +140,9 @@ ax.grid(True)
 ax.legend(fontsize=12, loc='upper left')
 
 plt.tight_layout()
-file_name = f"atm_time_series_combo_avg_{args.window}_days.png"
+file_name = f"atm_time_series_sums_avg_{args.window}_days.png"
 if args.dev:
-    file_name = f"atm_time_series_combo_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"atm_time_series_sums_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
