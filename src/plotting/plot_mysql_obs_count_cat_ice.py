@@ -25,7 +25,8 @@ category_dicts = {
     'icec_nh' : {'observations/reanalysis/icec/nsidc/nh'},
     'icec_sh' : {'observations/reanalysis/icec/nsidc/sh'},
     'icec_emc' : {'observations/reanalysis/icec/emc'},
-    'icefb': {'observations/reanalysis/icefb'}, 
+    'icefb': {'observations/reanalysis/icefb'},
+    'icec_nsidc': {'observations/reananlysis/icec/nsidc'} 
 }
 
 category_titles = {
@@ -33,6 +34,7 @@ category_titles = {
     'icec_sh': 'Ice Concentration NSIDC SH',
     'icec_emc': 'Ice Concentration EMC Combined',
     'icefb': 'Ice Free Board',
+    'icec_nsidc': 'Ice Concentration NSIDC', 
 }
 
 
