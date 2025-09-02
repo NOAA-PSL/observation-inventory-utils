@@ -103,48 +103,50 @@ grouped_df = df.groupby(['category', 'date_only'], as_index=False)['obs_count'].
 # Convert obs_day to datetime if needed
 grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
 
-# Pivot so categories are columns
-pivot_df = grouped_df.pivot(index='date_only', columns='category', values='obs_count').fillna(0)
+# Sort the grouped data
+grouped_df = grouped_df.sort_values(by=['category','date_only'])
 
-# Apply rolling average per category
-pivot_df = pivot_df.rolling(window=args.window, min_periods=1).mean()
+grouped_df['rolling_avg'] = grouped_df.groupby('category')['obs_count'].transform(lambda x: x.rolling(window=args.window, min_periods=1).mean())
 
-# Ensure chronological order
-pivot_df = pivot_df.sort_index()
-
-# Compute stacked cumulative sums across categories
-stacked_df = pivot_df.cumsum(axis=1)
+# Get unique sensors
+unique_categories = grouped_df['category'].unique()
 
 # Create the plot
-fig, ax = plt.subplots(figsize=(10, 8))
+fig, ax = plt.subplots(figsize=(10, 8))  # Increase figure width
 
-# Plot cumulative stacked lines
-for cat in stacked_df.columns:
-    ax.plot(stacked_df.index, stacked_df[cat], label=category_titles.get(cat, cat))
+for category in unique_categories:
+    single_category_df = grouped_df[(grouped_df['category'] == category)]
 
-ax.set_title(f'{args.title}', fontsize=18)
-ax.set_xlabel('Observation Day', fontsize=17)
-ax.set_ylabel('Cumulative Average Daily Observation Count', fontsize=17)
-ax.set_yscale('log')  # stacked plot still works with log scale
+    ax.plot(single_category_df['date_only'], single_category_df['rolling_avg'], label=f'{category_titles[category]}')
+
+# --- Start of new code for total line ---
+# Calculate the total rolling average across all categories at each date
+total_rolling_avg = grouped_df.groupby('date_only')['rolling_avg'].sum().reset_index()
+
+# Plot the total line
+ax.plot(total_rolling_avg['date_only'], total_rolling_avg['rolling_avg'], label='Total', color='black', linestyle='-', linewidth=3)
+# --- End of new code ---
+
+ax.set_title(f'{args.title}', fontsize = 18) #16
+ax.set_xlabel('Observation Day', fontsize = 17) #14
+ax.set_ylabel('Average Daily Observation Count', fontsize = 17) #14
+ax.set_yscale('log')  # log10 y-axis
 ax.set_xlim(daterange)
-
 # Formatting the x-axis for dates (display only the year)
-ax.xaxis.set_major_locator(mdates.YearLocator(5))
-ax.xaxis.set_minor_locator(mdates.YearLocator())
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+ax.xaxis.set_major_locator(mdates.YearLocator(5))  # Major ticks every 5 years
+ax.xaxis.set_minor_locator(mdates.YearLocator())  # Minor ticks every year
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
 plt.xticks(rotation=45, ha='right')
 ax.tick_params(labelsize=12)
 
 # Add grid and legend
 ax.grid(True)
-ax.legend(fontsize=12, loc='upper left')
+ax.legend(fontsize = 12) #11
 
 plt.tight_layout()
-file_name = f"atm_time_series_sums_avg_{args.window}_days.png"
+file_name = f"atm_time_series_combo_avg_{args.window}_days.png"
 if args.dev:
-    file_name = f"atm_time_series_sums_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"atm_time_series_combo_avg_{args.window}_days_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
-
-
