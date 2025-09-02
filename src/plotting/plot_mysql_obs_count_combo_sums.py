@@ -124,7 +124,7 @@ for category in unique_categories:
 total_rolling_avg = grouped_df.groupby('date_only')['rolling_avg'].sum().reset_index()
 
 # Plot the total line
-ax.plot(total_rolling_avg['date_only'], total_rolling_avg['rolling_avg'], label='Total', color='black', linestyle='--', linewidth=3)
+ax.plot(total_rolling_avg['date_only'], total_rolling_avg['rolling_avg'], label='Total', color='black', linestyle='--', linewidth=2)
 # --- End of new code ---
 
 ax.set_title(f'{args.title}', fontsize = 18) #16
