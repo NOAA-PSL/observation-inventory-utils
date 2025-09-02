@@ -120,11 +120,12 @@ for category in unique_categories:
     ax.plot(single_category_df['date_only'], single_category_df['rolling_avg'], label=f'{category_titles[category]}')
 
 # --- Start of new code for total line ---
-# Calculate the total rolling average across all categories at each date
-total_rolling_avg = grouped_df.groupby('date_only')['rolling_avg'].sum().reset_index()
+# Calculate the total of the rolling averages and apply a final smoothing
+total_series = grouped_df.groupby('date_only')['rolling_avg'].sum()
+smoothed_total = total_series.rolling(window=args.window, min_periods=1).mean().reset_index()
 
 # Plot the total line
-ax.plot(total_rolling_avg['date_only'], total_rolling_avg['rolling_avg'], label='Total', color='black', linestyle='--', linewidth=2)
+ax.plot(smoothed_total['date_only'], smoothed_total['rolling_avg'], label='Total', color='black', linestyle='--', linewidth=3)
 # --- End of new code ---
 
 ax.set_title(f'{args.title}', fontsize = 18) #16
