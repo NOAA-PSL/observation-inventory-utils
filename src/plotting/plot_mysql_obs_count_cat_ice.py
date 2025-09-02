@@ -26,7 +26,7 @@ category_dicts = {
     'icec_sh' : {'observations/reanalysis/icec/nsidc/sh'},
     'icec_emc' : {'observations/reanalysis/icec/emc'},
     'icefb': {'observations/reanalysis/icefb'},
-    'icec_nsidc': {'observations/reananlysis/icec/nsidc'} 
+    'icec_nsidc': {'observations/reanalysis/icec/nsidc'} 
 }
 
 category_titles = {
