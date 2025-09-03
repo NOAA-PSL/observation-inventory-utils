@@ -73,9 +73,16 @@ def get_category(row):
 
 def get_sensor(row):
     directory = row['parent_dir']
-    sensor = directory.split("/")[2]
+    parts = directory.split("/")
+    sensor = parts[2]
     if sensor == 'hirs':
-        sensor = 'hirs/' + directory.split("/")[3]
+        sensor = 'hirs/' + parts[3]
+    if sensor == 'geo':
+        sensor = 'geo/' + parts[3]
+    if sensor == 'airs':
+        sensor = 'airs/' + parts[3]
+    if sensor == 'amsua':
+        sensor = 'amsua/' + parts[3]
     return sensor
 
 def make_sensor_list_by_categories(cat_list):
