@@ -32,7 +32,10 @@ category_dicts = {
     'polar_orbit_BT': {'cris', 'iasi', 'airs/nasa', 'ssu', 'hirs/1bhrs2', 'hirs/1bhrs3', 'hirs/1bhrs4' , 'gmi', 'amsr2', 'tmi', 'amsre', 'ssmi', 'ssmis', 'saphir', 'mhs', 'atms', 'msu', 'amsub', 'amsua/1bamua'},
     'tovs': {'hirs/1bhrs2', 'ssu', 'msu'},
     'atovs': {'hirs/1bhrs3', 'hirs/1bhrs4', 'amsua/1bamua', 'amsub', 'mhs'},
-    'post-atovs': {'cris', 'atms', 'iasi'}
+    'post-atovs': {'cris', 'atms', 'iasi'},
+    'geo-imager': {'geo/geoimr', 'geo/goesfv'},
+    'geo-sounder': {'geo/goesnd'},
+    'geo-adv-img': {'geo/ahicsr', 'geo/gsrasr'},
 }
 
 category_titles = {
@@ -48,6 +51,9 @@ category_titles = {
     'tovs': 'TOVS',
     'atovs': 'ATOVS',
     'post-atovs': 'Post-ATOVS',
+    'geo-imager': 'GEO Imager',
+    'geo-sounder': 'GEO Sounder',
+    'geo-adv-img': 'GEO Advanced Imager',
 }
 
 
