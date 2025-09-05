@@ -95,7 +95,7 @@ if args.ioda_version == 3:
     df = df[df["ioda_version"] == "v3"]
 
 # Group by sensor and obs_day-- date only, summing obs_count
-grouped_df = df.groupby(['sensor', 'date_only'], as_index=False)['var_count'].sum()
+grouped_df = df.groupby(['variable', 'date_only'], as_index=False)['var_count'].sum()
 
 # Convert obs_day to datetime if needed
 grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
@@ -139,9 +139,9 @@ ax.legend()
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = f"{args.category}_v{args.ioda_version}_count_variables.png"
+file_name = f"{args.category}_v{args.ioda_version}_avg_{args.window}_count_variables.png"
 if args.dev:
-    file_name = f"{args.category}_v{args.ioda_version}_count_variables_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"{args.category}_v{args.ioda_version}_avg_{args.window}_count_variables_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
