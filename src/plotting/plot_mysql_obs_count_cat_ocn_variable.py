@@ -16,8 +16,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 parser.add_argument("-version", dest='ioda_version', help="Version of ioda to include in the plot, if not provided will include all versions inventoried. Value should be an int.", type=int, default=0)
+parser.add_argument("-window", dest='window', help=" Rolling average of window size", type=int, default=1)
 parser.add_argument("-cat", dest='category', help="Category of sensors to plot", type=str)
-parser.add_argument("--variables", dest='List of variables to plot from in the category', type=str, nargs='+')
+parser.add_argument("--variables", dest='variables', help='List of variables to plot from in the category', type=str, nargs='+')
 args = parser.parse_args()
 
 category_dicts = {
@@ -102,16 +103,24 @@ grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
 # Sort the grouped data
 grouped_df = grouped_df.sort_values(by='date_only')
 
-# Get unique sensors
-unique_sensors = grouped_df['sensor'].unique()
+grouped_df['rolling_avg'] = grouped_df.groupby('variable')['obs_count'].transform(lambda x: x.rolling(window=args.window, min_periods=1).mean())
+
+# Get unique variables
+unique_variables = grouped_df['variable'].unique()
 
 # Create the plot
 fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 
-for sensor in unique_sensors:
-    single_sensor_df = grouped_df[(grouped_df['sensor'] == sensor)]
+if args.variables == None:
+    for variable in unique_variables:
+        single_variable_df = grouped_df[(grouped_df['variable'] == variable)]
 
-    ax.plot(single_sensor_df['date_only'], single_sensor_df['var_count'], label=f'Sensor {sensor}')
+        ax.plot(single_variable_df['date_only'], single_variable_df['var_count'], label=f'Variable {variable}')
+else:
+    for variable in args.variables:
+        single_variable_df = grouped_df[(grouped_df['variable'] == variable)]
+
+        ax.plot(single_variable_df['date_only'], single_variable_df['var_count'], label=f'Variable {variable}')
 
 ax.set_title(f'Time Series for {category_titles[args.category]}')
 ax.set_xlabel('Observation Day')
@@ -130,9 +139,9 @@ ax.legend()
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = f"{args.category}_v{args.ioda_version}_count_daily.png"
+file_name = f"{args.category}_v{args.ioda_version}_count_variables.png"
 if args.dev:
-    file_name = f"{args.category}_v{args.ioda_version}_count_daily_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"{args.category}_v{args.ioda_version}_count_variables_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
