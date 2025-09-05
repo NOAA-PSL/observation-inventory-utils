@@ -115,12 +115,12 @@ if args.variables == None:
     for variable in unique_variables:
         single_variable_df = grouped_df[(grouped_df['variable'] == variable)]
 
-        ax.plot(single_variable_df['date_only'], single_variable_df['var_count'], label=f'Variable {variable}')
+        ax.plot(single_variable_df['date_only'], single_variable_df['rolling_avg'], label=f'Variable {variable}')
 else:
     for variable in args.variables:
         single_variable_df = grouped_df[(grouped_df['variable'] == variable)]
 
-        ax.plot(single_variable_df['date_only'], single_variable_df['var_count'], label=f'Variable {variable}')
+        ax.plot(single_variable_df['date_only'], single_variable_df['rolling_avg'], label=f'Variable {variable}')
 
 ax.set_title(f'Time Series for {category_titles[args.category]}')
 ax.set_xlabel('Observation Day')
