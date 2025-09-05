@@ -80,7 +80,9 @@ satinfo_translate_dictionary={
     "goesnd_g15":"sndrD_g15", "goesnd_g08":"sndr_g08", "goesnd_g10":"sndr_g10", "goesnd_g11":"sndr_g11",
     "goesnd_g12":"sndr_g12", "crisf4_n20":"cris-fsr_n20", "crisf4_n21":"cris-fsr_n21", "crisf4_npp":"cris-fsr_npp",
     "cfsr_n09":"sbuv2_n09", "cfsr_n11":"sbuv2_n11", "cfsr_n14":"sbuv2_n14", "cfsr_n16":"sbuv2_n16", "cfsr_n17":"sbuv2_n17",
-    "cfsr_n18":"sbuv2_n18", "cfsr_n19":"sbuv2_n19", "cfsr_nim07":"sbuv2_nim07"
+    "cfsr_n18":"sbuv2_n18", "cfsr_n19":"sbuv2_n19", "cfsr_nim07":"sbuv2_nim07", "gsrasr_g16":"abi_g16", "gsrcsr_g16":"abi_g16", 
+    "gsrasr_g17":"abi_g17", "gsrcsr_g17":"abi_g17", "gsrasr_g18":"abi_g18", "gsrcsr_g18":"abi_g18", "ahicsr_himawari8":"ahi_himawari8",
+    "ahicsr_himawari9":"ahi_himawari9"
 }
 
 #function for reading from raw satinfo files which is standard across the various plot scripts 
