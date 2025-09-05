@@ -22,19 +22,25 @@ parser.add_argument("-cats", dest='cat_list', help="Categories of sensors to plo
 args = parser.parse_args()
 
 category_dicts = {
-    'icec_nh' : {'observations/reanalysis/icec/nsidc/nh'},
-    'icec_sh' : {'observations/reanalysis/icec/nsidc/sh'},
+    'icec_nsidc_nh' : {'observations/reanalysis/icec/nsidc/nh'},
+    'icec_nsidc_sh' : {'observations/reanalysis/icec/nsidc/sh'},
     'icec_emc' : {'observations/reanalysis/icec/emc'},
     'icefb': {'observations/reanalysis/icefb'},
-    'icec_nsidc': {'observations/reanalysis/icec/nsidc'} 
+    'icec_nsidc': {'observations/reanalysis/icec/nsidc'},
+    'icec_glore_nh' : {'observations/reanalysis/icec/GLORe/nh'},
+    'icec_glore_sh' : {'observations/reanalysis/icec/GLORe/sh'},
+    'icec_glore': {'observations/reanalysis/icec/GLORe'}
 }
 
 category_titles = {
-    'icec_nh': 'Ice Concentration NSIDC NH',
-    'icec_sh': 'Ice Concentration NSIDC SH',
+    'icec_nsidc_nh': 'Ice Concentration NSIDC NH',
+    'icec_nsidc_sh': 'Ice Concentration NSIDC SH',
     'icec_emc': 'Ice Concentration EMC Combined',
     'icefb': 'Ice Free Board',
     'icec_nsidc': 'Ice Concentration NSIDC', 
+    'icec_glore_nh': 'Ice Concentration GLORe NH',
+    'icec_glore_sh': 'Ice Concentration GLORe SH',
+    'icec_glore': 'Ice Concentration GLORe'
 }
 
 
