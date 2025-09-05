@@ -114,13 +114,13 @@ fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
 if args.variables == None:
     for variable in unique_variables:
         single_variable_df = grouped_df[(grouped_df['variable'] == variable)]
-
-        ax.plot(single_variable_df['date_only'], single_variable_df['rolling_avg'], label=f'Variable {variable}')
+        friendly_name = variable_titles[variable] if variable in variable_titles else variable
+        ax.plot(single_variable_df['date_only'], single_variable_df['rolling_avg'], label=f'{friendly_name}')
 else:
     for variable in args.variables:
         single_variable_df = grouped_df[(grouped_df['variable'] == variable)]
 
-        ax.plot(single_variable_df['date_only'], single_variable_df['rolling_avg'], label=f'Variable {variable}')
+        ax.plot(single_variable_df['date_only'], single_variable_df['rolling_avg'], label=f'{variable}')
 
 ax.set_title(f'Time Series for {category_titles[args.category]}')
 ax.set_xlabel('Observation Day')
