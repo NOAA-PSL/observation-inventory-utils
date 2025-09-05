@@ -103,7 +103,7 @@ grouped_df['date_only'] = pd.to_datetime(grouped_df['date_only'])
 # Sort the grouped data
 grouped_df = grouped_df.sort_values(by='date_only')
 
-grouped_df['rolling_avg'] = grouped_df.groupby('variable')['obs_count'].transform(lambda x: x.rolling(window=args.window, min_periods=1).mean())
+grouped_df['rolling_avg'] = grouped_df.groupby('variable')['var_count'].transform(lambda x: x.rolling(window=args.window, min_periods=1).mean())
 
 # Get unique variables
 unique_variables = grouped_df['variable'].unique()
