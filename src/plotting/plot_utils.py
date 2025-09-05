@@ -25,7 +25,7 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                "METOP-1 (Metop-A":"metop-b","METOP-2 (Metop-B":"metop-a","METOP-3 (Metop-C":"metop-c",
                "METOP-1 (Metop-B":"metop-b","METOP-2 (Metop-A":"metop-a", "METOP-B":"metop-b", "METOP-A":"metop-a", "METOP-C":"metop-c",
                "AQUA":"aqua", "NPP":"npp",
-               "GOES 7" : "g07", "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
+               "GOES 6": "g06", "GOES 7" : "g07", "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
                "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16", "GOES 17":"g17", "GOES 18":"g18", "GOES 19": "g19",
                "MTSAT-2":"MTSAT-2", "MTSAT-1R":"MTSAT-1R",
                "METEOSAT 2" : "m02", "METEOSAT 3": "m03", "METEOSAT 4": "m04","METEOSAT 5": "m05", "METEOSAT 6": "m06", "METEOSAT 7": "m07",
@@ -46,7 +46,8 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                 "TanDEM-X": "TanDEM-X", "PAZ":"PAZ", "KOMPSAT-5": "KOMPSAT-5",
                "LANDSAT 5":"LANDSAT 5", "GPM-core":"gpm", "TRMM":"TRMM",
                "Himawari-8":"himawari8", "Himawari-9":"himawari9", "Spire Lemur 3U C":"Spire L3UC", "Sentinel 6A":"Sentinel 6A",
-               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"aura", "NIMBUS 7":"nim07"}
+               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"aura", "NIMBUS 7":"nim07", "GCOM-W1":"GCOM-W1", "INSAT 2E":"INSAT 2E", 
+               "INSAT 2B": "INSAT 2B"}
 
 #Dictionary for translating typ numbers from cmpbqm output into their full names
 typ_dictionary = {
