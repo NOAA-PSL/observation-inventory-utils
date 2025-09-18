@@ -25,8 +25,8 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                "METOP-1 (Metop-A":"metop-b","METOP-2 (Metop-B":"metop-a","METOP-3 (Metop-C":"metop-c",
                "METOP-1 (Metop-B":"metop-b","METOP-2 (Metop-A":"metop-a", "METOP-B":"metop-b", "METOP-A":"metop-a", "METOP-C":"metop-c",
                "AQUA":"aqua", "NPP":"npp",
-               "GOES 7" : "g07", "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
-               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16", "GOES 17":"g17", "GOES 18":"g18",
+               "GOES 6": "g06", "GOES 7" : "g07", "GOES 8": "g08", "GOES 9": "g09", "GOES 10": "g10","GOES 11": "g11","GOES 12": "g12",
+               "GOES 13": "g13", "GOES 14": "g14", "GOES 15": "g15", "GOES 16" : "g16", "GOES 17":"g17", "GOES 18":"g18", "GOES 19": "g19",
                "MTSAT-2":"MTSAT-2", "MTSAT-1R":"MTSAT-1R",
                "METEOSAT 2" : "m02", "METEOSAT 3": "m03", "METEOSAT 4": "m04","METEOSAT 5": "m05", "METEOSAT 6": "m06", "METEOSAT 7": "m07",
                "METEOSAT 8": "m08", "METEOSAT 9": "m09", "METEOSAT 10": "m10", "METEOSAT 11": "m11",
@@ -46,7 +46,8 @@ sat_dictionary={"NOAA 5": "n05", "NOAA 6": "n06", "NOAA 7": "n07", "NOAA 8": "n0
                 "TanDEM-X": "TanDEM-X", "PAZ":"PAZ", "KOMPSAT-5": "KOMPSAT-5",
                "LANDSAT 5":"LANDSAT 5", "GPM-core":"gpm", "TRMM":"TRMM",
                "Himawari-8":"himawari8", "Himawari-9":"himawari9", "Spire Lemur 3U C":"Spire L3UC", "Sentinel 6A":"Sentinel 6A",
-               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"aura", "NIMBUS 7":"nim07"}
+               "PlanetiQ GNOMES-":"PlanetiQ GNOMES", "AURA":"aura", "NIMBUS 7":"nim07", "GCOM-W1":"GCOM-W1", "INSAT 2E":"INSAT 2E", 
+               "INSAT 2B": "INSAT 2B"}
 
 #Dictionary for translating typ numbers from cmpbqm output into their full names
 typ_dictionary = {
@@ -76,11 +77,13 @@ satinfo_translate_dictionary={
     "hirs_metop-b":"hirs4_metop-b", "hirs_n19":"hirs4_n19", "hirs_tirosn":"hirs2_tirosn", "avhrr_n14":"avhrr2_n14",
     "avhrr_metop-a":"avhrr3_metop-a", "avhrr_metop-b":"avhrr3_metop-b", "avhrr_n15":"avhrr3_n15",
     "avhrr_n16":"avhrr3_n16", "avhrr_n17":"avhrr3_n17", "avhrr_n18":"avhrr3_n18", "avhrr_n19":"avhrr3_n19",
-    "goesnd_g11":"sndrD_g11", "goesnd_g12":"sndrD_g12", "goesnd_g13":"sndrD_g13", "goesnd_g14":"sndrD_g14",
-    "goesnd_g15":"sndrD_g15", "goesnd_g08":"sndr_g08", "goesnd_g10":"sndr_g10", "goesnd_g11":"sndr_g11",
+    "goesfv_g11":"sndrD_g11", "goesfv_g12":"sndrD_g12", "goesfv_g13":"sndrD_g13", "goesfv_g14":"sndrD_g14",
+    "goesfv_g15":"sndrD_g15", "goesnd_g08":"sndr_g08", "goesnd_g10":"sndr_g10", "goesnd_g11":"sndr_g11",
     "goesnd_g12":"sndr_g12", "crisf4_n20":"cris-fsr_n20", "crisf4_n21":"cris-fsr_n21", "crisf4_npp":"cris-fsr_npp",
     "cfsr_n09":"sbuv2_n09", "cfsr_n11":"sbuv2_n11", "cfsr_n14":"sbuv2_n14", "cfsr_n16":"sbuv2_n16", "cfsr_n17":"sbuv2_n17",
-    "cfsr_n18":"sbuv2_n18", "cfsr_n19":"sbuv2_n19", "cfsr_nim07":"sbuv2_nim07"
+    "cfsr_n18":"sbuv2_n18", "cfsr_n19":"sbuv2_n19", "cfsr_nim07":"sbuv2_nim07", "gsrasr_g16":"abi_g16", "gsrcsr_g16":"abi_g16", 
+    "gsrasr_g17":"abi_g17", "gsrcsr_g17":"abi_g17", "gsrasr_g18":"abi_g18", "gsrcsr_g18":"abi_g18", "ahicsr_himawari8":"ahi_himawari8",
+    "ahicsr_himawari9":"ahi_himawari9"
 }
 
 #function for reading from raw satinfo files which is standard across the various plot scripts 
