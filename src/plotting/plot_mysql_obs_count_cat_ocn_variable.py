@@ -129,14 +129,15 @@ ax.set_ylabel('Average Daily Observation Count', fontsize = 17)
 ax.set_yscale('log')  # log10 y-axis
 ax.set_xlim(daterange)
 # Formatting the x-axis for dates (display only the year)
-ax.xaxis.set_major_locator(mdates.YearLocator())  # Major ticks every year
-ax.xaxis.set_minor_locator(mdates.MonthLocator())  # Minor ticks every month
+ax.xaxis.set_major_locator(mdates.YearLocator(5))  # Major ticks every year
+ax.xaxis.set_minor_locator(mdates.YearLocator())  # Minor ticks every month
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
 plt.xticks(rotation=45, ha='right')
+ax.tick_params(labelsize=12)
 
 # Add grid and legend
 ax.grid(True)
-ax.legend()
+ax.legend(fontsize = 12)
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
