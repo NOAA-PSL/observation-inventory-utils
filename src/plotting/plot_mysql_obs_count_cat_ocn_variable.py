@@ -18,6 +18,7 @@ parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp t
 parser.add_argument("-version", dest='ioda_version', help="Version of ioda to include in the plot, if not provided will include all versions inventoried. Value should be an int.", type=int, default=0)
 parser.add_argument("-window", dest='window', help=" Rolling average of window size", type=int, default=1)
 parser.add_argument("-cat", dest='category', help="Category of sensors to plot", type=str)
+parser.add_argument("-title", dest='title', help='Title for the plot', type=str, default="Time Series of Observation Count")
 parser.add_argument("--variables", dest='variables', help='List of variables to plot from in the category', type=str, nargs='+')
 args = parser.parse_args()
 
@@ -109,7 +110,7 @@ grouped_df['rolling_avg'] = grouped_df.groupby('variable')['var_count'].transfor
 unique_variables = grouped_df['variable'].unique()
 
 # Create the plot
-fig, ax = plt.subplots(figsize=(14, 6))  # Increase figure width
+fig, ax = plt.subplots(figsize=(10, 8))  # Increase figure width
 
 if args.variables == None:
     for variable in unique_variables:
@@ -122,9 +123,9 @@ else:
 
         ax.plot(single_variable_df['date_only'], single_variable_df['rolling_avg'], label=f'{variable}')
 
-ax.set_title(f'Time Series for {category_titles[args.category]}')
-ax.set_xlabel('Observation Day')
-ax.set_ylabel('Observation Count')
+ax.set_title(f'{args.title}', fontsize = 18) #16
+ax.set_xlabel('Observation Day', fontsize = 17)
+ax.set_ylabel('Average Daily Observation Count', fontsize = 17)
 ax.set_yscale('log')  # log10 y-axis
 ax.set_xlim(daterange)
 # Formatting the x-axis for dates (display only the year)
