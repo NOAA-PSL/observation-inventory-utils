@@ -13,6 +13,8 @@ import pathlib
 import numpy as np
 
 from config_handlers.obs_meta_ioda import ObsMetaIodaConfig
+from config_handlers.obs_meta_wod import ObsMetaWodConfig
+from config_handlers.obs_meta_ozone_nc import ObsMetaOzoneConfig
 from obs_inv_utils import obs_inv_queries as oiq
 from obs_inv_utils import aws_s3_interface as s3
 from obs_inv_utils import time_utils
@@ -142,7 +144,7 @@ class ObsIodaFileMetaHandler(object):
 
 @dataclass
 class ObsWODFileMetaHandler(object):
-    meta_config: ObsMetaIodaConfig
+    meta_config: ObsMetaWodConfig
     wod_files: list = field(default_factory=list, init=False)
     date_range: DateRange = field(init=False)
 
@@ -194,3 +196,55 @@ class ObsWODFileMetaHandler(object):
         cmd.post_harvest_results(wod_file)
 
 
+@dataclass
+class ObsOzoneFileMetaHandler(object):
+    meta_config: ObsMetaOzoneConfig
+    ozone_files: list = field(default_factory=list, init=False)
+    date_range: DateRange = field(init=False)
+
+    def __post_init__(self):
+        self.date_range = self.meta_config.get_date_range()
+        self.ozone_files = self.meta_config.get_ozone_file_list()
+
+    def __repr__(self):
+        return f'meta_config: {self.meta_config}, ' \
+            f'ozone_files: {self.ozone_files}, ' \
+            f'date_range: {self.date_range}'
+    
+    def get_ozone_file_meta(self, cmd_type):
+        inventory_ozone_files = oiq.get_files_data(
+            self.ozone_files,
+            self.date_range.start,
+            self.date_range.end
+        )
+
+        temp_uuid = str(uuid.uuid4())
+
+        work_dir = os.path.join(self.meta_config.work_dir, temp_uuid)
+
+        for idx, ozone_file in inventory_ozone_files.iterrows():
+            file_downloaded = False
+
+            saved_filename = download_netcdf_file_from_s3(work_dir, ozone_file)
+
+            if saved_filename is None:
+                continue
+
+            self.get_obs_meta_with_hv_ozone(saved_filename, ozone_file)
+
+            # clean up files
+            if self.meta_config.scrub_files:
+                shutil.rmtree( work_dir )
+
+
+    def get_obs_meta_with_hv_ozone(self, filename, ozone_file):
+        args = {'filename': filename}
+        cmd = cmhd.ScoreHVCmdHandler(
+            hv_cmds.HV_OZONE_NC_META,
+            hv_cmds.score_hv_cmds,
+            args
+        )
+
+        cmd.harvest()
+        cmd.post_cmd_result(ozone_file.obs_day)
+        cmd.post_harvest_results(ozone_file)
