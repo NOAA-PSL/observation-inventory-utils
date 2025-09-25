@@ -66,7 +66,7 @@ class ObsMetaOzoneConfig(ConfigInterface):
             date_range)
 
         self.ozone_files = self.yaml_loader.get_value(
-            key='wod_files',
+            key='ozone_files',
             document=self.config_data,
             return_type=list
         )
