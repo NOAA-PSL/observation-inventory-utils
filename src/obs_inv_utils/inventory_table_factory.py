@@ -1451,7 +1451,7 @@ def insert_obs_meta_hv_ozone_netcdf_item(obs_meta_items, max_retries=3, backoff_
         sql = """
             INSERT IGNORE INTO obs_meta_hv_ozone_netcdf
             (obs_id, cmd_result_id, cmd_str, variable, ozone_count, levels, profiles, min_pressure, max_pressure,
-            sensor, casts, filename, min_data_date, max_data_date, obs_day, inserted_at)
+            sensor, filename, min_data_date, max_data_date, obs_day, inserted_at)
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :ozone_count, :levels, :profiles, :min_pressure, :max_pressure, 
             :sensor, :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
@@ -1459,7 +1459,7 @@ def insert_obs_meta_hv_ozone_netcdf_item(obs_meta_items, max_retries=3, backoff_
         sql = """
             INSERT OR IGNORE INTO obs_meta_hv_ozone_netcdf
             (obs_id, cmd_result_id, cmd_str, variable, ozone_count, levels, profiles, min_pressure, max_pressure, 
-            sensor, casts, filename, min_data_date, max_data_date, obs_day, inserted_at)
+            sensor, filename, min_data_date, max_data_date, obs_day, inserted_at)
             VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :ozone_count, :levels, :profiles, :min_pressure, :max_pressure, 
             :sensor, :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
         """
