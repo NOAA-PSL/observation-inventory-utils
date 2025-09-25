@@ -27,6 +27,7 @@ OBS_META_HV_IODA_NETCDF_TABLE = 'obs_meta_hv_ioda_netcdf'
 OBS_META_HV_IODA_NETCDF_AGG_TABLE = 'obs_meta_hv_ioda_netcdf_aggregate'
 OBS_META_HV_WOD_NETCDF_TABLE = 'obs_meta_hv_wod_netcdf'
 OBS_META_HV_WOD_NETCDF_AGG_TABLE = 'obs_meta_hv_wod_netcdf_aggregate'
+OBS_META_HV_OZONE_NETCDF_TABLE = 'obs_meta_hv_ozone_netcdf'
 OBS_DATABASE = ''
 OBS_SQLITE_DEFAULT = 'observations_inventory.db'
 
@@ -478,6 +479,49 @@ def create_obs_meta_hv_wod_netcdf_agg_table():
             )
         )
 
+def create_obs_meta_hv_ozone_netcdf_table():
+    insp = inspect(engine)
+    table_exists = insp.has_table(OBS_META_HV_OZONE_NETCDF_TABLE)
+    print(f'{OBS_META_HV_OZONE_NETCDF_TABLE} table exists: {table_exists}')
+    if not insp.has_table(OBS_META_HV_OZONE_NETCDF_TABLE):
+
+        Table(OBS_META_HV_OZONE_NETCDF_TABLE, metadata,
+              Column('meta_id', Integer, primary_key=True),
+              Column(
+                  'obs_id',
+                  Integer,
+                  ForeignKey('obs_inventory.obs_id'),
+                  nullable=False
+              ),
+              Column(
+                  'cmd_result_id',
+                  Integer,
+                  ForeignKey('cmd_results.cmd_result_id'),
+                  nullable=False
+              ),
+              Column('cmd_str', String),
+              Column('variable', String),
+              Column('ozone_count', Integer),
+              Column('levels', Integer),
+              Column('profiles', Integer),
+              Column('min_pressure', Float),
+              Column('max_pressure', Float),
+              Column('sensor', String),
+              Column('filename', String),
+              Column('min_data_date', DateTime),
+              Column('max_data_date', DateTime),
+              Column('obs_day', DateTime),
+              Column('inserted_at', DateTime),
+              UniqueConstraint(
+                'obs_id',
+                'ozone_count',
+                'levels',
+                'filename',
+                'obs_day',
+                name='unique_ozone_nc_meta'
+            )
+        )
+
 class CmdResult(Base):
     __tablename__ = CMD_RESULTS_TABLE
 
@@ -783,6 +827,38 @@ class ObsMetaHvWodNetcdfAggregate(Base):
     min_data_date = Column(DateTime())
     max_data_date = Column(DateTime())
     obs_day = Column(DateTime())
+    inserted_at = Column(DateTime())
+
+    cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
+
+class ObsMetaHvOzoneNetcdf(Base):
+    __tablename__ = OBS_META_HV_OZONE_NETCDF_TABLE
+    __table_args__ = (
+        UniqueConstraint(
+            'obs_id',
+            'ozone_count',
+            'levels',
+            'filename',
+            'obs_day',
+            name='unique_ozone_nc_meta'
+        ),
+    )
+
+    meta_id = Column(Integer, primary_key=True)
+    obs_id = Column(Integer, ForeignKey('obs_inventory.obs_id'))
+    cmd_result_id = Column(Integer, ForeignKey('cmd_results.cmd_result_id'))
+    cmd_str = Column(String(31))
+    variable = Column(String(63))
+    ozone_count = Column(Integer())
+    levels = Column(Integer())
+    profiles = Column(Integer())
+    min_pressure = Column(Float())
+    max_pressure = Column(Float())
+    sensor = Column(String(63))
+    filename = Column(String(63))
+    min_data_date = Column(DateTime())
+    max_data_date = Column(DateTime())
+    obs_day = Column(DateTime()) 
     inserted_at = Column(DateTime())
 
     cmd_result = relationship("CmdResult", foreign_keys=[cmd_result_id])
@@ -1362,6 +1438,72 @@ def insert_obs_meta_hv_wod_netcdf_agg_item(obs_meta_items, max_retries=3, backof
     if inserted_count == 0:
         print("NO DATA PROVIDED TO INSERT. No data inserted into the wod netcdf aggregate meta table.")
 
+
+def insert_obs_meta_hv_ozone_netcdf_item(obs_meta_items, max_retries=3, backoff_delay=0.2):
+    if not isinstance(obs_meta_items, list):
+        msg = 'Inserted obs meta ozone NetCDF items must be in the form of a list.' \
+              f' Received type: {type(obs_meta_items)}'
+        raise TypeError(msg)
+
+
+    # SQL statement with INSERT/IGNORE or INSERT OR IGNORE depending on database type
+    if(database_type.lower() == 'mysql'):
+        sql = """
+            INSERT IGNORE INTO obs_meta_hv_ozone_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, ozone_count, levels, profiles, min_pressure, max_pressure,
+            sensor, casts, filename, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :ozone_count, :levels, :profiles, :min_pressure, :max_pressure, 
+            :sensor, :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+    else:
+        sql = """
+            INSERT OR IGNORE INTO obs_meta_hv_ozone_netcdf
+            (obs_id, cmd_result_id, cmd_str, variable, ozone_count, levels, profiles, min_pressure, max_pressure, 
+            sensor, casts, filename, min_data_date, max_data_date, obs_day, inserted_at)
+            VALUES (:obs_id, :cmd_result_id, :cmd_str, :variable, :ozone_count, :levels, :profiles, :min_pressure, :max_pressure, 
+            :sensor, :filename, :min_data_date, :max_data_date, :obs_day, :inserted_at)
+        """
+
+    session = Session()
+    inserted_count = 0
+
+    for item in obs_meta_items:
+        row = {
+            'obs_id': item.obs_id,
+            'cmd_result_id': item.cmd_result_id,
+            'cmd_str': item.cmd_str,
+            'variable': item.variable,
+            'ozone_count': item.ozone_count,
+            'levels': item.levels,
+            'profiles': item.profiles,
+            'min_pressure': item.min_pressure,
+            'max_pressure': item.max_pressure,
+            'sensor': item.sensor,
+            'filename': item.filename,
+            'min_data_date': item.min_data_date,
+            'max_data_date': item.max_data_date,
+            'obs_day': item.obs_day.strftime('%Y-%m-%d %H:%M:%S'),
+            'inserted_at': datetime.utcnow()
+        }
+
+        for attempt in range(max_retries):
+            try:
+                session.execute(text(sql), row)
+                session.commit()
+                inserted_count += 1
+                break
+            except OperationalError as e:
+                session.rollback()
+                if '1213' in str(e): #MySQL deadlock
+                    time.sleep(backoff_delay * (attempt + 1))
+                else:
+                    session.close()
+                    raise
+
+    session.close()
+    if inserted_count == 0:
+        print("NO DATA PROVIDED TO INSERT. No data inserted into the ozone netcdf meta table.")
+
 if(database_type.lower() == 'mysql'):
     Base.metadata.create_all(engine)
 else:
@@ -1374,4 +1516,5 @@ else:
     create_obs_meta_hv_ioda_netcdf_agg_table()
     create_obs_meta_hv_wod_netcdf_table()
     create_obs_meta_hv_wod_netcdf_agg_table()
+    create_obs_meta_hv_ozone_netcdf_table()
     metadata.create_all(engine)
