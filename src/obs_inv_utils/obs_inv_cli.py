@@ -113,7 +113,7 @@ def get_obs_count_meta_ozone_hv_base(config_yaml):
     config.load()
     print(repr(config))
     mh = ObsOzoneFileMetaHandler(config)
-    mh.get_ozone_file_meta(obs_meta_ozone_nc.HV_OZONE_META)
+    mh.get_ozone_file_meta(obs_meta_ozone_nc.HV_OZONE_META_NC)
 
 @cli.command()
 @click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
