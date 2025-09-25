@@ -24,7 +24,7 @@ from config_handlers.obs_meta_cmpbqm import ObsMetaCMPBQMConfig
 from config_handlers.obs_meta_ioda import ObsMetaIodaConfig
 from config_handlers.obs_meta_wod import ObsMetaWodConfig
 from config_handlers.obs_meta_ozone_nc import ObsMetaOzoneConfig
-from config_handlers import obs_meta_sinv, obs_meta_cmpbqm, obs_meta_ioda, obs_meta_wod
+from config_handlers import obs_meta_sinv, obs_meta_cmpbqm, obs_meta_ioda, obs_meta_wod, obs_meta_ozone_nc
 from obs_inv_utils.nceplibs_bufr_cmd_handler import ObsBufrFileMetaHandler, ObsPrepBufrFileMetaHandler
 from obs_inv_utils.score_hv_netcdf_cmd_handler import ObsIodaFileMetaHandler, ObsWODFileMetaHandler, ObsOzoneFileMetaHandler
 
@@ -113,7 +113,7 @@ def get_obs_count_meta_ozone_hv_base(config_yaml):
     config.load()
     print(repr(config))
     mh = ObsOzoneFileMetaHandler(config)
-    mh.get_ozone_file_meta(obs_meta_wod.HV_OZONE_META)
+    mh.get_ozone_file_meta(obs_meta_ozone_nc.HV_OZONE_META)
 
 @cli.command()
 @click.option('-c', '--config-yaml', 'config_yaml', required=True, type=str)
