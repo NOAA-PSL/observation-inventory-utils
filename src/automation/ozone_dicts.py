@@ -61,4 +61,4 @@ ozone_nasa_ompsnm = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET
 )
 
-ozone_infos = [ozone_nasa_mls, ozone_nasa_omieff, ozone_nasa_ompslp]
+ozone_infos = [ozone_nasa_mls, ozone_nasa_omieff, ozone_nasa_ompslp, ozone_nasa_ompsnmeff, ozone_nasa_ompsnm]

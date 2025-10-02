@@ -8,6 +8,7 @@ import automation_utils as au
 import atm_dicts
 import ocn_dicts
 import ice_dicts
+import ozone_dicts
 import yaml_generation as yg
 
 import argparse
@@ -52,14 +53,17 @@ if args.category == 'ocean':
     to_inventory = ocn_dicts.ocn_infos
 if args.category == 'ice':
     to_inventory = ice_dicts.ice_infos
+if args.category == 'ozone':
+    to_inventory = ozone_dicts.ozone_infos
 if args.category == 'all':
-    to_inventory = atm_dicts.atm_infos + ocn_dicts.ocn_infos + ice_dicts.ice_infos
+    to_inventory = atm_dicts.atm_infos + ocn_dicts.ocn_infos + ice_dicts.ice_infos + ozone_dicts.ozone_infos
 if args.category == 'list':
     try:
         to_inventory_atm = [x for x in atm_dicts.atm_infos if any(x.obs_name == i for i in args.var_list)]
         to_inventory_ocean = [x for x in ocn_dicts.ocn_infos if any(x.obs_name == i for i in args.var_list)]
         to_inventory_ice = [x for x in ice_dicts.ice_infos if any(x.obs_name == i for i in args.var_list)]
-        to_inventory = to_inventory_atm + to_inventory_ocean + to_inventory_ice
+        to_inventory_ozone = [x for x in ozone_dicts.ozone_infos if any(x.obs_name == i for i in args.var_list)]
+        to_inventory = to_inventory_atm + to_inventory_ocean + to_inventory_ice + to_inventory_ozone
     except Exception as ex:
         print("An error occurred getting list values to inventory")
         print(ex)
@@ -131,6 +135,10 @@ def run_inv_cmd(inventory_info):
     elif inventory_info.inv_cmd == au.HV_WOD_NC_META:
         yaml_file = yg.generate_hv_wod_inventory_config(inventory_info, start_time, end_time, args.work_dir)
         cli.get_obs_count_meta_wod_hv_base(yaml_file)
+        os.remove(yaml_file)
+    elif inventory_info.inv_cmd == au.HV_OZONE_NC_META:
+        yaml_file = yg.generate_hv_ozone_inventory_config(inventory_info, start_time, end_time, args.work_dir)
+        cli.get_obs_count_meta_ozone_hv_base(yaml_file)
         os.remove(yaml_file)
     else:
         print(f'No valid commmand found for inv_cmd in {inventory_info.obs_name} inventory info with value: ' + inventory_info.inv_cmd)
