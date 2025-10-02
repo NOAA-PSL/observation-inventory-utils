@@ -9,6 +9,7 @@ NCEPLIBS_CMPBQM = 'cmpbqm'
 
 HV_IODA_META = 'ioda_meta_netcdf'
 HV_WOD_NC_META = 'wod_insitu_meta_netcdf'
+HV_OZONE_NC_META = 'ozone_meta_netcdf'
 
 CLEAN_PLATFORM = 'aws_s3_clean'
 REANALYSIS_BUCKET = 'noaa-reanlyses-pds'
