@@ -229,8 +229,9 @@ class ObsOzoneFileMetaHandler(object):
 
             if saved_filename is None:
                 continue
-
-            self.get_obs_meta_with_hv_ozone(saved_filename, ozone_file)
+            
+            if ozone_file['file_size'] > 0:
+                self.get_obs_meta_with_hv_ozone(saved_filename, ozone_file)
 
             # clean up files
             if self.meta_config.scrub_files:

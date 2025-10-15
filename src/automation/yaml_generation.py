@@ -153,3 +153,31 @@ def generate_hv_wod_inventory_config(inventory_info, start_time, end_time, work_
     yaml.dump(body, outfile)
     outfile.close()
     return yaml_file_path
+
+def generate_hv_ozone_inventory_config(inventory_info, start_time, end_time, work_dir):
+    filename = inventory_info.obs_name + dt.now().strftime("%Y%m%d%H%M%S") + str(random.randint(1, 9999)) + '_obs_meta_hv_wod.yaml'
+    yaml_file_path = os.path.join(PY_CURRENT_DIR, filename)
+    if start_time is dt:
+        start = start_time.strftime(au.DATESTR_FORMAT)
+    else:
+        start = start_time
+    if end_time is dt:
+        end = end_time.strftime(au.DATESTR_FORMAT)
+    else:
+        end = end_time
+    body = {
+        's3_bucket': inventory_info.s3_bucket,
+        's3_prefix': inventory_info.s3_prefix,
+        'date_range': {
+            'datestr':au.DATESTR_FORMAT,
+            'start': start,
+            'end': end
+        },
+        'ozone_files':[inventory_info.files],
+        'work_dir': work_dir,
+        'scrub_files': True
+    }
+    outfile = open(yaml_file_path, 'w')
+    yaml.dump(body, outfile)
+    outfile.close()
+    return yaml_file_path
