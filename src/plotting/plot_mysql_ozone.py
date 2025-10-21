@@ -20,7 +20,6 @@ parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp t
 args = parser.parse_args()
 
 #parameters
-satinfo_db_root=args.satinfo_db_root
 daterange=[date(1975,1,1), date(2026,1,1)]
 
 def plot_one_line(dftmp, yloc):
