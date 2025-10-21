@@ -18,11 +18,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("--sidb", dest='satinfo_db_root', help="root for sat info db files",default='satellites/satinfo/',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
+parser.add_argument("--list", dest="sensor_list", help="List of sensors to include on the plot", type=str, nargs="+")
 args = parser.parse_args()
 
 #parameters
 satinfo_db_root=args.satinfo_db_root
-daterange=[date(1975,1,1), date(2026,1,1)]
+daterange=[date(2000,1,1), date(2026,1,1)]
 
 def plot_one_line(satinfo, dftmp, yloc):
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),
@@ -60,35 +61,25 @@ def get_source_dir(row):
     source_dir = re.split("/[12][90][0-9][0-9]/[01][0-9]/", directory)[0]
     return source_dir
 
+def make_sensor_list(sensor_list):
+    search_list = []
+    for sensor in sensor_list: 
+        search_list.append("observations/reanalysis/" + sensor)
+    return search_list
 
 #read data from sql database of obs counts
-print('connecting to mysql db') 
-db_frame = utils.get_distinct_bufr()
-print("Data pulled from mysql database")
+search_list = make_sensor_list(args.sensor_list)
+db_frame = utils.get_distinct_bufr_by_sensors(search_list)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
 db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
 db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 
-#remove gps, amv, and geo rows to be plotted separately
-index_gps = db_frame[(db_frame['sensor']=='gps')].index
-db_frame.drop(index_gps, inplace=True)
-
-index_amv = db_frame[(db_frame['sensor']=='amv')].index
-db_frame.drop(index_amv, inplace=True)
-
-index_geo = db_frame[(db_frame['sensor']=='geo')].index
-db_frame.drop(index_geo, inplace=True)
-
-index_ozone = db_frame[(db_frame['sensor']=='ozone')].index
-db_frame.drop(index_ozone, inplace=True)
-
-index_conv = db_frame[(db_frame['sensor']=='conv')].index
-db_frame.drop(index_conv, inplace=True)
-
 db_frame.loc[db_frame['sat_id_name'].isin(['METOP-1', 'METOP-1 (Metop-B']), 'sat_id_name'] = 'METOP-B'
 db_frame.loc[db_frame['sat_id_name'].isin(['METOP-2', 'METOP-2 (Metop-A']), 'sat_id_name'] = 'METOP-A'
 db_frame.loc[db_frame['sat_id_name'].isin(['METOP-3', 'METOP-3 (Metop-C']), 'sat_id_name'] = 'METOP-C'
+db_frame.loc[db_frame['sat_id_name'].isin(['GRACE C (GRACE-F']), 'sat_id_name'] = 'GRACE C'
+db_frame.loc[db_frame['sat_id_name'].isin(['GRACE D (GRACE-F']), 'sat_id_name'] = 'GRACE D'
 
 first_datetime = db_frame.groupby(['sensor', 'source_dir', 'sat_id'])['datetime'].min().reset_index()
 first_datetime.rename(columns={'datetime': 'first_datetime'}, inplace=True)
@@ -122,7 +113,6 @@ plt.ylabel('Sensor & Satellite')
 
 directory_labels = []
 counter=0
-# for index, row in unique_sat_id.iterrows():
 for index, row in unique_dir_sensor_sats.iterrows():
     try:
         satinfo_string_ = row['sensor']+"_"+ utils.sat_dictionary[row['sat_id_name']]
@@ -161,9 +151,10 @@ ax_dup.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax_dup.set_xlim(daterange)
 
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = "all_line_observations_inventory_dir_sensor_sat.png"
+count = len(sensor_sat_labels)
+file_name = f"specified_line_observations_inventory_dir_sensor_sat_{count}.png"
 if args.dev:
-    file_name = "all_line_observations_inventory_dir_sensor_sat_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+    file_name = f"specified_line_observations_inventory_dir_sensor_sat_{count}_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')

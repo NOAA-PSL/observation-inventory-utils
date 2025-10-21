@@ -256,6 +256,14 @@ def parse_filename_regex(filename):
             r'(?P<date_time>\d{4}-\d{2}-\d{2})T(?P<cycle_hour>\d{2})'
             r'\.(?P<data_format>[^.]+)$'
         ),
+        # Underscore-separated cycle tag (e.g., OMPSNP.20230925_12z.nc)
+        re.compile(
+            r'^(?P<prefix>.+?)\.'
+            r'(?P<date_time>\d{8})_'
+            r'(?P<cycle_tag>\d{2}z)\.'
+            r'(?P<data_format>[^.]+)'
+            r'(?:\.(?P<not_restricted_tag>nr))?$'
+        )
     ]
 
     for pattern in patterns:

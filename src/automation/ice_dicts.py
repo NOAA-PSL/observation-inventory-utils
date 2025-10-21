@@ -73,6 +73,30 @@ icec_nsidc_sh_v3 = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET
 )
 
+icec_glore_nh_v3 = InventoryInfo(
+    obs_name='icec_glore_nh_v3',
+    key='observations/reanalysis/icec/GLORe/nh/%Y/%m/24h/iodav3/icec_nsidc_nh.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='19790101T120000Z',
+    s3_prefix='observations/reanalysis/icec/GLORe/nh/%Y/%m/24h/iodav3/',
+    files='icec_nsidc_nh.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    cycling_interval=au.CYCLING_DAILY,
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
+)
+
+icec_glore_sh_v3 = InventoryInfo(
+    obs_name='icec_glore_sh_v3',
+    key='observations/reanalysis/icec/GLORe/sh/%Y/%m/24h/iodav3/icec_nsidc_sh.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='19790101T120000Z',
+    s3_prefix='observations/reanalysis/icec/GLORe/sh/%Y/%m/24h/iodav3/',
+    files='icec_nsidc_sh.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    cycling_interval=au.CYCLING_DAILY,
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
+)
+
 icefb_esa_cryosat2_v2 = InventoryInfo(
     obs_name='icefb_esa_cryosat2_v2',
     key='observations/reanalysis/icefb/esa/cryosat2/%Y/%m/24h/iodav2/icefb.esa.l2_cryosat2.%Y%m%d.T%H%M%SZ.iodav2.nc',
@@ -98,4 +122,4 @@ icefb_esa_cryosat2_v3 = InventoryInfo(
 )
 
 ice_infos = [icec_emc_dmsp_v2, icec_emc_dmsp_v3, icec_nsidc_nh_v2, icec_nsidc_nh_v3, icec_nsidc_sh_v2, icec_nsidc_sh_v3, icefb_esa_cryosat2_v2,
-             icefb_esa_cryosat2_v3, ]
+             icefb_esa_cryosat2_v3, icec_glore_nh_v3, icec_glore_sh_v3]
