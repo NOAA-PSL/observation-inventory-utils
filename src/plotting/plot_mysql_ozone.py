@@ -71,6 +71,14 @@ unique_sensor = db_frame[['sensor', 'subsensor']].value_counts().reset_index(nam
 step=0.05
 height=step*len(unique_sensor)
 
+#check via print statements
+print("check 1")
+print(db_frame['subsensor'].value_counts().head(20))
+print(db_frame[db_frame['subsensor'].str.len() < 3]['parent_dir'].unique())
+
+print("check 2")
+print(len(unique_sensor), "labels vs", db_frame['subsensor'].nunique(), "unique subsensors in frame")
+
 #make list of sensor&sat labels 
 sensor_sub_labels = []
 for index, row in unique_sensor.iterrows():
@@ -83,12 +91,19 @@ plt.title("Inventory of NNJA Ozone Sensors")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor')
 
+print("check while plotting")
+
 directory_labels = []
 counter=0
 for index, row in unique_sensor.iterrows():
     pandas.options.mode.chained_assignment = None
     dftmp = select_subsensor(row['subsensor'], db_frame)
     pandas.options.mode.chained_assignment = 'warn'
+
+    if dftmp.empty:
+        print("Empty subsensor:", row['subsensor'])
+        continue
+    print(f"{row['sensor']} {row['subsensor']} -> {len(dftmp)} records")
 
     dirs = dftmp['source_dir'].unique()
     directory_labels.append(np.array2string(dirs))
