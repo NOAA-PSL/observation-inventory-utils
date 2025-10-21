@@ -66,7 +66,7 @@ db_frame.loc[db_frame['sat_id_name'].isin(['METOP-2', 'METOP-2 (Metop-A']), 'sat
 db_frame.loc[db_frame['sat_id_name'].isin(['METOP-3', 'METOP-3 (Metop-C']), 'sat_id_name'] = 'METOP-C'
 
 #loop and plot sensors/sat_ids
-unique_sensor = db_frame[['sensor', 'subsensor']].value_counts().reset_index(name='count').sort_values(by = ['sensor'], ascending=[False])
+unique_sensor = db_frame[['sensor', 'subsensor']].value_counts().reset_index(name='count').sort_values(by = ['subsensor'], ascending=[False])
 step=0.05
 height=step*len(unique_sensor)
 
@@ -133,3 +133,5 @@ if args.dev:
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
+plt.clf()
+plt.close()
