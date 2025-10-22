@@ -29,7 +29,10 @@ category_dicts = {
     'icec_nsidc': {'observations/reanalysis/icec/nsidc'},
     'icec_glore_nh' : {'observations/reanalysis/icec/GLORe/nh'},
     'icec_glore_sh' : {'observations/reanalysis/icec/GLORe/sh'},
-    'icec_glore': {'observations/reanalysis/icec/GLORe'}
+    'icec_glore': {'observations/reanalysis/icec/GLORe'},
+    'icec_emc_nhsh': {'observations/reanalysis/icec/emc'},
+    'icec_glore_nh-short' : {'observations/reanalysis/icec/GLORe/nh'},
+    'icec_glore_sh-short' : {'observations/reanalysis/icec/GLORe/sh'}
 }
 
 category_titles = {
@@ -40,7 +43,10 @@ category_titles = {
     'icec_nsidc': 'Ice Concentration NSIDC', 
     'icec_glore_nh': 'Ice Concentration GLORe NH',
     'icec_glore_sh': 'Ice Concentration GLORe SH',
-    'icec_glore': 'Ice Concentration GLORe'
+    'icec_glore': 'Ice Concentration GLORe',
+    'icec_emc_nhsh': 'Ice Concentration NH+SH',
+    'icec_glore_nh-short': 'Ice Concentration NH',
+    'icec_glore_sh-short': 'Ice Concentration SH'
 }
 
 
