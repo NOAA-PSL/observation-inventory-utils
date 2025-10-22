@@ -131,7 +131,7 @@ ax.tick_params(labelsize=12)
 
 # Add grid and legend
 ax.grid(True)
-ax.legend(fontsize = 12) #11
+ax.legend(fontsize = 12, loc='upper right') #11
 
 plt.tight_layout()
 # plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
