@@ -77,6 +77,9 @@ print(db_frame[db_frame['subsensor'].str.len() < 3]['parent_dir'].unique())
 print("check 2")
 print(len(unique_sensor), "labels vs", db_frame['subsensor'].nunique(), "unique subsensors in frame")
 
+print("check 3")
+print("Missing subsensor count:", len(db_frame[db_frame['subsensor'] == '']))
+
 #make list of sensor&sat labels 
 sensor_sub_labels = []
 for index, row in unique_sensor.iterrows():
