@@ -129,7 +129,7 @@ grouped_df['rolling_avg'] = grouped_df.groupby('category')['obs_count'].transfor
 unique_categories = grouped_df['category'].unique()
 
 # Create the plot
-fig, ax = plt.subplots(figsize=(10, 8))  # Increase figure width
+fig, ax = plt.subplots(figsize=(12, 8))  # Increase figure width
 
 for category in unique_categories:
     single_category_df = grouped_df[(grouped_df['category'] == category)]
