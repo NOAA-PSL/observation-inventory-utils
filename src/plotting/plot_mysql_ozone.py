@@ -93,6 +93,10 @@ plt.title("Inventory of NNJA Ozone Sensors")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor')
 
+fnout=os.path.join(args.out_dir,"blank_hopefully.png")
+print(f"saving {fnout}")
+plt.savefig(fnout, bbox_inches='tight')
+
 print("check while plotting")
 
 directory_labels = []
