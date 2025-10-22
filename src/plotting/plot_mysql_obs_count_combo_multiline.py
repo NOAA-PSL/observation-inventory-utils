@@ -22,7 +22,9 @@ args = parser.parse_args()
 
 category_dicts = {
     'AMV': {'amv'},
+    'AMV-long': {'amv'},
     'GPS': {'gps'},
+    'GPS-long': {'gps'},
     'geo_rad' : {'geo/ahicsr', 'geo/geoimr', 'geo/goesfv', 'geo/goesnd', 'geo/gsrasr'},
     'hyper_infrared': {'cris', 'iasi', 'airs/nasa'}, 
     'multi_infrared': {'ssu', 'hirs/1bhrs2', 'hirs/1bhrs3', 'hirs/1bhrs4'}, 
@@ -40,7 +42,9 @@ category_dicts = {
 
 category_titles = {
     'AMV': 'AMV',
+    'AMV-long': 'Atmospheric Motion Vectors',
     'GPS': 'GPS',
+    'GPS-long': 'Global Positioning System',
     'geo_rad': 'Geostationary Radiances',
     'hyper_infrared': 'Hyperspectral Infrared',
     'multi_infrared': 'Multispectral Infrared',
