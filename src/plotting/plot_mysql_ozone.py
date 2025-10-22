@@ -25,8 +25,8 @@ daterange=[date(1975,1,1), date(2026,1,1)]
 def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
 
-def select_subsensor(subsensor, db_frame):
-    dftmp = db_frame.loc[db_frame['subsensor']==subsensor]
+def select_subsensor_dir(subsensor, source_dir, db_frame):
+    dftmp = db_frame.loc[(db_frame['subsensor']==subsensor)  & (db_frame['source_dir']==source_dir)]
     return dftmp
 
 def select_sensor(sensor, db_frame):
@@ -96,7 +96,7 @@ directory_labels = []
 counter=0
 for index, row in unique_sensor.iterrows():
     pandas.options.mode.chained_assignment = None
-    dftmp = select_subsensor(row['subsensor'], db_frame)
+    dftmp = select_subsensor_dir(row['subsensor'], row['source_dir'], db_frame)
     pandas.options.mode.chained_assignment = 'warn'
 
     if dftmp.empty:
