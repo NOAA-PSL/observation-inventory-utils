@@ -112,6 +112,8 @@ for index, row in unique_sensor.iterrows():
     plot_one_line(dftmp, step/2+step*counter)
     counter = counter + 1
 
+print("Lines in figure:", len(ax.lines))
+
 ax.set_yticks(step/2+step*np.arange(counter))
 ax.set_yticklabels(sensor_sub_labels)
 ax.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
