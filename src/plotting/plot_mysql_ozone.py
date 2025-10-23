@@ -23,7 +23,8 @@ args = parser.parse_args()
 daterange=[date(1975,1,1), date(2026,1,1)]
 
 def plot_one_line(dftmp, yloc, color='black'):
-    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color=color,markersize=5)
+    mask = dftmp.obs_count.astype('bool')
+    plt.plot(dftmp.datetime[mask], yloc*np.ones(mask.sum()),'|',color=color,markersize=5)
 
 def select_subsensor_dir(subsensor, source_dir, db_frame):
     dftmp = db_frame.loc[(db_frame['subsensor']==subsensor)  & (db_frame['source_dir']==source_dir)]
