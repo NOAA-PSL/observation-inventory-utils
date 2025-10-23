@@ -70,23 +70,6 @@ unique_sensor = db_frame[['sensor', 'subsensor', 'source_dir']].value_counts().r
 step=0.05
 height=step*len(unique_sensor)
 
-#check via print statements
-print("check 1")
-print(db_frame['subsensor'].value_counts().head(20))
-print(db_frame[db_frame['subsensor'].str.len() < 3]['parent_dir'].unique())
-
-print("check 2")
-print(len(unique_sensor), "labels vs", db_frame['subsensor'].nunique(), "unique subsensors in frame")
-
-print("check 3")
-print("Missing subsensor count:", len(db_frame[db_frame['subsensor'] == '']))
-
-print("check 4")
-print(unique_sensor)
-
-print("check 5")
-print(db_frame['sensor'])
-
 #make list of sensor&sat labels 
 sensor_sub_labels = []
 for index, row in unique_sensor.iterrows():
@@ -100,8 +83,6 @@ plt.title("Inventory of NNJA Ozone Sensors")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor')
 
-print("check while plotting")
-
 directory_labels = []
 counter=0
 for index, row in unique_sensor.iterrows():
@@ -109,59 +90,23 @@ for index, row in unique_sensor.iterrows():
     dftmp = select_subsensor_dir(row['subsensor'], row['source_dir'], db_frame)
     pandas.options.mode.chained_assignment = 'warn'
 
-    if dftmp.empty:
-        print("Empty subsensor:", row['subsensor'])
-        continue
-    print(f"{row['sensor']} {row['subsensor']} -> {len(dftmp)} records")
-
     dirs = dftmp['source_dir'].unique()
     directory_labels.append(np.array2string(dirs))
-    color = plt.cm.tab20(counter % 20)
-    plot_one_line(dftmp, step/2+step*counter, color)
+    plot_one_line(dftmp, step/2+step*counter)
     counter = counter + 1
-
-print("Lines in figure:", len(ax.lines))
-
-# right after the plotting loop, before setting yticks/yticklabels:
-print("\n--- PER-ARTIST LINE INSPECTION ---")
-for i, line in enumerate(ax.lines):
-    y = np.asarray(line.get_ydata())
-    x = np.asarray(line.get_xdata())
-    mean_y = float(np.nanmean(y)) if len(y) else float('nan')
-    nonzero = np.count_nonzero(y)
-    xmin, xmax = (np.nanmin(x) if len(x) else np.nan, np.nanmax(x) if len(x) else np.nan)
-    print(f"line {i:02d}: mean_y={mean_y:.4f}, nonzero_points={nonzero}, x_count={len(x)}, x_range=({xmin}, {xmax})")
-
-import hashlib
-print("\n=== DETAILED AX ARTIST INSPECTION ===")
-for i, line in enumerate(ax.lines):
-    x = np.asarray(line.get_xdata())
-    y = np.asarray(line.get_ydata())
-    # Unique y levels (rounded)
-    uniq_y = np.unique(np.round(y, 6))
-    # compute a simple checksum for x-values to help match to dftmp
-    xs_bytes = np.array2string(x).encode('utf-8')
-    cs = hashlib.md5(xs_bytes).hexdigest()
-    print(f"line {i:02d}: len(x)={len(x)}, nonzero_y_count={np.count_nonzero(y)}, uniq_y={uniq_y}, x_range=({np.nanmin(x) if len(x) else 'NA'} , {np.nanmax(x) if len(x) else 'NA'}), x_checksum={cs}")
-
-print("\nArtist counts:", "lines=", len(ax.lines), "collections=", len(ax.collections), "artists=", len(ax.artists))
-if len(ax.collections) > 0:
-    print("First collection example:", ax.collections[0])
-
-
 
 ax.set_yticks(step/2+step*np.arange(counter))
 ax.set_yticklabels(sensor_sub_labels)
 ax.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
 ax.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax.set_xlim(daterange)
-ax.set_ylim([0-step, height+step])
+ax.set_ylim([0, height])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 ax2 = ax.twinx()
 ax2.set_yticks(step/2+step*np.arange(counter))
 ax2.set_yticklabels(directory_labels)
-ax2.set_ylim([0-step, height+step])
+ax2.set_ylim([0, height])
 ax_dup = ax.twiny()
 ax_dup.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
 ax_dup.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
