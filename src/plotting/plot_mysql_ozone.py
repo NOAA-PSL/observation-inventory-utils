@@ -22,8 +22,8 @@ args = parser.parse_args()
 #parameters
 daterange=[date(1975,1,1), date(2026,1,1)]
 
-def plot_one_line(dftmp, yloc):
-    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
+def plot_one_line(dftmp, yloc, color='black'):
+    plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color=color,markersize=5)
 
 def select_subsensor_dir(subsensor, source_dir, db_frame):
     dftmp = db_frame.loc[(db_frame['subsensor']==subsensor)  & (db_frame['source_dir']==source_dir)]
@@ -115,7 +115,8 @@ for index, row in unique_sensor.iterrows():
 
     dirs = dftmp['source_dir'].unique()
     directory_labels.append(np.array2string(dirs))
-    plot_one_line(dftmp, step/2+step*counter)
+    color = plt.cm.tab20(counter % 20)
+    plot_one_line(dftmp, step/2+step*counter, color)
     counter = counter + 1
 
 print("Lines in figure:", len(ax.lines))
@@ -129,6 +130,23 @@ for i, line in enumerate(ax.lines):
     nonzero = np.count_nonzero(y)
     xmin, xmax = (np.nanmin(x) if len(x) else np.nan, np.nanmax(x) if len(x) else np.nan)
     print(f"line {i:02d}: mean_y={mean_y:.4f}, nonzero_points={nonzero}, x_count={len(x)}, x_range=({xmin}, {xmax})")
+
+import hashlib
+print("\n=== DETAILED AX ARTIST INSPECTION ===")
+for i, line in enumerate(ax.lines):
+    x = np.asarray(line.get_xdata())
+    y = np.asarray(line.get_ydata())
+    # Unique y levels (rounded)
+    uniq_y = np.unique(np.round(y, 6))
+    # compute a simple checksum for x-values to help match to dftmp
+    xs_bytes = np.array2string(x).encode('utf-8')
+    cs = hashlib.md5(xs_bytes).hexdigest()
+    print(f"line {i:02d}: len(x)={len(x)}, nonzero_y_count={np.count_nonzero(y)}, uniq_y={uniq_y}, x_range=({np.nanmin(x) if len(x) else 'NA'} , {np.nanmax(x) if len(x) else 'NA'}), x_checksum={cs}")
+
+print("\nArtist counts:", "lines=", len(ax.lines), "collections=", len(ax.collections), "artists=", len(ax.artists))
+if len(ax.collections) > 0:
+    print("First collection example:", ax.collections[0])
+
 
 
 ax.set_yticks(step/2+step*np.arange(counter))
