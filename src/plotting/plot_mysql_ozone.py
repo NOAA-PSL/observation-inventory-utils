@@ -82,7 +82,10 @@ plt.close('all')
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title("Inventory of NNJA Ozone Sensors")
+if args.inverse:
+    plt.title("Inventory of NNJA Ozone Sensors with Zero Obs Count Files")
+else:
+    plt.title("Inventory of NNJA Ozone Sensors")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor')
 
