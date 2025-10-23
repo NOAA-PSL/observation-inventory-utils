@@ -83,6 +83,9 @@ print("Missing subsensor count:", len(db_frame[db_frame['subsensor'] == '']))
 print("check 4")
 print(unique_sensor)
 
+print("check 5")
+print(db_frame['sensor'])
+
 #make list of sensor&sat labels 
 sensor_sub_labels = []
 for index, row in unique_sensor.iterrows():
