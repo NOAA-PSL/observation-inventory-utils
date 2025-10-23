@@ -120,6 +120,17 @@ for index, row in unique_sensor.iterrows():
 
 print("Lines in figure:", len(ax.lines))
 
+# right after the plotting loop, before setting yticks/yticklabels:
+print("\n--- PER-ARTIST LINE INSPECTION ---")
+for i, line in enumerate(ax.lines):
+    y = np.asarray(line.get_ydata())
+    x = np.asarray(line.get_xdata())
+    mean_y = float(np.nanmean(y)) if len(y) else float('nan')
+    nonzero = np.count_nonzero(y)
+    xmin, xmax = (np.nanmin(x) if len(x) else np.nan, np.nanmax(x) if len(x) else np.nan)
+    print(f"line {i:02d}: mean_y={mean_y:.4f}, nonzero_points={nonzero}, x_count={len(x)}, x_range=({xmin}, {xmax})")
+
+
 ax.set_yticks(step/2+step*np.arange(counter))
 ax.set_yticklabels(sensor_sub_labels)
 ax.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
