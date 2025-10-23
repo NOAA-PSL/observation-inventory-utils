@@ -17,13 +17,16 @@ import plot_utils as utils
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
+parser.add_argument("-invert", dest='inverse', help='Use this flag to invert the plot to only show files with 0 obs count', default=False, type=bool)
 args = parser.parse_args()
 
 #parameters
 daterange=[date(1975,1,1), date(2026,1,1)]
 
-def plot_one_line(dftmp, yloc, color='black'):
+def plot_one_line(dftmp, yloc, color='black', plot_inverse=False):
     mask = dftmp.obs_count.astype('bool')
+    if plot_inverse:
+        mask = ~mask
     plt.plot(dftmp.datetime[mask], yloc*np.ones(mask.sum()),'|',color=color,markersize=5)
 
 def select_subsensor_dir(subsensor, source_dir, db_frame):
@@ -83,6 +86,12 @@ plt.title("Inventory of NNJA Ozone Sensors")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor')
 
+invert_plot = False
+color = 'black'
+if args.inverse:
+    color = 'red'
+    invert_plot = True
+
 directory_labels = []
 counter=0
 for index, row in unique_sensor.iterrows():
@@ -92,7 +101,7 @@ for index, row in unique_sensor.iterrows():
 
     dirs = dftmp['source_dir'].unique()
     directory_labels.append(np.array2string(dirs))
-    plot_one_line(dftmp, step/2+step*counter)
+    plot_one_line(dftmp, step/2+step*counter, color, invert_plot)
     counter = counter + 1
 
 ax.set_yticks(step/2+step*np.arange(counter))
