@@ -80,6 +80,9 @@ print(len(unique_sensor), "labels vs", db_frame['subsensor'].nunique(), "unique 
 print("check 3")
 print("Missing subsensor count:", len(db_frame[db_frame['subsensor'] == '']))
 
+print("check 4")
+print(unique_sensor)
+
 #make list of sensor&sat labels 
 sensor_sub_labels = []
 for index, row in unique_sensor.iterrows():
@@ -92,10 +95,6 @@ ax = fig.add_axes([0, 0.1, 1, height+step])
 plt.title("Inventory of NNJA Ozone Sensors")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor')
-
-fnout=os.path.join(args.out_dir,"blank_hopefully.png")
-print(f"saving {fnout}")
-plt.savefig(fnout, bbox_inches='tight')
 
 print("check while plotting")
 
@@ -123,13 +122,13 @@ ax.set_yticklabels(sensor_sub_labels)
 ax.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
 ax.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax.set_xlim(daterange)
-ax.set_ylim([0, height])
+ax.set_ylim([0, height+step])
 ax.grid(which='major',color='grey', linestyle='-', linewidth=0.5)
 ax.grid(which='minor', color='grey', linestyle='--', linewidth=0.2)
 ax2 = ax.twinx()
 ax2.set_yticks(step/2+step*np.arange(counter))
 ax2.set_yticklabels(directory_labels)
-ax2.set_ylim([0, height])
+ax2.set_ylim([0, height+step])
 ax_dup = ax.twiny()
 ax_dup.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
 ax_dup.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
