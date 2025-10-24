@@ -27,7 +27,7 @@ def plot_one_line(dftmp, yloc, color='black', plot_inverse=False):
     mask = dftmp.obs_count.astype('bool')
     if plot_inverse:
         mask = ~mask
-    plt.plot(dftmp.datetime[mask], yloc*np.ones(mask.sum()),'|',color=color,markersize=1)
+    plt.plot(dftmp.datetime[mask], yloc*np.ones(mask.sum()),'|',color=color,markersize=5)
 
 def select_subsensor_dir(subsensor, source_dir, db_frame):
     dftmp = db_frame.loc[(db_frame['subsensor']==subsensor)  & (db_frame['source_dir']==source_dir)]
