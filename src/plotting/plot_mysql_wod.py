@@ -51,7 +51,7 @@ fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
 if args.inverse:
-    plt.title("Inventory of NNJA WOD Ocean Sensors with Zero Obs Count")
+    plt.title("Inventory of NNJA WOD Ocean Sensors with any Zero Obs Count Variable")
 else:
     plt.title("Inventory of NNJA WOD Ocean Sensors")
 plt.xlabel('Observation Date')
