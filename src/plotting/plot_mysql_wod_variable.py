@@ -16,13 +16,16 @@ import re
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
+parser.add_argument("-invert", dest='inverse', help='Use this flag to invert the plot to only show files with 0 obs count', default=False, type=bool)
 args = parser.parse_args()
 
 #parameters
 daterange=[date(1970,1,1), date(2026,1,1)]
 
-def plot_one_line(dftmp, yloc, color='black'):
+def plot_one_line(dftmp, yloc, color='black', plot_inverse=False):
     mask = dftmp.var_count.astype('bool')
+    if plot_inverse:
+        mask = ~mask
     plt.plot(dftmp.datetime[mask], yloc*np.ones(mask.sum()),'|',color=color,markersize=5)
 
 def select_sensor(sensor, db_frame):
@@ -61,9 +64,18 @@ print(f"Identified {len(sensor_var_labels)} unique sensor, variable combinations
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title("Inventory of NNJA WOD Ocean Sensors by Variable")
+if args.inverse:
+    plt.title("Inventory of NNJA WOD Ocean Sensors by Variable with Zero Obs Count")
+else:
+    plt.title("Inventory of NNJA WOD Ocean Sensors by Variable")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Variable')
+
+invert_plot = False
+color = 'black'
+if args.inverse:
+    color = 'red'
+    invert_plot = True
 
 directory_labels = []
 counter=0
@@ -75,7 +87,7 @@ for index, row in unique_sensor_variable.iterrows():
 
     dirs = dftmp['source_dir'].unique()
     directory_labels.append(np.array2string(dirs))
-    plot_one_line(dftmp, step/2+step*counter)
+    plot_one_line(dftmp, step/2+step*counter, color, invert_plot)
     counter = counter + 1
 
 ax.set_yticks(step/2+step*np.arange(counter))
@@ -96,9 +108,14 @@ ax_dup.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax_dup.set_xlim(daterange)
 
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = "wod_line_obs_inventory_sensor_var.png"
-if args.dev:
-    file_name = "wod_line_obs_inventory_sensor_var_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+if args.inverse:
+    file_name = "wod_line_obs_inventory_sensor_var_inverted.png"
+    if args.dev:
+        file_name = "wod_line_obs_inventory_sensor_var_inverted_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+else:
+    file_name = "wod_line_obs_inventory_sensor_var.png"
+    if args.dev:
+        file_name = "wod_line_obs_inventory_sensor_var_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
