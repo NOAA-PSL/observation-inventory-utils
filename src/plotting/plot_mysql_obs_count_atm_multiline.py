@@ -101,7 +101,7 @@ def get_category(row):
 
 def get_variable(row):
     variable = row['variable']
-    for cat in args.cat_list:
+    for cat in args.conv_cat_list:
         if variable in variable_dicts.get(cat, set()):
             return cat
     return None
