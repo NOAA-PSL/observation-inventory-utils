@@ -200,6 +200,9 @@ total_series = combined_df.groupby('date_only')['rolling_avg'].sum()
 smoothed_total = total_series.rolling(window=args.window, min_periods=1).mean().reset_index()
 ax.plot(smoothed_total['date_only'], smoothed_total['rolling_avg'], label='Total', color='black', linestyle='--', linewidth=3)
 
+print(combined_df)
+print(smoothed_total)
+
 ax.set_title(f'{args.title}', fontsize = 18) #16
 ax.set_xlabel('Observation Day', fontsize = 17) #14
 ax.set_ylabel('Average Daily Observation Count', fontsize = 17) #14
