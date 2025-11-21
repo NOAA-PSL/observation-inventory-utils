@@ -33,7 +33,7 @@ def plot_one_line(satinfo, dftmp, yloc):
     satinfo_tmp['datetime']=pandas.date_range(start='1/1/1900', end='1/1/2050')
     satinfo_tmp['status_nan']=f(satinfo_tmp.datetime.to_numpy().astype('float')).tolist()
     
-    plt.plot(satinfo_tmp.datetime, yloc*satinfo_tmp.status_nan,'b')
+    plt.plot(satinfo_tmp.datetime, yloc*satinfo_tmp.status_nan,'#1f77b4')
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
     plt.plot(dftmp.datetime, yloc*dftmp.active,'|',color='#1f77b4',markersize=5)
 
