@@ -51,7 +51,7 @@ category_titles = {
     'micro_imagers': 'Microwave Imagers', 
     'micro_sounders': 'Microwave Sounders', 
     'ozone': 'Ozone',
-    'polar_orbit_BT': 'Polar Orbiting Brightness Temperature',
+    'polar_orbit_BT': 'Polar Orbiting BT',
     'tovs': 'TOVS',
     'atovs': 'ATOVS',
     'post-atovs': 'Post-ATOVS',
@@ -157,7 +157,7 @@ ax.tick_params(labelsize=16)
 
 # Add grid and legend
 ax.grid(True)
-ax.legend(fontsize = 14) #11
+ax.legend(fontsize = 16) #11
 
 plt.tight_layout()
 file_name = f"atm_time_series_combo_sum_{args.window}_days.png"
