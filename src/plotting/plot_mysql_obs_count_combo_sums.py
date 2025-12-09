@@ -129,7 +129,7 @@ grouped_df['rolling_avg'] = grouped_df.groupby('category')['obs_count'].transfor
 unique_categories = grouped_df['category'].unique()
 
 # Create the plot
-fig, ax = plt.subplots(figsize=(14, 10))  # Increase figure width
+fig, ax = plt.subplots(figsize=(12, 8))  # Increase figure width
 
 for category in unique_categories:
     single_category_df = grouped_df[(grouped_df['category'] == category)]
@@ -157,7 +157,7 @@ ax.tick_params(labelsize=16)
 
 # Add grid and legend
 ax.grid(True)
-ax.legend(fontsize = 16) #11
+ax.legend(fontsize = 14) #11
 
 plt.tight_layout()
 file_name = f"atm_time_series_combo_sum_{args.window}_days.png"
