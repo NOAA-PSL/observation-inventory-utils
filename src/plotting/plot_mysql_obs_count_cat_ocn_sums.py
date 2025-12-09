@@ -110,7 +110,7 @@ grouped_df['rolling_avg'] = grouped_df.groupby('variable')['var_count'].transfor
 unique_variables = grouped_df['variable'].unique()
 
 # Create the plot
-fig, ax = plt.subplots(figsize=(10, 8))  # Increase figure width
+fig, ax = plt.subplots(figsize=(12, 8))  # Increase figure width
 
 if args.variables == None:
     for variable in unique_variables:
@@ -130,9 +130,9 @@ smoothed_total = total_series.rolling(window=args.window, min_periods=1).mean().
 # Plot the total line
 ax.plot(smoothed_total['date_only'], smoothed_total['rolling_avg'], label='Total', color='black', linestyle='--', linewidth=3)
 
-ax.set_title(f'{args.title}', fontsize = 18) #16
-ax.set_xlabel('Observation Day', fontsize = 17)
-ax.set_ylabel('Average Daily Observation Count', fontsize = 17)
+ax.set_title(f'{args.title}', fontsize = 20) #16
+ax.set_xlabel('Observation Day', fontsize = 18)
+ax.set_ylabel('Average Daily Observation Count', fontsize = 18)
 ax.set_yscale('log')  # log10 y-axis
 ax.set_xlim(daterange)
 # Formatting the x-axis for dates (display only the year)
@@ -140,11 +140,11 @@ ax.xaxis.set_major_locator(mdates.YearLocator(5))  # Major ticks every year
 ax.xaxis.set_minor_locator(mdates.YearLocator())  # Minor ticks every month
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Format major ticks as years
 plt.xticks(rotation=45, ha='right')
-ax.tick_params(labelsize=12)
+ax.tick_params(labelsize=16)
 
 # Add grid and legend
 ax.grid(True)
-ax.legend(fontsize = 12)
+ax.legend(fontsize = 16)
 
 plt.tight_layout()
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
