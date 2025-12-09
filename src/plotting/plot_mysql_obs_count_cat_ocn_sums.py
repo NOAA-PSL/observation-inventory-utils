@@ -147,7 +147,7 @@ ax.grid(True)
 ax.legend(fontsize = 16)
 
 plt.tight_layout()
-plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
+#plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
 file_name = f"{args.category}_v{args.ioda_version}_sum_{args.window}_count_variables.png"
 if args.dev:
     file_name = f"{args.category}_v{args.ioda_version}_sum_{args.window}_count_variables_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
