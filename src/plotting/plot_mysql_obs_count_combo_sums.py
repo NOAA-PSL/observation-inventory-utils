@@ -157,7 +157,7 @@ ax.tick_params(labelsize=16)
 
 # Add grid and legend
 ax.grid(True)
-ax.legend(fontsize = 16, loc='upper left') #11
+ax.legend(fontsize = 14, loc='upper left') #11
 
 plt.tight_layout()
 file_name = f"atm_time_series_combo_sum_{args.window}_days.png"
