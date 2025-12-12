@@ -111,9 +111,9 @@ amv_merged = InventoryInfo(
     s3_prefix='observations/reanalysis/amv/merged/%Y/%m/bufr/',
     files='gdas.%z.satwnd.tm00.bufr_d',
     inv_cmd=au.NCEPLIBS_SINV,
-    platform=au.PRIVATE_EUMETSAT_PLATFORM,
+    platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_6H,
-    s3_bucket=au.PRIVATE_EUMETSAT_BUCKET,
+    s3_bucket=au.REANALYSIS_BUCKET,
 )
 
 amv_satwnd = InventoryInfo(
@@ -476,6 +476,18 @@ gmi_nasa_gmiv7 = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
+gmi_nasa_gmiv7_2210 = InventoryInfo(
+    obs_name='gmi_nasa_gmiv7_2210',
+    key='observations/reanalysis/gmi/nasa/gmi_v7/%Y/%m/bufr/gmi_L1CR.%Y%m%d.t%Hz.bufr',
+    start='20221001T000000Z',
+    s3_prefix='observations/reanalysis/gmi/nasa/gmi_v7/%Y/%m/bufr/',
+    files='gmi_L1CR.%z.bufr',
+    inv_cmd=au.NCEPLIBS_SINV,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 gps_eumetsat = InventoryInfo(
     obs_name='gps_eumetsat',
     key='observations/reanalysis/gps/eumetsat/%Y/%m/bufr/gdas.%Y%m%d.t%Hz.gpsro.tm00.bufr_d',
@@ -483,9 +495,9 @@ gps_eumetsat = InventoryInfo(
     s3_prefix='observations/reanalysis/gps/eumetsat/%Y/%m/bufr/',
     files='gdas.%z.gpsro.tm00.bufr_d',
     inv_cmd=au.NCEPLIBS_SINV,
-    platform=au.PRIVATE_EUMETSAT_PLATFORM,
+    platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_6H,
-    s3_bucket=au.PRIVATE_EUMETSAT_BUCKET,
+    s3_bucket=au.REANALYSIS_BUCKET,
 )
 
 gps_gpsro = InventoryInfo(
@@ -711,9 +723,9 @@ ssmi_eumetsat = InventoryInfo(
     s3_prefix='observations/reanalysis/ssmi/eumetsat/%Y/%m/bufr/',
     files='gdas.%z.ssmit.tm00.bufr_d',
     inv_cmd=au.NCEPLIBS_SINV,
-    platform=au.PRIVATE_EUMETSAT_PLATFORM,
+    platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_6H,
-    s3_bucket=au.PRIVATE_EUMETSAT_BUCKET,
+    s3_bucket=au.REANALYSIS_BUCKET,
 )
 
 ssmi_ssmit = InventoryInfo(
@@ -735,9 +747,9 @@ ssmis_eumetsat = InventoryInfo(
     s3_prefix='observations/reanalysis/ssmis/eumetsat/%Y/%m/bufr/',
     files='gdas.%z.ssmisu.tm00.bufr_d',
     inv_cmd=au.NCEPLIBS_SINV,
-    platform=au.PRIVATE_EUMETSAT_PLATFORM,
+    platform=au.CLEAN_PLATFORM,
     cycling_interval=au.CYCLING_6H,
-    s3_bucket=au.PRIVATE_EUMETSAT_BUCKET,
+    s3_bucket=au.REANALYSIS_BUCKET,
 )
 
 ssmis_ssmisu = InventoryInfo(
@@ -782,9 +794,7 @@ atm_infos = [airs_airsev, airs_aqua, amsr2_nasa, amsre_nasa, amsua_1bamua, amsua
              conv_convbufr_ascatt, conv_convbufr_ascatw, conv_convbufr_goesnd, conv_convbufr_hdob, conv_convbufr_proflr, conv_convbufr_rassda, conv_convbufr_satwnd, 
              conv_convbufr_sfcshp, conv_convbufr_vadwnd,conv_convbufr_wdsatr,
              conv_prepbufr_acft_profiles, conv_prepbufr, cris_cris, cris_crisf4, geo_ahicsr, geo_geoimr, geo_goesfv, geo_goesnd, geo_gsrasr, geo_gsrcsr,
-             gmi_nasa_gmiv7, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4, iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_cfsr, 
+             gmi_nasa_gmiv7, gmi_nasa_gmiv7_2210, gps_gpsro, hirs_1bhrs2, hirs_1bhrs3, hirs_1bhrs4, iasi_mtiasi, mhs_1bmhs, msu_1bmsu, ozone_cfsr, 
              ozone_nasa_sbuv_v87, ozone_ncep_gome, ozone_ncep_mls, ozone_ncep_omi, ozone_ncep_ompslp,
              ozone_ncep_ompsn8, ozone_ncep_ompst8, saphir_saphir, seviri_sevasr, seviri_sevcsr,
-             ssmi_ssmit, ssmis_ssmisu, ssu_1bssu, trmm_nasa_tmi]
-
-atm_private_infos = [amv_merged, gps_eumetsat, ssmi_eumetsat, ssmis_eumetsat]
+             ssmi_ssmit, ssmis_ssmisu, ssu_1bssu, trmm_nasa_tmi, amv_merged, gps_eumetsat, ssmi_eumetsat, ssmis_eumetsat]
