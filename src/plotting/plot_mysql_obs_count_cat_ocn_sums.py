@@ -106,8 +106,10 @@ grouped_df = grouped_df.sort_values(by='date_only')
 
 grouped_df['rolling_avg'] = grouped_df.groupby('variable')['var_count'].transform(lambda x: x.rolling(window=args.window, min_periods=1).mean())
 
-date_79 = '1979-12-31'
-print(grouped_df[grouped_df['date_only'] == date_79])
+date_00_01 = '2000-01-01'
+date_00_12 = '2000-12-31'
+print(grouped_df[grouped_df['date_only'] == date_00_01])
+print(grouped_df[grouped_df['date_only'] == date_00_12])
 
 # Get unique variables
 unique_variables = grouped_df['variable'].unique()
