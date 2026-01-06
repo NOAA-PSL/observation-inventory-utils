@@ -86,8 +86,6 @@ grouped_df = grouped_df.sort_values(by=['category','date_only'])
 
 grouped_df['rolling_avg'] = grouped_df.groupby('category')['tot'].transform(lambda x: x.rolling(window=args.window, min_periods=1).mean())
 
-print(grouped_df)
-
 # Get unique sensors
 unique_categories = grouped_df['category'].unique()
 

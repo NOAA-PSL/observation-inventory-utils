@@ -106,9 +106,6 @@ grouped_df = grouped_df.sort_values(by='date_only')
 
 grouped_df['rolling_avg'] = grouped_df.groupby('category')['var_count'].transform(lambda x: x.rolling(window=args.window, min_periods=1).mean())
 
-date_19 = '2019-12-31'
-print(grouped_df[grouped_df['date_only'] == date_19])
-
 # Get unique sensors
 unique_categories = grouped_df['category'].unique()
 
