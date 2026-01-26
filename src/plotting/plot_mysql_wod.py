@@ -15,13 +15,17 @@ import obs_inv_utils.inventory_table_factory as itf
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
+parser.add_argument("-invert", dest='inverse', help='Use this flag to invert the plot to only show files with 0 obs count', default=False, type=bool)
 args = parser.parse_args()
 
 #parameters
 daterange=[date(1970,1,1), date(2026,1,1)]
 
-def plot_one_line(dftmp, yloc):
-    plt.plot(dftmp.datetime, yloc*dftmp.var_count.astype('bool'),'|',color='black',markersize=5)
+def plot_one_line(dftmp, yloc, color='black', plot_inverse=False):
+    mask = dftmp.var_count.astype('bool')
+    if plot_inverse:
+        mask = ~mask
+    plt.plot(dftmp.datetime[mask], yloc*np.ones(mask.sum()),'|',color=color,markersize=5)
 
 def select_sensor(sensor, db_frame):
     dftmp = db_frame.loc[db_frame['sensor']==sensor]
@@ -46,9 +50,18 @@ for index, row in unique_sensor.iterrows():
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title("Inventory of NNJA WOD Ocean Sensors")
+if args.inverse:
+    plt.title("Inventory of NNJA WOD Ocean Sensors with any Zero Obs Count Variable")
+else:
+    plt.title("Inventory of NNJA WOD Ocean Sensors")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor')
+
+invert_plot = False
+color = 'black'
+if args.inverse:
+    color = 'red'
+    invert_plot = True
 
 counter=0
 # for index, row in unique_sat_id.iterrows():
@@ -57,7 +70,7 @@ for index, row in unique_sensor.iterrows():
     dftmp = select_sensor(row['sensor'], db_frame)
     pandas.options.mode.chained_assignment = 'warn'
 
-    plot_one_line(dftmp, step/2+step*counter)
+    plot_one_line(dftmp, step/2+step*counter, color, invert_plot)
     counter = counter + 1
 
 ax.set_yticks(step/2+step*np.arange(counter))
@@ -74,9 +87,14 @@ ax_dup.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax_dup.set_xlim(daterange)
 
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = "wod_line_observations_inventory_sensor.png"
-if args.dev:
-    file_name = "wod_line_observations_inventory_sensor_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+if args.inverse:
+    file_name = "wod_line_observations_inventory_sensor_inverted.png"
+    if args.dev:
+        file_name = "wod_line_observations_inventory_sensor_inverted_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+else:
+    file_name = "wod_line_observations_inventory_sensor.png"
+    if args.dev:
+        file_name = "wod_line_observations_inventory_sensor_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')

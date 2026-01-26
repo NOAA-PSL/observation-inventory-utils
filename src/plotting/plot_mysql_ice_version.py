@@ -21,8 +21,9 @@ args = parser.parse_args()
 #parameters
 daterange=[date(1970,1,1), date(2026,1,1)]
 
-def plot_one_line(dftmp, yloc):
-    plt.plot(dftmp.datetime, yloc*dftmp.var_count.astype('bool'),'|',color='black',markersize=5)
+def plot_one_line(dftmp, yloc, color='black'):
+    mask = dftmp.var_count.astype('bool')
+    plt.plot(dftmp.datetime[mask], yloc*np.ones(mask.sum()),'|',color=color,markersize=5)
 
 def select_sensor_dir_version(sensor, source_dir, ioda_version, db_frame):
     dftmp = db_frame.loc[(db_frame['sensor']==sensor) & (db_frame['source_dir']==source_dir) & (db_frame['ioda_version']==ioda_version)]

@@ -7,10 +7,11 @@ import pandas , matplotlib.pyplot as plt
 from datetime import datetime, date
 import matplotlib.dates as mdates
 import os
+from scipy import interpolate
 import argparse
-import plot_utils as utils
 import obs_inv_utils.inventory_table_factory as itf
 import re
+import plot_utils as utils
 
 #argparse section
 parser = argparse.ArgumentParser()
@@ -20,21 +21,26 @@ parser.add_argument("-invert", dest='inverse', help='Use this flag to invert the
 args = parser.parse_args()
 
 #parameters
-daterange=[date(1970,1,1), date(2026,1,1)]
+daterange=[date(1975,1,1), date(2026,1,1)]
 
 def plot_one_line(dftmp, yloc, color='black', plot_inverse=False):
-    mask = dftmp.var_count.astype('bool')
+    mask = dftmp.obs_count.astype('bool')
     if plot_inverse:
         mask = ~mask
     plt.plot(dftmp.datetime[mask], yloc*np.ones(mask.sum()),'|',color=color,markersize=5)
+
+def select_subsensor_dir(subsensor, source_dir, db_frame):
+    dftmp = db_frame.loc[(db_frame['subsensor']==subsensor)  & (db_frame['source_dir']==source_dir)]
+    return dftmp
 
 def select_sensor(sensor, db_frame):
     dftmp = db_frame.loc[db_frame['sensor']==sensor]
     return dftmp
 
-def select_sensor_variable(sensor, variable, db_frame):
-    dftmp = db_frame.loc[(db_frame['sensor']==sensor) & (db_frame['variable']==variable)]
-    return dftmp
+def get_sensor(row):
+    directory = row['parent_dir']
+    sensor = directory.split("/")[2]
+    return sensor
 
 def get_source_dir(row):
     directory = row['parent_dir']
@@ -42,34 +48,46 @@ def get_source_dir(row):
     source_dir = re.split("/[12][90][0-9][0-9]/[01][0-9]/", directory)[0]
     return source_dir
 
+def get_subsensor(row):
+    source_dir = get_source_dir(row)
+    subsensor = source_dir.split("/")[-1]
+    return subsensor
 
 #read data from sql database of obs counts
-db_frame = utils.get_wod_nc()
+db_frame1 = utils.get_distinct_bufr_by_sensors(['observations/reanalysis/ozone/'])
+db_frame2 = utils.get_ozone_nc()
+
+db_frame = pandas.concat([db_frame1, db_frame2], axis=0, ignore_index=True)
 
 db_frame['datetime'] = pandas.to_datetime(db_frame.obs_day)
+db_frame['sensor'] = db_frame.apply(get_sensor, axis=1)
+db_frame['subsensor'] = db_frame.apply(get_subsensor, axis=1)
 db_frame['source_dir'] = db_frame.apply(get_source_dir, axis=1)
 
-#loop and plot sensors
-unique_sensor_variable = db_frame[['sensor','variable']].value_counts().reset_index(name='count').sort_values(by = ['sensor', 'variable'], ascending=[False, False])
+db_frame.loc[db_frame['sat_id_name'].isin(['METOP-1', 'METOP-1 (Metop-B']), 'sat_id_name'] = 'METOP-B'
+db_frame.loc[db_frame['sat_id_name'].isin(['METOP-2', 'METOP-2 (Metop-A']), 'sat_id_name'] = 'METOP-A'
+db_frame.loc[db_frame['sat_id_name'].isin(['METOP-3', 'METOP-3 (Metop-C']), 'sat_id_name'] = 'METOP-C'
+
+#loop and plot sensors/sat_ids
+unique_sensor = db_frame[['sensor', 'subsensor', 'source_dir']].value_counts().reset_index(name='count').sort_values(by = ['subsensor', 'source_dir'], ascending=[False, False])
 step=0.05
-height=step*len(unique_sensor_variable)
+height=step*len(unique_sensor)
 
-#make list of sensor labels
-sensor_var_labels = []
-for index, row in unique_sensor_variable.iterrows():
-    sensor_var_labels.append(str(row.sensor) + " " + str(row.variable))
+#make list of sensor&sat labels 
+sensor_sub_labels = []
+for index, row in unique_sensor.iterrows():
+        sensor_sub_labels.append(row.sensor + " " + str(row.subsensor))
 
-print(f"Identified {len(sensor_var_labels)} unique sensor, variable combinations. Generating plot now")
-
+plt.close('all')
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
 if args.inverse:
-    plt.title("Inventory of NNJA WOD Ocean Sensors by Variable with Zero Obs Count")
+    plt.title("Inventory of NNJA Ozone Sensors with Zero Obs Count Files")
 else:
-    plt.title("Inventory of NNJA WOD Ocean Sensors by Variable")
+    plt.title("Inventory of NNJA Ozone Sensors")
 plt.xlabel('Observation Date')
-plt.ylabel('Sensor & Variable')
+plt.ylabel('Sensor')
 
 invert_plot = False
 color = 'black'
@@ -79,10 +97,9 @@ if args.inverse:
 
 directory_labels = []
 counter=0
-# for index, row in unique_sat_id.iterrows():
-for index, row in unique_sensor_variable.iterrows():
+for index, row in unique_sensor.iterrows():
     pandas.options.mode.chained_assignment = None
-    dftmp = select_sensor_variable(row['sensor'], row['variable'], db_frame)
+    dftmp = select_subsensor_dir(row['subsensor'], row['source_dir'], db_frame)
     pandas.options.mode.chained_assignment = 'warn'
 
     dirs = dftmp['source_dir'].unique()
@@ -91,7 +108,7 @@ for index, row in unique_sensor_variable.iterrows():
     counter = counter + 1
 
 ax.set_yticks(step/2+step*np.arange(counter))
-ax.set_yticklabels(sensor_var_labels)
+ax.set_yticklabels(sensor_sub_labels)
 ax.xaxis.set_major_locator(mdates.YearLocator(5,month=1,day=1))
 ax.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax.set_xlim(daterange)
@@ -109,13 +126,15 @@ ax_dup.set_xlim(daterange)
 
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
 if args.inverse:
-    file_name = "wod_line_obs_inventory_sensor_var_inverted.png"
+    file_name = "ozone_line_observations_inventory_all_sensor_inverted.png"
     if args.dev:
-        file_name = "wod_line_obs_inventory_sensor_var_inverted_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+        file_name = "ozone_line_observations_inventory_all_sensor_inverted_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 else:
-    file_name = "wod_line_obs_inventory_sensor_var.png"
+    file_name = "ozone_line_observations_inventory_all_sensor.png"
     if args.dev:
-        file_name = "wod_line_obs_inventory_sensor_var_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+        file_name = "ozone_line_observations_inventory_all_sensor_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)
 print(f"saving {fnout}")
 plt.savefig(fnout, bbox_inches='tight')
+plt.clf()
+plt.close()
