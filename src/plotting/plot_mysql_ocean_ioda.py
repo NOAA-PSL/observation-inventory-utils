@@ -62,7 +62,7 @@ for index, row in unique_sensor_dir.iterrows():
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title("Inventory of NNJA Ice IODA files")
+plt.title("Inventory of NNJA Ocean IODA files")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor')
 
