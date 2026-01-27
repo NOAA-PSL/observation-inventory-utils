@@ -42,7 +42,7 @@ category_titles = {
 
 
 #parameters
-daterange=[date(1979,1,1), date(date.today().year,1,1)]
+daterange=[date(1979,1,1), date(date.today().year+1,1,1)]
 
 def plot_one_line(dftmp, yloc):
     plt.plot(dftmp.datetime, yloc*dftmp.obs_count.astype('bool'),'|',color='black',markersize=5)
