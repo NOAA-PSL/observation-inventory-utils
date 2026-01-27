@@ -21,7 +21,7 @@ parser.add_argument("-invert", dest='inverse', help='Use this flag to invert the
 args = parser.parse_args()
 
 #parameters
-daterange=[date(1975,1,1), date(2026,1,1)]
+daterange=[date(1975,1,1), date(date.today().year,1,1)]
 
 def plot_one_line(dftmp, yloc, color='black', plot_inverse=False):
     mask = dftmp.obs_count.astype('bool')

@@ -22,7 +22,7 @@ args = parser.parse_args()
 
 #parameters
 satinfo_db_root=args.satinfo_db_root
-daterange=[date(1975,1,1), date(2026,1,1)]
+daterange=[date(1975,1,1), date(date.today().year,1,1)]
 
 def plot_one_line(satinfo, dftmp, yloc):
     f=interpolate.interp1d(satinfo.datetime.to_numpy().astype('float'),

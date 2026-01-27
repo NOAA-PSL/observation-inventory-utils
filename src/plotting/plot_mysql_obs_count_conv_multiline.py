@@ -42,7 +42,7 @@ category_titles = {
 
 
 #parameters
-daterange=[date(1979,1,1), date(2026,1,1)]
+daterange=[date(1979,1,1), date(date.today().year,1,1)]
 
 def select_variable(variable, db_frame):
     dftmp = db_frame.loc[db_frame['variable']==variable]
