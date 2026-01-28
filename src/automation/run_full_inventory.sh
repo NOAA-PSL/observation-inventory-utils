@@ -37,3 +37,6 @@ python3 ../plotting/plot_mysql_sensor_sat_geo.py --sidb $SATINFO_DIR -o $OUTPUT_
 python3 ../plotting/plot_mysql_sensor_sat_gps.py --sidb $SATINFO_DIR -o $OUTPUT_LOC
 python3 ../plotting/plot_mysql_sensor_sat_ozone.py --sidb $OZINFO_DIR -o $OUTPUT_LOC
 python3 ../plotting/plot_mysql_typ.py -o $OUTPUT_LOC 
+python3 ../plotting/plot_mysql_ice.py -o $OUTPUT_LOC
+python3 ../plotting/plot_mysql_ocean_ioda.py -o $OUTPUT_LOC
+python3 ../plotting/plot_mysql_ozone.py -o $OUTPUT_LOC
