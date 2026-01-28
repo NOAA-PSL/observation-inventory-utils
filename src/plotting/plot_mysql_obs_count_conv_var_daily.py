@@ -41,7 +41,7 @@ variable_titles = {
 
 
 #parameters
-daterange=[date(1979,1,1), date(2026,1,1)]
+daterange=[date(1979,1,1), date(date.today().year+1,1,1)]
 
 #read data from sql database of obs counts
 df = utils.get_distinct_prepbufr_by_variable(variable_dicts[args.var])
