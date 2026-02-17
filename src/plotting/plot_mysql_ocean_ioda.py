@@ -64,7 +64,7 @@ fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
 plt.title("Inventory of NNJA Ocean IODA files")
 plt.xlabel('Observation Date')
-plt.ylabel('Sensor')
+plt.ylabel('Variable')
 
 directory_labels = []
 counter=0
@@ -96,7 +96,7 @@ ax_dup.xaxis.set_minor_locator(mdates.YearLocator(1,month=1,day=1))
 ax_dup.set_xlim(daterange)
 
 plt.suptitle(f'accurate as of {datetime.now().strftime("%m/%d/%Y %H:%M:%S")} UTC', y=-0.01)
-file_name = "ocean_ioda_line_observations_inventory_.png"
+file_name = "ocean_ioda_line_observations_inventory.png"
 if args.dev:
     file_name = "ocean_ioda_line_observations_inventory_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
 fnout=os.path.join(args.out_dir,file_name)

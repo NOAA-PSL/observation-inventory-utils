@@ -62,7 +62,7 @@ fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
 plt.title("Inventory of NNJA IODA files")
 plt.xlabel('Observation Date')
-plt.ylabel('Sensor')
+plt.ylabel('Variable')
 
 directory_labels = []
 counter=0
