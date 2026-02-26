@@ -97,10 +97,21 @@ height=step*len(unique_dir_sensor_sats)
 #make list of sensor&sat labels 
 sensor_sat_labels = []
 for index, row in unique_dir_sensor_sats.iterrows():
+    sensor_name = str(row.sensor)
+    if(row.sensor == 'airs'):
+        sensor_name = "AIRS"
+    if(row.sensor == 'cris'):
+        if "crisf4" in row['source_dir']:
+            sensor_name = "CrIS-FSR"
+        else:
+            sensor_name = "CrIS"
+    if(row.sensor == 'iasi'):
+        sensor_name = 'IASI'
+
     if row.sat_id_name.strip():
-        sensor_sat_labels.append(str(row.sensor) +  " " + str(row.sat_id_name))
+        sensor_sat_labels.append(sensor_name +  " " + str(row.sat_id_name))
     else:
-        sensor_sat_labels.append(str(row.sensor) + " " + str(row.sat_id))
+        sensor_sat_labels.append(sensor_name + " " + str(row.sat_id))
 
 print(f"Identified {len(sensor_sat_labels)} unique dir, sensor, sat combos. Generating plot now.")
 
