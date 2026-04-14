@@ -13,6 +13,18 @@ adt_GLORe_cryosat2_v3 = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
+adt_GLORe_ers1_v3 = InventoryInfo(
+    obs_name='adt_GLORe_ers1_v3',
+    key='observations/reanalysis/adt/GLORe/ers1/%Y/%m/iodav3/adt.e1.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='19930101T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/ers1/%Y/%m/iodav3/',
+    files='adt.e1.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 adt_GLORe_ers2_v3 = InventoryInfo(
     obs_name='adt_GLORe_ers2_v3',
     key='observations/reanalysis/adt/GLORe/ers2/%Y/%m/iodav3/adt.e2.%Y%m%d.T%H%M%SZ.iodav3.nc',
