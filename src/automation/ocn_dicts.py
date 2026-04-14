@@ -13,6 +13,18 @@ adt_GLORe_cryosat2_v3 = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET,
 )
 
+adt_GLORe_ers1_v3 = InventoryInfo(
+    obs_name='adt_GLORe_ers1_v3',
+    key='observations/reanalysis/adt/GLORe/ers1/%Y/%m/iodav3/adt.e1.%Y%m%d.T%H%M%SZ.iodav3.nc',
+    start='19930101T000000Z',
+    s3_prefix='observations/reanalysis/adt/GLORe/ers1/%Y/%m/iodav3/',
+    files='adt.e1.%z.iodav3.nc',
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    cycling_interval=au.CYCLING_6H,
+    s3_bucket=au.REANALYSIS_BUCKET,
+)
+
 adt_GLORe_ers2_v3 = InventoryInfo(
     obs_name='adt_GLORe_ers2_v3',
     key='observations/reanalysis/adt/GLORe/ers2/%Y/%m/iodav3/adt.e2.%Y%m%d.T%H%M%SZ.iodav3.nc',
@@ -1009,7 +1021,7 @@ insitu_wod_xbt = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET
 )
 
-ocn_infos = [adt_GLORe_cryosat2_v3, adt_GLORe_ers2_v3, adt_GLORe_GFO_v3, adt_GLORe_jason1_v3, adt_GLORe_jason2_v3, adt_GLORe_jason3_v3, adt_GLORe_n1_v3, 
+ocn_infos = [adt_GLORe_cryosat2_v3, adt_GLORe_ers1_v3, adt_GLORe_ers2_v3, adt_GLORe_GFO_v3, adt_GLORe_jason1_v3, adt_GLORe_jason2_v3, adt_GLORe_jason3_v3, adt_GLORe_n1_v3, 
              adt_GLORe_saral_v3, adt_GLORe_sentinel3a_v3, adt_GLORe_sentinel3b_v3, adt_GLORe_sentinel6a_v3, adt_GLORe_swot_v3, adt_GLORe_topex_poseidon_v3, 
              adt_nesdis_cryosat2_v2, adt_nesdis_cryosat2_v3, adt_nesdis_cryosat2_12_v2, adt_nesdis_cryosat2_12_v3, adt_nesdis_ers1_v2, adt_nesdis_ers1_v3, adt_nesdis_ers2_v2, adt_nesdis_ers2_v3,
              adt_nesdis_jason2_v2, adt_nesdis_jason2_v3, adt_nesdis_jason2_12_v2, adt_nesdis_jason2_12_v3, adt_nesdis_jason3_v2,
