@@ -228,7 +228,7 @@ def parse_filename_regex(filename):
         re.compile(
             r'^(?P<prefix>.+?)\.'
             r'(?P<date_time>\d{8})\.'
-            r'(?P<cycle_tag>t\d{2}z)\.'
+            r'(?P<cycle_tag>[tT]\d{2}[zZ)\.'
             r'(?P<data_format>[^.]+)'
             r'(?:\.(?P<not_restricted_tag>nr))?$'
         ),
@@ -236,7 +236,7 @@ def parse_filename_regex(filename):
         re.compile(
             r'^(?P<prefix>.+?)\.'
             r'(?P<date_time>\d{8})\.'
-            r'(?P<cycle_tag>t\d{2}z)\.'
+            r'(?P<cycle_tag>[tT]\d{2}[zZ])\.'
             r'(?P<suffix>.+?)\.'
             r'(?P<data_format>[^.]+)'
             r'(?:\.(?P<not_restricted_tag>nr))?$'
@@ -260,7 +260,7 @@ def parse_filename_regex(filename):
         re.compile(
             r'^(?P<prefix>.+?)\.'
             r'(?P<date_time>\d{8})_'
-            r'(?P<cycle_tag>\d{2}z)\.'
+            r'(?P<cycle_tag>\d{2}[zZ])\.'
             r'(?P<data_format>[^.]+)'
             r'(?:\.(?P<not_restricted_tag>nr))?$'
         )
