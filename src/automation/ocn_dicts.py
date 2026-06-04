@@ -901,6 +901,18 @@ sst_nesdis_noaa19_v3 = InventoryInfo(
     s3_bucket=au.REANALYSIS_BUCKET
 )
 
+sst_nggodas_avhrr_v3 = InventoryInfo(
+    obs_name='sst_nggodas_avhrr_v3',
+    key='observations/reanalysis/sst/nggodas/avhrr/%Y/%m/6h/netcdf/iodav3/sst.ESACCI20cm.avhrr.%Y%m%d.T%HZ.iodav3.nc',
+    start='19810824T000000Z',
+    s3_prefix='observations/reanalysis/sst/nggodas/avhrr/%Y/%m/6h/netcdf/iodav3/',
+    files='sst.ESACCI20cm.avhrr.%z.iodav3.nc',
+    cycling_interval=au.CYCLING_6H,
+    inv_cmd=au.HV_IODA_META,
+    platform=au.CLEAN_PLATFORM,
+    s3_bucket=au.REANALYSIS_BUCKET
+)
+
 insitu_wod_apb = InventoryInfo(
     obs_name='insitu_wod_apb',
     key='observations/reanalysis/insitu/wod/apb/%Y/%m/wod_apb_%Y-%m-%dT%H.nc',
@@ -1034,5 +1046,5 @@ ocn_infos = [adt_GLORe_cryosat2_v3, adt_GLORe_ers1_v3, adt_GLORe_ers2_v3, adt_GL
              sst_nesdis_gpm_v2, sst_nesdis_gpm_v3, sst_nesdis_metopa_v2, sst_nesdis_metopa_v3, sst_nesdis_noaa07_v2, sst_nesdis_noaa07_v3, 
              sst_nesdis_noaa09_v2, sst_nesdis_noaa09_v3, sst_nesdis_noaa11_v2, sst_nesdis_noaa11_v3, sst_nesdis_noaa12_v2, sst_nesdis_noaa12_v3, 
              sst_nesdis_noaa14_v2, sst_nesdis_noaa14_v3, sst_nesdis_noaa15_v2, sst_nesdis_noaa15_v3, sst_nesdis_noaa16_v2, sst_nesdis_noaa16_v3,
-             sst_nesdis_noaa19_v2, sst_nesdis_noaa19_v3, insitu_wod_apb, insitu_wod_ctd, insitu_wod_drb, insitu_wod_gld, insitu_wod_mbt, insitu_wod_mrb,
+             sst_nesdis_noaa19_v2, sst_nesdis_noaa19_v3, sst_nggodas_avhrr_v3, insitu_wod_apb, insitu_wod_ctd, insitu_wod_drb, insitu_wod_gld, insitu_wod_mbt, insitu_wod_mrb,
              insitu_wod_osd, insitu_wod_pfl, insitu_wod_uor, insitu_wod_xbt]
