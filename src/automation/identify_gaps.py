@@ -6,12 +6,12 @@ import atm_dicts
 import ocn_dicts
 import ice_dicts
 import ozone_dicts
-import obs_inv_utils.obs_inv_cli as cli
+import obs_inv_utils.inventory_table_factory as inv_factory
 
 # ==========================================
 # 1. Configuration & Setup
 # ==========================================
-engine = cli.get_engine()  # Ensure the database engine is initialized
+engine = inv_factory.get_engine()  # Ensure the database engine is initialized
 
 # ==========================================
 # 2. Build the Interval Mapping
