@@ -17,6 +17,7 @@ import plot_utils as utils
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", dest='out_dir', help="output directory for figures",default='figures',type=str)
 parser.add_argument("--sidb", dest='satinfo_db_root', help="root for sat info db files",default='satellites/satinfo/',type=str)
+parser.add_argument("-title", dest='title', help='Title for the plot', type=str, default="Inventory of NNJA Atmosphere Sensors by Satellite")
 parser.add_argument("-dev", dest='dev', help='Use this flag to add a timestamp to the filename for development', default=False, type=bool)
 parser.add_argument("--list", dest="sensor_list", help="List of sensors to include on the plot", type=str, nargs="+")
 args = parser.parse_args()
@@ -107,7 +108,7 @@ print(f"Identified {len(sensor_sat_labels)} unique dir, sensor, sat combos. Gene
 fig = plt.figure(dpi=300)
 fig.patch.set_facecolor('white')
 ax = fig.add_axes([0, 0.1, 1, height+step])
-plt.title("Inventory of NNJA Atmosphere Sensors by Satellite")
+plt.title(f"{args.title}")
 plt.xlabel('Observation Date')
 plt.ylabel('Sensor & Satellite')
 
